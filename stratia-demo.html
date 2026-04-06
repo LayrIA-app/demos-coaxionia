@@ -1345,6 +1345,8 @@ function showS(id){
   var fx=screenFX[id]||['kpis','counters'];
   if(id==='dash'){setTimeout(function(){initChartFact();startIALive();},200);}
   setTimeout(function(){applyScreenFX(fx);},80);
+  var mc=document.getElementById('mainContent');
+  if(mc) mc.scrollTop=0;
 }
 
 function applyScreenFX(fx){

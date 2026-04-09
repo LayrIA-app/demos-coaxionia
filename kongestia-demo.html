@@ -24,7 +24,7 @@ html,body{height:100%;overflow:hidden;font-family:DM Sans,sans-serif;}
 }
 .rs-split{position:absolute;top:0;bottom:0;left:55%;width:1px;background:linear-gradient(180deg,transparent,rgba(26,120,255,.4),transparent);}
 .rs-fbg{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
-.rs-fbg span{position:absolute;font-family:DM Sans,sans-serif;font-weight:700;color:rgba(7,24,48,.04);white-space:nowrap;animation:drift linear infinite;}
+.rs-fbg span{position:absolute;font-family:DM Sans,sans-serif;font-weight:700;color:rgba(7,24,48,.04);white-space:nowrap;animation:drift linear infinite;max-width:120px;overflow:hidden;}
 .rs-inner{display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;width:100%;}
 .rs-logo-wrap{display:flex;align-items:center;gap:16px;margin-bottom:10px;animation:fadeUp .5s ease both;background:#071830;padding:14px 28px;border-radius:50px;box-shadow:0 8px 32px rgba(7,24,48,.3);}
 .rs-logo-icon{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#00C8FF,#1A78FF);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(0,200,255,.4);}
@@ -765,8 +765,43 @@ html,body{height:100%;overflow:hidden;font-family:DM Sans,sans-serif;}
   .tbl th,.tbl td{padding:5px 6px;font-size:.62rem;}
   .tbl th:last-child,.tbl td:last-child{min-width:80px;}
 }
+
+/* ── Hero Director responsive ── */
+@media(max-width:900px){
+  #dir-hero{flex-wrap:wrap;gap:10px;}
+  #dir-hero > div:last-child{max-width:100%;width:100%;box-sizing:border-box;}
+}
+@media(max-width:600px){
+  #dir-hero{padding:10px 12px;gap:8px;}
+  #dir-hero > div:first-child{gap:8px;overflow:hidden;}
+  #dir-hero > div:first-child > div:last-child{display:none !important;}
+  #dir-hero > div:last-child{display:none !important;}
+}
+
+/* ── Gradient text animado en cifras clave ── */
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.kpi-val{
+  background:linear-gradient(90deg,var(--kc,var(--blue)),#00C8FF,var(--kc,var(--blue)));
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:gradShift 3s ease infinite;
+}
+
+/* ── Aurora background en hero Asesor ── */
+@keyframes auroraMove{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+.as-hero{
+  background:linear-gradient(135deg,#071830,#0D3060,#1A78FF,#00C8FF,#0D55CC,#071830) !important;
+  background-size:400% 400% !important;
+  animation:auroraMove 8s ease infinite !important;
+}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
 
@@ -976,7 +1011,7 @@ function makeFbg(el){
   for(let i=0;i<22;i++){
     const s=document.createElement('span');
     s.textContent=fbgItems[i%fbgItems.length];
-    s.style.cssText='left:'+Math.random()*95+'%;top:'+Math.random()*95+'%;font-size:'+(10+Math.random()*10)+'px;animation-duration:'+(18+Math.random()*22)+'s;animation-delay:-'+(Math.random()*22)+'s;';
+    s.style.cssText='left:'+Math.random()*70+'%;top:'+Math.random()*90+'%;font-size:'+(10+Math.random()*10)+'px;animation-duration:'+(18+Math.random()*22)+'s;animation-delay:-'+(Math.random()*22)+'s;overflow:hidden;text-overflow:ellipsis;max-width:100px;';
     el.appendChild(s);
   }
 }
@@ -1059,6 +1094,7 @@ function buildDirectorApp(){
   document.getElementById('mainContent').innerHTML=`
 
   <div class="screen active" id="screen-dash">
+
     <div class="page-hdr">
       <div class="page-hdr-line">
         <h2>Dashboard Ejecutivo</h2>
@@ -1067,6 +1103,13 @@ function buildDirectorApp(){
       <p>Resumen ejecutivo del despacho — actualizado por IA en tiempo real</p>
     </div>
 
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val" data-target="284600" data-prefix="" data-suffix="€">0€</div><div class="kpi-label">Facturación YTD 2026</div><div class="kpi-delta up">▲ +22% vs 2025</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val" data-target="68" data-prefix="" data-suffix="%">0%</div><div class="kpi-label">Margen operativo</div><div class="kpi-delta up">▲ +6 pp con KonGest IA</div></div>
@@ -1172,6 +1215,13 @@ function buildDirectorApp(){
 
   <div class="screen" id="screen-rentabilidad">
     <div class="page-hdr"><h2>Rentabilidad por cliente</h2><p>Margen real por cliente incluyendo tiempo, complejidad e incidencias — calculado por IA</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">68%</div><div class="kpi-label">Margen medio despacho</div><div class="kpi-delta up">▲ +11pp vs sin IA</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">142€/h</div><div class="kpi-label">Ingreso hora efectiva</div><div class="kpi-delta up">▲ +38€/h con KonGest IA</div></div>
@@ -1181,24 +1231,18 @@ function buildDirectorApp(){
     <div class="card mb14">
       <div class="card-title">Rentabilidad real por cliente <span class="card-title-ia">IA</span></div>
       <table class="tbl">
-        <thead><tr><th>Cliente</th><th>Facturado</th><th>Coste real</th><th>Margen</th><th>Horas/mes</th><th>Rentabilidad IA</th></tr></thead>
+        <thead><tr><th>Cliente</th><th>Facturado</th><th>Coste real</th><th>Margen</th><th>Horas/mes</th><th>Rentabilidad IA</th><th>Acción</th></tr></thead>
         <tbody>
-          ${[
-            ['Grupo Inversor Norte','48.200€','14.200€','71%','22h','Alta'],
-            ['Almacenes Valdés S.L.','34.600€','10.800€','69%','18h','Alta'],
-            ['TechPyme S.L.','28.400€','9.400€','67%','24h','Media'],
-            ['Construcciones Arco','19.800€','8.200€','59%','32h','Baja'],
-            ['María González','8.400€','2.100€','75%','8h','Alta'],
-            ['Industrias Clave S.A.','14.200€','9.800€','31%','44h','Muy baja'],
-            ['Restaurantes Bernat','6.800€','5.200€','24%','38h','Muy baja'],
-          ].map(([n,f,c,m,h,r])=>`<tr>
-            <td><strong>${n}</strong></td>
-            <td style="color:#1a9e4a;font-weight:700">${f}</td>
-            <td style="color:#7a8899">${c}</td>
-            <td style="font-weight:700;color:${parseInt(m)>60?'#1a9e4a':parseInt(m)>45?'#e8a010':'#e03030'}">${m}</td>
-            <td style="color:#7a8899">${h}</td>
-            <td><span class="badge ${r==='Alta'?'b-ok':r==='Media'?'b-blue':r==='Baja'?'b-amber':'b-red'}">${r}</span></td>
-          </tr>`).join('')}
+          <tr><td><strong>Grupo Inversor Norte</strong></td><td style="color:#1a9e4a;font-weight:700">48.200€</td><td style="color:#7a8899">14.200€</td><td style="color:#1a9e4a;font-weight:700">71%</td><td>22h</td><td><span class="badge b-ok">Alta</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('propuesta','Grupo Inversor Norte')">Propuesta IA</button></td></tr>
+          <tr><td><strong>Almacenes Valdés S.L.</strong></td><td style="color:#1a9e4a;font-weight:700">34.600€</td><td style="color:#7a8899">10.800€</td><td style="color:#1a9e4a;font-weight:700">69%</td><td>18h</td><td><span class="badge b-ok">Alta</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('propuesta','Almacenes Valdés')">Propuesta IA</button></td></tr>
+          <tr><td><strong>TechPyme S.L.</strong></td><td style="color:#1A78FF;font-weight:700">28.400€</td><td style="color:#7a8899">9.400€</td><td style="color:#1A78FF;font-weight:700">67%</td><td>24h</td><td><span class="badge b-blue">Media</span></td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('honorarios','TechPyme S.L.')">Optimizar IA</button></td></tr>
+          <tr><td><strong>Construcciones Arco</strong></td><td style="color:#e8a010;font-weight:700">19.800€</td><td style="color:#7a8899">11.200€</td><td style="color:#e8a010;font-weight:700">43%</td><td>38h</td><td><span class="badge b-amber">Baja</span></td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('honorarios','Construcciones Arco')">Revisar urgente</button></td></tr>
+          <tr><td><strong>Farmacia Beltrán</strong></td><td style="color:#1a9e4a;font-weight:700">16.400€</td><td style="color:#7a8899">4.900€</td><td style="color:#1a9e4a;font-weight:700">70%</td><td>14h</td><td><span class="badge b-ok">Alta</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('upselling','Farmacia Beltrán')">Upselling IA</button></td></tr>
+          <tr><td><strong>Industrias Clave S.A.</strong></td><td style="color:#1A78FF;font-weight:700">14.200€</td><td style="color:#7a8899">6.800€</td><td style="color:#1A78FF;font-weight:700">52%</td><td>28h</td><td><span class="badge b-blue">Media</span></td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('honorarios','Industrias Clave')">Optimizar IA</button></td></tr>
+          <tr><td><strong>María González</strong></td><td style="color:#1a9e4a;font-weight:700">8.400€</td><td style="color:#7a8899">2.400€</td><td style="color:#1a9e4a;font-weight:700">71%</td><td>9h</td><td><span class="badge b-ok">Alta</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('propuesta','María González')">Propuesta IA</button></td></tr>
+          <tr><td><strong>Transportes Montes</strong></td><td style="color:#e8a010;font-weight:700">7.800€</td><td style="color:#7a8899">5.600€</td><td style="color:#e8a010;font-weight:700">28%</td><td>42h</td><td><span class="badge b-amber">Baja</span></td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('honorarios','Transportes Montes')">Revisar urgente</button></td></tr>
+          <tr><td><strong>Clínica Sur S.L.</strong></td><td style="color:#1a9e4a;font-weight:700">6.200€</td><td style="color:#7a8899">1.900€</td><td style="color:#1a9e4a;font-weight:700">69%</td><td>8h</td><td><span class="badge b-ok">Alta</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('upselling','Clínica Sur')">Upselling IA</button></td></tr>
+          <tr><td><strong>Automoción Pérez</strong></td><td style="color:#e03030;font-weight:700">4.100€</td><td style="color:#7a8899">4.400€</td><td style="color:#e03030;font-weight:700">-7%</td><td>48h</td><td><span class="badge b-red">Negativa</span></td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('honorarios','Automoción Pérez')">Revisar urgente</button></td></tr>
         </tbody>
       </table>
       <div class="ia-box"><div class="ia-box-icon"></div><div class="ia-box-text"><strong>KonGest IA recomienda:</strong> Industrias Clave S.A. y Restaurantes Bernat generan pérdida neta ajustada. IA propone revisión de honorarios o renegociación del contrato de servicio en los próximos 30 días.</div></div>
@@ -1207,6 +1251,13 @@ function buildDirectorApp(){
 
   <div class="screen" id="screen-clientes">
     <div class="page-hdr"><h2>Cartera de clientes</h2><p>Gestión y seguimiento inteligente de toda la cartera</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">142</div><div class="kpi-label">Clientes activos</div><div class="kpi-delta up">▲ +12 este trimestre</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">108</div><div class="kpi-label">Salud fiscal óptima</div><div class="kpi-delta up">▲ 76% de la cartera</div></div>
@@ -1216,24 +1267,18 @@ function buildDirectorApp(){
     <div class="card">
       <div class="card-title">Cartera completa <span class="card-title-ia">IA</span></div>
       <table class="tbl">
-        <thead><tr><th>Cliente</th><th>Tipo</th><th>Asesor</th><th>Régimen</th><th>Último cierre</th><th>Estado IA</th></tr></thead>
+        <thead><tr><th>Cliente</th><th>Tipo</th><th>Servicio</th><th>Facturado</th><th>Alertas IA</th><th>Estado</th><th>Acción</th></tr></thead>
         <tbody>
-          ${[
-            ['Grupo Inversor Norte','Empresa','Laura Sánchez','IS + IVA','Dic 2025','Sano'],
-            ['Almacenes Valdés S.L.','Empresa','Marcos Torres','IS + IVA','Dic 2025','Sano'],
-            ['TechPyme S.L.','Empresa','Laura Sánchez','IS + IVA','Dic 2025','Revisar'],
-            ['Construcciones Arco','Empresa','Ana Castillo','IS + IVA','Dic 2025','Riesgo'],
-            ['María González','Autónomo','Pedro Ruiz','IRPF + IVA','Dic 2025','Sano'],
-            ['Industrias Clave S.A.','Empresa','Marcos Torres','IS + IVA','Dic 2025','Sano'],
-            ['Farmacia Beltrán','Autónomo','Ana Castillo','IRPF + IVA','Dic 2025','Revisar'],
-          ].map(([n,t,a,r,c,e])=>`<tr>
-            <td><strong>${n}</strong></td>
-            <td style="color:#7a8899">${t}</td>
-            <td style="color:#1A78FF">${a}</td>
-            <td style="color:#7a8899;font-size:.72rem">${r}</td>
-            <td style="color:#7a8899">${c}</td>
-            <td><span class="badge ${e==='Sano'?'b-ok':e==='Revisar'?'b-blue':'b-red'}">${e}</span></td>
-          </tr>`).join('')}
+          <tr><td><strong>Grupo Inversor Norte</strong></td><td>Empresa</td><td>Fiscal + Contable</td><td style="color:#1a9e4a;font-weight:700">48.200€</td><td>0</td><td><span class="badge b-ok">Sano</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('upselling','Grupo Inversor Norte')">Upselling IA</button></td></tr>
+          <tr><td><strong>Almacenes Valdés S.L.</strong></td><td>Empresa</td><td>Fiscal + Laboral</td><td style="color:#1a9e4a;font-weight:700">34.600€</td><td>0</td><td><span class="badge b-ok">Sano</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('ver-expediente','Almacenes Valdés')">Ver expediente</button></td></tr>
+          <tr><td><strong>TechPyme S.L.</strong></td><td>Empresa</td><td>Fiscal integral</td><td style="color:#1A78FF;font-weight:700">28.400€</td><td>1</td><td><span class="badge b-blue">Revisar</span></td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('alerta-ia','TechPyme S.L.')">Activar alerta</button></td></tr>
+          <tr><td><strong>Construcciones Arco</strong></td><td>Empresa</td><td>Fiscal + Contable</td><td style="color:#e8a010;font-weight:700">19.800€</td><td>3</td><td><span class="badge b-amber">Riesgo</span></td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('protocolo','Construcciones Arco')">Protocolo IA</button></td></tr>
+          <tr><td><strong>Farmacia Beltrán</strong></td><td>Autónomo</td><td>Contable</td><td style="color:#1a9e4a;font-weight:700">16.400€</td><td>1</td><td><span class="badge b-ok">Sano</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('propuesta','Farmacia Beltrán')">Propuesta IA</button></td></tr>
+          <tr><td><strong>Industrias Clave S.A.</strong></td><td>Empresa</td><td>Fiscal + RRHH</td><td style="color:#1A78FF;font-weight:700">14.200€</td><td>2</td><td><span class="badge b-amber">Riesgo</span></td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('protocolo','Industrias Clave')">Protocolo IA</button></td></tr>
+          <tr><td><strong>María González</strong></td><td>Autónomo</td><td>IRPF + IVA</td><td style="color:#1a9e4a;font-weight:700">8.400€</td><td>0</td><td><span class="badge b-ok">Sano</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('upselling','María González')">Upselling IA</button></td></tr>
+          <tr><td><strong>Transportes Montes</strong></td><td>Empresa</td><td>Contable</td><td style="color:#e8a010;font-weight:700">7.800€</td><td>2</td><td><span class="badge b-amber">Riesgo</span></td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('alerta-ia','Transportes Montes')">Alerta IA</button></td></tr>
+          <tr><td><strong>Clínica Sur S.L.</strong></td><td>Empresa</td><td>Fiscal + Laboral</td><td style="color:#1a9e4a;font-weight:700">6.200€</td><td>0</td><td><span class="badge b-ok">Sano</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('propuesta','Clínica Sur')">Propuesta IA</button></td></tr>
+          <tr><td><strong>Automoción Pérez</strong></td><td>Autónomo</td><td>IRPF + Contable</td><td style="color:#e03030;font-weight:700">4.100€</td><td>1</td><td><span class="badge b-red">Baja</span></td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('retencion','Automoción Pérez')">Retención IA</button></td></tr>
         </tbody>
       </table>
     </div>
@@ -1241,6 +1286,13 @@ function buildDirectorApp(){
 
   <div class="screen" id="screen-equipo">
     <div class="page-hdr"><h2>Equipo</h2><p>Rendimiento y carga de trabajo del equipo en tiempo real</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">4</div><div class="kpi-label">Asesores activos</div><div class="kpi-delta neutral">→ 1 con sobrecarga</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">142€/h</div><div class="kpi-label">Productividad media</div><div class="kpi-delta up">▲ +38€/h con IA</div></div>
@@ -1283,6 +1335,13 @@ function buildDirectorApp(){
         </div>
       </div>
       <p>El despacho gestionado como un negocio — KonGest IA como tu CFO inteligente</p>
+    </div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
     </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">1.38M€</div><div class="kpi-label">Proyección 2026</div><div class="kpi-delta up">▲ +21% sobre objetivo</div></div>
@@ -1328,9 +1387,13 @@ function buildDirectorApp(){
         <thead><tr><th>Cliente</th><th>Riesgo</th><th>Motivo IA</th><th>Probabilidad inspección</th><th>Acción IA</th></tr></thead>
         <tbody>
           <tr><td><strong>Construcciones Arco</strong></td><td><span class="badge b-red">Crítico</span></td><td style="font-size:.72rem;color:#7a8899">IVA deducido atípico · Ratio gastos/ingresos anómalo</td><td style="color:#e03030;font-weight:700">78%</td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('protocolo','Construcciones Arco')">Protocolo IA</button></td></tr>
-          <tr><td><strong>Industrias Clave S.A.</strong></td><td><span class="badge b-red">Crítico</span></td><td style="font-size:.72rem;color:#7a8899">Operaciones vinculadas sin documentar · IS inconsistente</td><td style="color:#e03030;font-weight:700">64%</td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('doc-prev','Industrias Clave')">Documentar IA</button></td></tr>
+          <tr><td><strong>Industrias Clave S.A.</strong></td><td><span class="badge b-red">Crítico</span></td><td style="font-size:.72rem;color:#7a8899">Operaciones vinculadas sin documentar · IS inconsistente</td><td style="color:#e03030;font-weight:700">64%</td><td><button class="tbl-btn tbl-btn-red" onclick="dirAction('doc-prev','Industrias Clave')">Documentar IA</button></td></tr>
           <tr><td><strong>Transportes Montes</strong></td><td><span class="badge b-red">Crítico</span></td><td style="font-size:.72rem;color:#7a8899">Módulos fiscales incompatibles con facturación real</td><td style="color:#e03030;font-weight:700">58%</td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('doc-prev','Transportes Montes')">Documentar IA</button></td></tr>
           <tr><td><strong>Farmacia Beltrán</strong></td><td><span class="badge b-amber">Medio</span></td><td style="font-size:.72rem;color:#7a8899">Retenciones IRPF irregulares Q3-Q4</td><td style="color:#e8a010;font-weight:700">34%</td><td><button class="tbl-btn tbl-btn-green" onclick="dirAction('ver-expediente','Farmacia Beltrán')">Ver corrección</button></td></tr>
+          <tr><td><strong>TechPyme S.L.</strong></td><td><span class="badge b-amber">Medio</span></td><td style="font-size:.72rem;color:#7a8899">Discrepancia entre IS presentado y contabilidad real</td><td style="color:#e8a010;font-weight:700">29%</td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('doc-prev','TechPyme S.L.')">Documentar IA</button></td></tr>
+          <tr><td><strong>Automoción Pérez</strong></td><td><span class="badge b-amber">Medio</span></td><td style="font-size:.72rem;color:#7a8899">Gastos deducibles no justificados · Tickets sin digitalizar</td><td style="color:#e8a010;font-weight:700">24%</td><td><button class="tbl-btn tbl-btn-amber" onclick="dirAction('doc-prev','Automoción Pérez')">Documentar IA</button></td></tr>
+          <tr><td><strong>Grupo Inversor Norte</strong></td><td><span class="badge b-blue">Bajo</span></td><td style="font-size:.72rem;color:#7a8899">Operación inmobiliaria pendiente de declarar en próximo IS</td><td style="color:#1A78FF;font-weight:700">12%</td><td><button class="tbl-btn tbl-btn-blue" onclick="dirAction('ver-expediente','Grupo Inversor Norte')">Ver detalle</button></td></tr>
+          <tr><td><strong>Clínica Sur S.L.</strong></td><td><span class="badge b-ok">Bajo</span></td><td style="font-size:.72rem;color:#7a8899">Módulos sanitarios — revisión preventiva programada</td><td style="color:#1a9e4a;font-weight:700">8%</td><td><button class="tbl-btn tbl-btn-green" onclick="dirAction('ver-expediente','Clínica Sur')">Sin acción</button></td></tr>
         </tbody>
       </table>
     </div>
@@ -1338,6 +1401,13 @@ function buildDirectorApp(){
 
   <div class="screen" id="screen-prevision">
     <div class="page-hdr"><h2>Previsión de ingresos</h2><p>Proyección automática a 3, 6 y 12 meses con escenarios IA</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">342k€</div><div class="kpi-label">Próximos 3 meses</div><div class="kpi-delta up">▲ Escenario base IA</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">698k€</div><div class="kpi-label">Próximos 6 meses</div><div class="kpi-delta up">▲ +14% vs año anterior</div></div>
@@ -1508,6 +1578,13 @@ function buildDirectorApp(){
 
   <div class="screen" id="screen-captacion">
     <div class="page-hdr"><h2>Captación inteligente</h2><p>IA identifica qué clientes nuevos son más rentables y dónde encontrarlos</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">12</div><div class="kpi-label">Leads activos IA</div><div class="kpi-delta up">▲ Generados este mes</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">3</div><div class="kpi-label">Propuestas enviadas</div><div class="kpi-delta up">▲ Personalizadas por IA</div></div>
@@ -1569,6 +1646,7 @@ function buildAsesorApp(){
     <button class="sb-btn" id="sb-as-normativa" onclick="showS('as-normativa')"><span class="sb-icon"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12.55a11 11 0 0 1 14.08 0'/><path d='M1.42 9a16 16 0 0 1 21.16 0'/><path d='M8.53 16.11a6 6 0 0 1 6.95 0'/><line x1='12' y1='20' x2='12.01' y2='20'/></svg></span>Monitor normativo <span class="sb-ia-badge">IA</span></button>
     <button class="sb-btn" id="sb-as-verifactu" onclick="showS('as-verifactu')"><span class="sb-icon"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg></span>Verifactu IA <span class="sb-ia-badge">IA</span></button>
     <button class="sb-btn" id="sb-as-cierre" onclick="showS('as-cierre')"><span class="sb-icon"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg></span>Planif. cierre fiscal <span class="sb-ia-badge">IA</span></button>
+    <button class="sb-btn" id="sb-simulador" onclick="showS('simulador')"><span class="sb-icon"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M12 2v2M12 20v2M2 12h2M20 12h2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42'/></svg></span>Simulador fiscal <span class="sb-ia-badge">IA</span></button>
     <div class="sb-footer">
       <button class="sb-footer-btn exit" onclick="goBack()">↩ Cambiar perfil</button>
     </div>`;
@@ -1582,6 +1660,13 @@ function buildAsesorApp(){
         <span class="badge b-blue">Laura Sánchez · Fiscal & Contable</span>
       </div>
       <p>Resumen del día — KonGest IA ha priorizado tus tareas automáticamente</p>
+    </div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
     </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">38</div><div class="kpi-label">Clientes asignados</div><div class="kpi-delta neutral">→ 3 con alerta hoy</div></div>
@@ -1643,6 +1728,13 @@ function buildAsesorApp(){
 
   <div class="screen" id="screen-as-clientes">
     <div class="page-hdr"><h2>Mis Clientes</h2><p>Gestión y seguimiento de tu cartera asignada</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">38</div><div class="kpi-label">Clientes asignados</div><div class="kpi-delta up">▲ +3 este trimestre</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">29</div><div class="kpi-label">Al día fiscalmente</div><div class="kpi-delta up">▲ 76% de mi cartera</div></div>
@@ -1670,7 +1762,7 @@ function buildAsesorApp(){
             <td style="color:#7a8899">${u}</td>
             <td style="font-weight:600;color:${b==='b-red'?'#e03030':b==='b-amber'?'#e8a010':'#1A78FF'}">${v}</td>
             <td><span class="badge ${b}">${e}</span></td>
-          </tr>`).join('')}
+          <td><button class=\"tbl-btn tbl-btn-blue\" onclick=\"asAction('recordatorio','${n}')\">Recordatorio</button></td></tr>`).join('')}
         </tbody>
       </table>
     </div>
@@ -1734,6 +1826,13 @@ function buildAsesorApp(){
 
   <div class="screen" id="screen-as-contabilidad">
     <div class="page-hdr"><h2>Contabilidad</h2><p>Contabilización autónoma con OCR — KonGest IA contabiliza, tú supervisas</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">284</div><div class="kpi-label">Facturas este mes</div><div class="kpi-delta up">▲ 268 contabilizadas IA</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">94%</div><div class="kpi-label">Contabilización automática</div><div class="kpi-delta up">▲ Sin intervención manual</div></div>
@@ -1777,6 +1876,13 @@ function buildAsesorApp(){
 
   <div class="screen" id="screen-as-nominas">
     <div class="page-hdr"><h2>Nóminas & Laboral</h2><p>Gestión de nóminas autónoma — KonGest IA calcula, genera y alerta de cambios normativos</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">124</div><div class="kpi-label">Nóminas este mes</div><div class="kpi-delta up">▲ Calculadas por IA</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">0</div><div class="kpi-label">Errores detectados</div><div class="kpi-delta up">▲ Auditoría IA activa</div></div>
@@ -1811,6 +1917,13 @@ function buildAsesorApp(){
 
   <div class="screen" id="screen-as-documentos">
     <div class="page-hdr"><h2>Documentos</h2><p>Gestor documental inteligente — OCR, clasificación y recuperación por IA</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">1.842</div><div class="kpi-label">Documentos totales</div><div class="kpi-delta up">▲ Todos indexados por IA</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">98%</div><div class="kpi-label">Clasificados por IA</div><div class="kpi-delta up">▲ OCR automático</div></div>
@@ -1949,6 +2062,13 @@ function buildAsesorApp(){
       </div>
       <p>KonGest IA monitoriza cambios normativos 24/7 y los aplica automáticamente a cada cliente afectado</p>
     </div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">4</div><div class="kpi-label">Cambios este mes</div><div class="kpi-delta neutral">→ Todos aplicados</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">38</div><div class="kpi-label">Clientes actualizados</div><div class="kpi-delta up">▲ Automáticamente</div></div>
@@ -2045,6 +2165,13 @@ function buildAsesorApp(){
         <span class="badge b-blue">IA · Anticipación</span>
       </div>
       <p>KonGest IA anticipa el cierre del ejercicio desde octubre — borradores y estrategias antes de que lo pidas</p>
+    </div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
     </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">38</div><div class="kpi-label">Cierres en preparación</div><div class="kpi-delta up">▲ IA trabajando ya</div></div>
@@ -2269,6 +2396,13 @@ function buildClienteApp(){
 
   <div class="screen" id="screen-cl-irpf">
     <div class="page-hdr"><h2>Mi IRPF acumulado</h2><p>Retenciones practicadas y estimación de tu declaración anual</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">3.120€</div><div class="kpi-label">Retenciones acumuladas</div><div class="kpi-delta up">▲ A cuenta del IS</div></div>
       <div class="kpi risen" style="--kc:#e8a010"><div class="kpi-val">15%</div><div class="kpi-label">Tipo retención aplicado</div><div class="kpi-delta neutral">→ Facturas emitidas</div></div>
@@ -2282,7 +2416,7 @@ function buildClienteApp(){
           <thead><tr><th>Mes</th><th>Facturación</th><th>Retención 15%</th><th>Estado</th></tr></thead>
           <tbody>
             ${[['Enero 2026','20.800€','3.120€','b-ok','Presentado'],['Febrero 2026','24.600€','3.690€','b-ok','Presentado'],['Marzo 2026','30.600€','4.590€','b-amber','Pendiente']].map(([m,f,r,b,e])=>`
-            <tr><td><strong>${m}</strong></td><td style="color:#7a8899">${f}</td><td style="color:#1A78FF;font-weight:700">${r}</td><td><span class="badge ${b}">${e}</span></td></tr>`).join('')}
+            <tr><td><strong>${m}</strong></td><td style="color:#7a8899">${f}</td><td style="color:#1A78FF;font-weight:700">${r}</td><td><span class="badge ${b}">${e}</span></td><td><button class="tbl-btn tbl-btn-blue" onclick="clAction('deduccion','deduccion detectada')">Aplicar</button></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
@@ -2296,6 +2430,13 @@ function buildClienteApp(){
 
   <div class="screen" id="screen-cl-facturas">
     <div class="page-hdr"><h2>Mis facturas</h2><p>Facturas emitidas y recibidas — procesadas automáticamente por KonGest IA</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">284</div><div class="kpi-label">Facturas este trimestre</div><div class="kpi-delta up">▲ 268 auto-procesadas</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">76.000€</div><div class="kpi-label">Facturado Q1 2026</div><div class="kpi-delta up">▲ +18% vs Q1 2026</div></div>
@@ -2316,6 +2457,13 @@ function buildClienteApp(){
 
   <div class="screen" id="screen-cl-documentos">
     <div class="page-hdr"><h2>Mis documentos</h2><p>Toda tu documentación fiscal organizada por KonGest IA</p></div>
+    <div style="background:#F4F7FC;border-radius:8px;padding:7px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="width:6px;height:6px;border-radius:50%;background:#1A78FF;animation:dotPulse 1.2s infinite"></div>
+        <span style="font-size:.54rem;font-weight:800;color:#1A78FF;letter-spacing:.1em;text-transform:uppercase">IA LIVE</span>
+      </div>
+      <div id="dir-ticker" style="font-size:.66rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">Cargando...</div>
+    </div>
     <div class="g4 mb14">
       <div class="kpi risen" style="--kc:#1A78FF"><div class="kpi-val">142</div><div class="kpi-label">Documentos totales</div><div class="kpi-delta up">▲ Todos indexados</div></div>
       <div class="kpi risen" style="--kc:#1a9e4a"><div class="kpi-val">18</div><div class="kpi-label">Declaraciones presentadas</div><div class="kpi-delta up">▲ Este ejercicio</div></div>
@@ -2643,7 +2791,6 @@ function injectDirectorSidebarBtns(){
 
   var btns=[
     {id:'sb-precio',   label:'Motor de Precio IA',    screen:'precio'},
-    {id:'sb-detector', label:'Detector Procesos IA',  screen:'detector'},
     {id:'sb-sucesion', label:'Riesgo de Cartera IA',  screen:'sucesion'}
   ];
 
@@ -2781,6 +2928,8 @@ function buildDetectorScreen(){
     +'</div>';
   mc.appendChild(div);
 }
+
+window.buildDetectorScreen = buildDetectorScreen;
 
 // ── Screen: Riesgo de Cartera y Sucesion IA ──
 function buildSucesionScreen(){
@@ -3199,6 +3348,7 @@ function injectAsesorBadges(){
   injectExclBar('as-firma','Cola de firma optimizada por urgencia y riesgo fiscal — ningun software del mercado prioriza automaticamente la firma');
   injectExclBar('as-carga','Monitor de carga real hora a hora con redistribucion autonoma de tareas — exclusivo para el asesor individual');
   injectExclBar('as-radar','Deteccion de nuevos servicios en tu cartera antes de que el cliente llame — sin equivalente integrado en el sector');
+  injectExclBar('as-com','VOZ IA + WhatsApp + Email integrados en un panel unico con datos fiscales reales del cliente — ningun software de gestion fiscal lo ofrece nativo sin integracion externa');
 }
 
 function buildAsesorComScreen(){
@@ -3319,7 +3469,8 @@ function injectAsesorNewBtns(){
   footer.parentNode.insertBefore(sec,footer);
   [{id:'sb-as-firma',label:'Asistente Firma IA',scr:'as-firma',p:'<path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/>'},
    {id:'sb-as-carga',label:'Monitor Carga IA',scr:'as-carga',p:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'},
-   {id:'sb-as-radar',label:'Radar Oportunidades',scr:'as-radar',p:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'}
+   {id:'sb-as-radar',label:'Radar Oportunidades',scr:'as-radar',p:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'},
+   {id:'sb-detector',label:'Detector Nuevos Servicios',scr:'detector',p:'<circle cx="11" cy="11" r="8"/><path d="M8 11h6M11 8v6"/>'}
   ].forEach(function(b){
     var btn=document.createElement('button');btn.className='sb-btn';btn.id=b.id;
     btn.innerHTML='<span class="sb-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+b.p+'</svg></span>'+b.label+' <span class="sb-ia-badge">IA</span>';
@@ -3640,6 +3791,18 @@ function buildClienteFuturoScreen(){
   mc.appendChild(div);
 }
 
+// ── ALERTAS CAMPANA ASESOR ──
+if(window._alertsData){
+  window._alertsData.asesor=[
+    {sec:'Dashboard',tipo:'amber',txt:'Cierre Q1 en 8 dias — 14 clientes con documentacion pendiente.'},
+    {sec:'Modelos AEAT',tipo:'red',txt:'Mod. 303 vence en 5 dias — 6 clientes sin datos completos.'},
+    {sec:'Modelos AEAT',tipo:'red',txt:'Mod. 111 — Almacenes Valdes pendiente de firma. Vence en 2 dias.'},
+    {sec:'Anomalias',tipo:'amber',txt:'Construcciones Arco — ratio IVA deducido atipico detectado por IA.'},
+    {sec:'Normativa',tipo:'blue',txt:'Nueva resolucion AEAT sobre operaciones vinculadas. 3 clientes afectados.'},
+    {sec:'Carga',tipo:'green',txt:'IA redistribuyo 12 tareas esta semana — 14h liberadas.'}
+  ];
+}
+
 // ── ALERTAS CAMPANA CLIENTE ──
 if(window._alertsData){
   window._alertsData.cliente=[
@@ -3897,7 +4060,7 @@ window.buildDirectorApp = function(){
     // Nuevas secciones
     if(typeof injectDirectorSidebarBtns==='function') injectDirectorSidebarBtns();
     if(typeof buildPrecioScreen==='function') buildPrecioScreen();
-    if(typeof buildDetectorScreen==='function') buildDetectorScreen();
+
     if(typeof buildSucesionScreen==='function') buildSucesionScreen();
     // Funcionalidades post-DOM
     if(typeof injectSparklines==='function') injectSparklines();
@@ -3912,7 +4075,7 @@ window.buildDirectorApp = function(){
       injectExclBar('sucesion','Simulador de abandono de cartera con impacto en P&L — no existe en ningun software de asesoria del mercado');
     }
     if(typeof buildLockedSidebar==='function') buildLockedSidebar('director');
-    if(typeof initAlerts==='function') initAlerts('director');
+    if(typeof initAlerts==='function'){initAlerts('director');}
     if(typeof startPush==='function') startPush('director');
     // Countdown Q1
     var dl=new Date();dl.setDate(dl.getDate()+8);dl.setHours(20,0,0,0);
@@ -3934,6 +4097,9 @@ window.buildAsesorApp = function(){
     if(typeof buildAsesorCargaScreen==='function') buildAsesorCargaScreen();
     if(typeof buildAsesorRadarScreen==='function') buildAsesorRadarScreen();
     if(typeof injectAsesorNewBtns==='function') injectAsesorNewBtns();
+    if(typeof buildSimuladorScreen==='function') buildSimuladorScreen();
+    if(typeof buildDetectorScreen==='function') buildDetectorScreen();
+
     if(typeof buildLockedSidebar==='function') buildLockedSidebar('asesor');
     if(typeof initAlerts==='function') initAlerts('asesor');
     if(typeof startPush==='function') startPush('asesor');
@@ -3961,7 +4127,7 @@ var _bnConfigs = {
     {id:'as-clientes',label:'Clientes', path:'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'},
     {id:'as-modelos', label:'Modelos',  path:'M13 2L3 14h9l-1 8 10-12h-9l1-8z'},
     {id:'as-firma',   label:'Firma',    path:'M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34'},
-    {id:'as-com',     label:'Chat',     path:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'},
+    {id:'simulador',  label:'Simular',  path:'M12 2v2M12 20v2M2 12h2M20 12h2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42'},
   ],
   cliente:[
     {id:'cl-dash',    label:'Mi Fiscal',path:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'},
@@ -4067,13 +4233,13 @@ function buildDirectorCharts(){
   if(window._chartsBuilt) return;
   window._chartsBuilt = true;
 
-  // ── DONUT: Salud de cartera
+  // -- DONUT: Salud de cartera
   var ctxD = document.getElementById('chartDonutSalud');
   if(ctxD){
-    new Chart(ctxD,{type:'doughnut',data:{datasets:[{data:[108,24,10],backgroundColor:['#1a9e4a','#e8a010','#e03030'],borderWidth:0,borderRadius:4,spacing:2}]},options:{responsive:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){var labels=['Sanos','Atención','Riesgo'];return ' '+labels[c.dataIndex]+': '+c.raw;}},backgroundColor:'#071830',bodyColor:'#fff',padding:8,cornerRadius:8}}}});
+    new Chart(ctxD,{type:'doughnut',data:{datasets:[{data:[108,24,10],backgroundColor:['#1a9e4a','#e8a010','#e03030'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){var labels=['Sanos','Atencion','Riesgo'];return ' '+labels[c.dataIndex]+': '+c.raw;}},backgroundColor:'#071830',bodyColor:'#fff',padding:8}}}}); 
   }
 
-  // ── CHART 1: Evolucion margen operativo (Bar)
+  // -- CHART 1: Evolucion margen operativo (Bar)
   var ctxM = document.getElementById('chartMargen');
   if(ctxM){
     new Chart(ctxM, {
@@ -4092,8 +4258,6 @@ function buildDirectorCharts(){
           ],
           borderColor: ['#1A78FF','#1A78FF','#1A78FF','#1A78FF','#00C8FF'],
           borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
         }]
       },
       options: {
@@ -4108,8 +4272,7 @@ function buildDirectorCharts(){
             backgroundColor: '#071830',
             titleColor: '#fff',
             bodyColor: '#00C8FF',
-            padding: 10,
-            cornerRadius: 8
+            padding: 10
           }
         },
         scales: {
@@ -4132,7 +4295,7 @@ function buildDirectorCharts(){
     });
   }
 
-  // ── CHART 2: Proyeccion mensual 3 escenarios (Line)
+  // -- CHART 2: Proyeccion mensual 3 escenarios (Line)
   var ctxP = document.getElementById('chartPrevision');
   if(ctxP){
     var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -4189,13 +4352,12 @@ function buildDirectorCharts(){
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: function(ctx){ return ' ' + ctx.dataset.label + ': ' + ctx.raw + 'k€'; }
+              label: function(ctx){ return ' ' + ctx.dataset.label + ': ' + ctx.raw + 'k'; }
             },
             backgroundColor: '#071830',
             titleColor: '#fff',
             bodyColor: '#94A3B8',
             padding: 10,
-            cornerRadius: 8
           }
         },
         scales: {
@@ -4439,6 +4601,241 @@ window.dirAction=function(action,context){
     'simular':'Simulación fiscal IA ejecutada para '+context,
   };
   iaToast(msgs[action]||'Acción IA ejecutada');
+};
+</script>
+
+
+<!-- ══ HERO DIRECTOR + TICKER + CONFETTI ══ -->
+<script>
+// ── Hero Director: fecha dinámica + briefing
+
+
+// ── Live Ticker Director
+var _dirTickerMsgs = [
+  'KonGest IA detectó ratio IVA atípico en Construcciones Arco — documentación preventiva generada',
+  'Borrador Mod. 303 completado para 11 clientes — cierre Q1 en 8 días',
+  'Margen operativo 68% — máximo histórico del despacho · +11pp desde implantación KonGest IA',
+  'Impago probable en Construcciones Arco — recordatorio automático enviado',
+  'Upselling detectado: 3 clientes con perfil para asesoría financiera · probabilidad 71%',
+  'Redistribución IA activa — Pedro Ruiz: 12 tareas automatizadas esta semana · 14h liberadas',
+  'Previsión 2026 actualizada: 1.38M€ · +21% sobre objetivo anual',
+  'Motor de riesgo AEAT: 7 clientes en monitorización activa · 0 inspecciones este trimestre',
+];
+var _dirTickerIdx = 0;
+var _dirTickerTimer = null;
+
+function startDirTicker(){
+  var el = document.getElementById('dir-ticker');
+  if(!el) return;
+  clearInterval(_dirTickerTimer);
+  el.textContent = _dirTickerMsgs[0];
+  _dirTickerIdx = 0;
+  _dirTickerTimer = setInterval(function(){
+    _dirTickerIdx = (_dirTickerIdx + 1) % _dirTickerMsgs.length;
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-8px)';
+    setTimeout(function(){
+      el.textContent = _dirTickerMsgs[_dirTickerIdx];
+      el.style.transition = 'opacity .4s,transform .4s';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }, 300);
+  }, 4000);
+}
+
+// ── Micro-celebration: confetti al completar acción
+var _confettiLoaded = false;
+function loadConfetti(cb){
+  if(window.confetti){ cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
+  s.onload = function(){ _confettiLoaded=true; cb(); };
+  document.head.appendChild(s);
+}
+function celebrate(){
+  loadConfetti(function(){
+    confetti({ particleCount:80, spread:60, origin:{y:0.7}, colors:['#1A78FF','#00C8FF','#0D55CC','#ffffff'] });
+  });
+}
+
+// ── Hook dirAction to trigger confetti on key actions
+var _origDirAction = window.dirAction;
+window.dirAction = function(action, context){
+  if(_origDirAction) _origDirAction(action, context);
+  var celebActions = ['redistribuir','propuesta','upselling','exportar','simular'];
+  if(celebActions.indexOf(action) > -1) setTimeout(celebrate, 400);
+};
+
+// ── Hook buildDirectorApp
+var _origDirHero = window.buildDirectorApp;
+window.buildDirectorApp = function(){
+  if(_origDirHero) _origDirHero();
+  setTimeout(function(){
+    startDirTicker();
+  }, 350);
+};
+
+// ── Also trigger when navigating to dash or dynamic screens
+var _origShowHero = window.showS;
+window.showS = function(id){
+  if(id === 'detector' && typeof buildDetectorScreen === 'function') buildDetectorScreen();
+  if(id === 'simulador' && typeof buildSimuladorScreen === 'function') buildSimuladorScreen();
+  if(id === 'precio' && typeof buildPrecioScreen === 'function') buildPrecioScreen();
+  if(id === 'sucesion' && typeof buildSucesionScreen === 'function') buildSucesionScreen();
+  if(_origShowHero) _origShowHero(id);
+  if(id === 'dash') setTimeout(function(){ startDirTicker(); }, 150);
+};
+
+</script>
+
+
+
+<!-- == SIMULADOR SCREEN BUILDER (shared Director+Asesor) == -->
+<script>
+function buildSimuladorScreen(){
+  if(document.getElementById('screen-simulador')) return;
+  var mc = document.getElementById('mainContent');
+  if(!mc) return;
+  var div = document.createElement('div');
+  div.className = 'screen';
+  div.id = 'screen-simulador';
+  div.innerHTML = `
+    <div class="page-hdr">
+      <div class="page-hdr-line">
+        <h2>Simulador de escenarios fiscales</h2>
+        <span class="badge b-blue">IA · Tiempo Real</span>
+      </div>
+      <p>¿Qué pasa si...? KonGest IA recalcula el impacto fiscal de cualquier decisión antes de tomarla</p>
+    </div>
+    <div class="g2 mb14">
+      <div class="card">
+        <div class="card-title">Configura el escenario <span class="card-title-ia">IA</span></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px">
+
+          <div>
+            <label style="display:block;font-size:.6rem;font-weight:700;color:#7a8899;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px">Cliente</label>
+            <select id="sim-cliente" onchange="simRecalc()" style="width:100%;padding:10px 14px;background:#F4F7FC;border:1.5px solid #E0E8F4;border-radius:8px;font-size:.85rem;font-family:DM Sans,sans-serif;color:#071830;outline:none;">
+              <option value="pyme">TechPyme S.L. — IS 25% · Facturación 280k€</option>
+              <option value="grande">Grupo Inversor Norte — IS 25% · Facturación 1.2M€</option>
+              <option value="autonomo">María González — IRPF 35% · Facturación 82k€</option>
+              <option value="construction">Construcciones Arco — IS 25% · Facturación 420k€</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.6rem;font-weight:700;color:#7a8899;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px">Escenario fiscal</label>
+            <select id="sim-tipo" onchange="simRecalc()" style="width:100%;padding:10px 14px;background:#F4F7FC;border:1.5px solid #E0E8F4;border-radius:8px;font-size:.85rem;font-family:DM Sans,sans-serif;color:#071830;outline:none;">
+              <option value="contratar">Contratar nuevos empleados</option>
+              <option value="inversion">Inversión en activo fijo</option>
+              <option value="facturacion">Aumento de facturación</option>
+              <option value="regimen">Cambio de régimen fiscal</option>
+              <option value="dividendos">Reparto de dividendos</option>
+              <option value="inspeccion">Preparación ante inspección AEAT</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.6rem;font-weight:700;color:#7a8899;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px">Magnitud</label>
+            <select id="sim-mag" onchange="simRecalc()" style="width:100%;padding:10px 14px;background:#F4F7FC;border:1.5px solid #E0E8F4;border-radius:8px;font-size:.85rem;font-family:DM Sans,sans-serif;color:#071830;outline:none;">
+              <option value="10">Pequeña — hasta 10.000€</option>
+              <option value="30">Media — hasta 30.000€</option>
+              <option value="60">Grande — hasta 60.000€</option>
+              <option value="100">Muy grande — más de 100.000€</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.6rem;font-weight:700;color:#7a8899;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px">Horizonte temporal</label>
+            <select id="sim-periodo" onchange="simRecalc()" style="width:100%;padding:10px 14px;background:#F4F7FC;border:1.5px solid #E0E8F4;border-radius:8px;font-size:.85rem;font-family:DM Sans,sans-serif;color:#071830;outline:none;">
+              <option value="1">Este trimestre</option>
+              <option value="2">6 meses</option>
+              <option value="4">Este ejercicio</option>
+              <option value="8">2 ejercicios</option>
+            </select>
+          </div>
+
+          <button onclick="simRecalc()" style="width:100%;padding:13px;background:linear-gradient(135deg,#1A78FF,#0D55CC);border:none;border-radius:8px;color:#fff;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:1rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:0 6px 20px rgba(26,120,255,.35);transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''"> Simular con KonGest IA</button>
+
+          <div class="ia-box"><div class="ia-box-icon"></div><div class="ia-box-text"><strong>Simulación en tiempo real.</strong> KonGest IA calcula el impacto fiscal exacto de cada decisión usando los datos reales del cliente. Sin riesgo, con números reales.</div></div>
+        </div>
+      </div>
+
+      <div class="card" id="sim-resultado">
+        <div class="card-title">Resultado simulado <span class="card-title-ia">IA</span></div>
+        <div id="sim-titulo" style="font-family:Barlow Condensed,sans-serif;font-size:1rem;font-weight:900;color:#1A78FF;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em">Contratar empleados · TechPyme S.L.</div>
+        <div id="sim-sub" style="font-size:.68rem;color:#7a8899;margin-bottom:16px">KonGest IA proyecta el impacto fiscal y financiero de la decisión</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="background:#EEF5FF;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:.6rem;color:#7a8899;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Ahorro fiscal IS/IRPF</div>
+            <div id="sim-k1" style="font-family:Barlow Condensed,sans-serif;font-size:1.8rem;font-weight:900;color:#1A78FF">−8.400€</div>
+          </div>
+          <div style="background:#FDF3E7;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:.6rem;color:#7a8899;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Coste real anual</div>
+            <div id="sim-k2" style="font-family:Barlow Condensed,sans-serif;font-size:1.8rem;font-weight:900;color:#e8a010">+28.800€</div>
+          </div>
+          <div style="background:#EBF5EF;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:.6rem;color:#7a8899;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Impacto neto</div>
+            <div id="sim-k3" style="font-family:Barlow Condensed,sans-serif;font-size:1.8rem;font-weight:900;color:#1a9e4a">+8.200€</div>
+          </div>
+          <div style="background:#F4F7FC;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:.6rem;color:#7a8899;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Umbral rentabilidad</div>
+            <div id="sim-k4" style="font-family:Barlow Condensed,sans-serif;font-size:1.8rem;font-weight:900;color:#071830">14 meses</div>
+          </div>
+        </div>
+
+        <div id="sim-recomendacion" class="ia-box" style="border-left:3px solid #1a9e4a">
+          <div class="ia-box-icon"></div>
+          <div class="ia-box-text" id="sim-rec-txt"><strong>KonGest IA recomienda ejecutar:</strong> La contratación en Q3 maximiza el ahorro fiscal. Esperar a Q1 2026 costaría 4.200€ adicionales en carga tributaria.</div>
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="card-title">Historial de simulaciones</div>
+          <table class="tbl" id="sim-historial">
+            <thead><tr><th>Escenario</th><th>Cliente</th><th>Ahorro fiscal</th><th>Neto</th><th>Decisión IA</th></tr></thead>
+            <tbody id="sim-hist-body">
+              <tr><td>Contratar empleados</td><td style="color:#7a8899">TechPyme</td><td style="color:#1A78FF">−8.400€</td><td style="color:#1a9e4a;font-weight:700">+8.200€</td><td><span class="badge b-ok">Ejecutar</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+  mc.appendChild(div);
+  // Init simRecalc after injection
+  setTimeout(function(){ if(typeof simRecalc==='function') simRecalc(); }, 100);
+}
+</script>
+
+<!-- == CTAS ASESOR Y CLIENTE == -->
+<script>
+window.asAction = function(action, context){
+  var msgs = {
+    'firmar': 'KonGest IA ha priorizado la firma de ' + context + ' por urgencia y riesgo fiscal',
+    'modelo': 'Modelo AEAT generado automaticamente para ' + context + ' — listo para revision',
+    'recordatorio': 'Recordatorio automatico enviado a ' + context + ' — documentacion pendiente solicitada',
+    'revisar': 'KonGest IA ha iniciado revision contable de ' + context + ' — anomalias en analisis',
+    'corregir': 'Correccion contable aplicada automaticamente en ' + context,
+    'notificar': 'Notificacion normativa enviada a ' + context + ' — 3 clientes afectados',
+    'presentar': 'Modelo presentado a la AEAT para ' + context + ' — acuse de recibo generado',
+    'borrador': 'Borrador de cierre generado por IA para ' + context + ' — revision pendiente',
+    'planificar': 'Plan de cierre fiscal IA activado para ' + context,
+    'contactar': 'Mensaje automatico enviado a ' + context + ' — respuesta esperada en 2h',
+  };
+  var msg = msgs[action] || 'KonGest IA ha ejecutado la accion para ' + context;
+  iaToast(msg);
+};
+
+window.clAction = function(action, context){
+  var msgs = {
+    'simular': 'KonGest IA ha calculado tu impacto fiscal para ' + context + ' — informe listo',
+    'descargar': 'Informe fiscal de ' + context + ' generado y listo para descarga',
+    'consultar': 'Consulta enviada a tu asesora — respuesta esperada en menos de 2 horas',
+    'recordatorio': 'Recordatorio de vencimiento configurado para ' + context,
+    'deduccion': 'KonGest IA ha detectado una deduccion aplicable en ' + context + ' — ahorro estimado incluido',
+  };
+  var msg = msgs[action] || 'KonGest IA ha procesado tu solicitud';
+  iaToast(msg);
 };
 </script>
 

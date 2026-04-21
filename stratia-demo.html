@@ -759,6 +759,13 @@ pre,code{white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;}
   .content{padding:20px;}
 }
 
+/* ── 1100px — desktop estrecho / tablet landscape (grids 4→2) ── */
+@media(max-width:1100px){
+  .sidebar{width:190px;}
+  .g4{grid-template-columns:repeat(2,1fr)!important;}
+  [style*="grid-template-columns: repeat(4"]{grid-template-columns:repeat(2,1fr)!important;}
+}
+
 /* ── 1024px — tablet landscape ── */
 @media(max-width:1024px){
   .sidebar{width:180px;}

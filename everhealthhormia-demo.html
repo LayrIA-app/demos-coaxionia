@@ -810,12 +810,13 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif}
 
 /* ── Notificaciones ── */
 .notif-container{position:fixed;bottom:24px;right:24px;z-index:98;display:flex;flex-direction:column;gap:8px;max-width:300px}
-.notif{background:var(--black);color:#fff;padding:12px 16px;border-radius:10px;border-left:3px solid;font-size:.64rem;line-height:1.45;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:notifIn .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.notif{background:var(--black);color:#fff;padding:12px 16px 12px 30px;border-radius:10px;font-size:.64rem;line-height:1.45;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:notifIn .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
 @keyframes notifIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-.notif.red{border-left-color:var(--red)}
-.notif.amber{border-left-color:var(--amber)}
-.notif.green{border-left-color:var(--green)}
-.notif.blue{border-left-color:var(--blue)}
+.notif::before{content:'';position:absolute;left:12px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:#fff}
+.notif.red::before{background:var(--red);box-shadow:0 0 6px rgba(224,70,104,.5)}
+.notif.amber::before{background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,.5)}
+.notif.green::before{background:var(--green);box-shadow:0 0 6px rgba(16,185,129,.5)}
+.notif.blue::before{background:var(--blue);box-shadow:0 0 6px rgba(37,99,235,.5)}
 .notif::after{content:'';position:absolute;bottom:0;left:0;height:2px;background:currentColor;animation:notifBar 4s linear forwards}
 @keyframes notifBar{from{width:100%}to{width:0}}
 
@@ -1266,6 +1267,166 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif}
   }
 })();
 
+// ─── Badge mensajes sin leer Comunicación (REGLA 4 COAXIONIA) ───
+// Simula 1 mensaje nuevo por shell al arrancar. Se pone a 0 al entrar a Comunicación.
+window._unreadComms={ceo:1,med:1,pac:1,inv:1,lab:1};
+window._clearUnread=function(shell,containerSel){
+  if(window._unreadComms[shell]>0){window._unreadComms[shell]=0;}
+  var dot=document.querySelector(containerSel+' .sb-unread-dot');
+  if(dot&&dot.parentNode)dot.parentNode.removeChild(dot);
+};
+
+// ─── Canales IA · vista proactiva (REGLA 7 COAXIONIA) ───
+// Helper que construye la sección. VOZ IA "Próximamente" · WhatsApp + Email activos con KPIs + últimas 3 acciones IA.
+// data = { voz:{futures:[s,s,s]}, wa:{sub,kpis:[n,n,n],actions:[s,s,s],navFn}, email:{sub,kpis:[n,n,n],actions:[s,s,s],navFn} }
+window.buildCanalesIA=function(data){
+  var icoVoz='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF6B2B" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.19 12 19.79 19.79 0 011.21 3.4 2 2 0 013.22 1.22h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9a16 16 0 006.88 6.88l1.38-1.38a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>';
+  var icoWa='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
+  var icoMail='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+  function kpis(arr,lbls){return '<div class="canal-kpis">'
+    +'<div class="canal-kpi"><span class="canal-kpi-val">'+arr[0]+'</span><span class="canal-kpi-lbl">'+lbls[0]+'</span></div>'
+    +'<div class="canal-kpi"><span class="canal-kpi-val">'+arr[1]+'</span><span class="canal-kpi-lbl">'+lbls[1]+'</span></div>'
+    +'<div class="canal-kpi"><span class="canal-kpi-val">'+arr[2]+'</span><span class="canal-kpi-lbl">'+lbls[2]+'</span></div>'
+    +'</div>';}
+  function actions(arr){return '<div class="canal-actions-title">Ultimas acciones IA &middot; 24h</div>'
+    +'<ul class="canal-actions">'+arr.map(function(a){return '<li><span>'+a+'</span></li>';}).join('')+'</ul>';}
+  function futures(arr){return '<ul class="canal-futures">'+arr.map(function(a){return '<li><span>'+a+'</span></li>';}).join('')+'</ul>';}
+  // VOZ IA — Próximamente
+  var cardVoz='<div class="card canal-card">'
+    +'<div class="canal-head">'
+      +'<div class="canal-ico" style="background:rgba(255,107,43,.12)">'+icoVoz+'</div>'
+      +'<div><div class="canal-name">VOZ IA</div><div class="canal-sub">Llamadas automaticas &middot; plan avanzado</div></div>'
+      +'<span class="canal-state soon">Proximamente</span>'
+    +'</div>'
+    +'<div class="canal-intro">Cuando se active, VOZ IA gestionara por telefono:</div>'
+    +futures(data.voz.futures)
+    +'<button class="canal-cta voz" onclick="activarVOZ()">Activar VOZ IA &rarr;</button>'
+    +'</div>';
+  // WhatsApp — Activo
+  var cardWa='<div class="card canal-card">'
+    +'<div class="canal-head">'
+      +'<div class="canal-ico" style="background:rgba(37,211,102,.12)">'+icoWa+'</div>'
+      +'<div><div class="canal-name">WhatsApp</div><div class="canal-sub">'+data.wa.sub+'</div></div>'
+      +'<span class="canal-state active">Activo</span>'
+    +'</div>'
+    +kpis(data.wa.kpis,['Conversaciones','Resueltas IA','Tu revision'])
+    +actions(data.wa.actions)
+    +'<button class="canal-cta" onclick="'+data.wa.navFn+'">Ver conversaciones &rarr;</button>'
+    +'</div>';
+  // Email — Activo
+  var cardEmail='<div class="card canal-card">'
+    +'<div class="canal-head">'
+      +'<div class="canal-ico" style="background:rgba(55,138,221,.12)">'+icoMail+'</div>'
+      +'<div><div class="canal-name">Email</div><div class="canal-sub">'+data.email.sub+'</div></div>'
+      +'<span class="canal-state active">Activo</span>'
+    +'</div>'
+    +kpis(data.email.kpis,['Emails','Drafts IA','Tu revision'])
+    +actions(data.email.actions)
+    +'<button class="canal-cta" onclick="'+data.email.navFn+'">Ver bandeja &rarr;</button>'
+    +'</div>';
+  return '<div class="live-ticker"><div class="live-dot"></div><span class="live-label">IA LIVE</span>'
+    +'<div class="live-text">'+(data.ticker||'Canales IA trabajando en segundo plano &middot; 24/7')+'</div></div>'
+    +'<div class="g3">'+cardVoz+cardWa+cardEmail+'</div>';
+};
+
+// Modal premium reutilizable para módulos bloqueados (doc responsive COAXIONIA)
+window.openPremiumModal=function(cfg){
+  var existing=document.getElementById('premium-modal-root');
+  if(existing)existing.remove();
+  var overlay=document.createElement('div');
+  overlay.id='premium-modal-root';
+  overlay.className='premium-modal-overlay open';
+  overlay.addEventListener('click',function(e){if(e.target===overlay)window.closePremiumModal();});
+  var featuresHTML=(cfg.features||[]).map(function(f){return '<li><span>'+f+'</span></li>';}).join('');
+  overlay.innerHTML=
+    '<div class="premium-modal">'
+      +'<div class="premium-hero" style="'+(cfg.heroStyle||'background:linear-gradient(160deg,#0A0A0F 0%,#1A1A2E 100%);')+'">'
+        +'<button class="premium-close" onclick="closePremiumModal()" aria-label="Cerrar">'
+          +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+        +'</button>'
+        +(cfg.heroIco?'<div class="premium-hero-ico">'+cfg.heroIco+'</div>':'')
+        +'<span class="premium-hero-pill">'+(cfg.pill||'Proximamente')+'</span>'
+        +'<div class="premium-hero-title">'+cfg.title+'</div>'
+        +(cfg.tagline?'<div class="premium-hero-tagline">'+cfg.tagline+'</div>':'')
+      +'</div>'
+      +'<div class="premium-body">'
+        +'<div class="premium-body-inner">'
+          +'<div class="premium-body-head">'+(cfg.bodyHead||'Que incluye el modulo')+'</div>'
+          +'<ul class="premium-features">'+featuresHTML+'</ul>'
+          +(cfg.meta?'<div class="premium-meta">'+cfg.meta+'</div>':'')
+          +'<div class="premium-ctas">'
+            +'<button class="premium-cta ghost" onclick="closePremiumModal()">Cerrar</button>'
+            +'<button class="premium-cta primary" onclick="'+(cfg.primaryFn||'closePremiumModal()')+'">'+(cfg.primaryLbl||'Contactar')+' &rarr;</button>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  document.body.appendChild(overlay);
+};
+window.closePremiumModal=function(){
+  var existing=document.getElementById('premium-modal-root');
+  if(!existing)return;
+  existing.classList.remove('open');
+  setTimeout(function(){if(existing.parentNode)existing.parentNode.removeChild(existing);},260);
+};
+
+window.activarVOZ=function(){
+  window.openPremiumModal({
+    heroStyle:'background:linear-gradient(160deg,#FF6B2B 0%,#E04668 100%);',
+    heroIco:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.19 12 19.79 19.79 0 011.21 3.4 2 2 0 013.22 1.22h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9a16 16 0 006.88 6.88l1.38-1.38a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>',
+    pill:'Proximamente &middot; Plan avanzado',
+    title:'VOZ IA',
+    tagline:'Llamadas automatizadas 24/7 sin operador. Tu voz clinica lista para hablar con pacientes, personal y equipo directivo.',
+    bodyHead:'Que incluye el modulo VOZ IA',
+    features:[
+      'Briefings ejecutivos automaticos a primera hora cada dia',
+      'Recordatorios de cita a pacientes 24h antes con confirmacion',
+      'Escalado urgente al medico cuando IA detecta valor critico',
+      'Notas clinicas transcritas en tiempo real durante consulta',
+      'Llamadas de seguimiento post-analitica en lenguaje comprensible',
+      'Integracion con tu centralita o linea virtual asignada'
+    ],
+    meta:'Plan avanzado COAXIONIA &middot; activacion en 5 dias laborables desde aprobacion. Incluye configuracion de voz personalizada, scripts medicos y formacion del equipo.',
+    primaryLbl:'Hablar con COAXIONIA',
+    primaryFn:'closePremiumModal();if(window.showToast)showToast(\'Solicitud enviada a comercial COAXIONIA &middot; te contactan en 24h\',\'ok\');'
+  });
+};
+
+// Gemelo · toggle lista de pacientes colapsable (≤480px doc responsive)
+window.gdToggleList=function(){
+  var wrap=document.getElementById('gd-list-wrap');
+  if(!wrap)return;
+  var open=wrap.classList.toggle('open');
+  var lbl=document.getElementById('gd-list-toggle-lbl');
+  if(lbl)lbl.textContent=open?'Ocultar lista de pacientes':'Ver lista de pacientes';
+  var btn=document.getElementById('gd-list-toggle');
+  if(btn)btn.setAttribute('aria-expanded',open?'true':'false');
+};
+
+// ─── Toast global (REGLA 9 COAXIONIA) ───
+// Uso: showToast('Protocolo aprobado · IA aplicando ajuste','ok')
+// Tipos: 'ok' (verde), 'info' (azul), 'warn' (amarillo), 'error' (rojo)
+window.showToast=function(msg,type){
+  type=type||'info';
+  var root=document.getElementById('toast-root');
+  if(!root){
+    root=document.createElement('div');
+    root.id='toast-root';
+    root.className='toast-root';
+    document.body.appendChild(root);
+  }
+  var t=document.createElement('div');
+  t.className='toast';
+  var dot=document.createElement('span');dot.className='toast-dot '+type;
+  var txt=document.createElement('span');txt.textContent=msg;
+  t.appendChild(dot);t.appendChild(txt);
+  root.appendChild(t);
+  setTimeout(function(){
+    t.classList.add('out');
+    setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},260);
+  },3000);
+};
+
 // ─── Datos de perfiles ───
 var profiles=[
   {
@@ -1293,7 +1454,7 @@ var profiles=[
           'An\xe1lisis de cohortes y gr\xe1ficos de retenci\xf3n',
           'Simulaci\xf3n financiera a 12/24/36 meses',
           'Mercado HRT global €27.5B \u2014 sin l\xedder digital en Espa\xf1a',
-          'Comparativa Hims, Numan, Hone, Evernow, Midi'
+          'Comparativa con los principales competidores del mercado'
         ],
         stats:[{v:'34%',l:'ROI proyectado'},{v:'x3.2',l:'Multiplicador 36m'},{v:'\u22648h',l:'Payback CAC'}]
       }
@@ -1625,7 +1786,8 @@ function buildSidebarCEO(){
     {id:'compliance',label:'Compliance y calidad',ia:true},
     {id:'churn',label:'Suscripciones y churn',ia:true,sec:'INTELIGENCIA'},
     {id:'simulacion',label:'Simulaci&#243;n Proyectiva',ia:true},
-    {id:'comunicacion',label:'Comunicaci&#243;n',ia:false,sec:'CANALES'}
+    {id:'canales',label:'Canales IA',ia:true,sec:'CANALES'},
+    {id:'comunicacion',label:'Comunicaci&#243;n',ia:false}
   ];
   var html='';
   items.forEach(function(it){
@@ -1634,6 +1796,7 @@ function buildSidebarCEO(){
       +lt+'span class='+q+'sb-icon'+q+gt+svgIcon(it.id)+lt+'/span'+gt
       +it.label
       +(it.ia?lt+'span class='+q+'sb-ia'+q+gt+'IA'+lt+'/span'+gt:'')
+      +(it.id==='comunicacion'&&window._unreadComms&&window._unreadComms.ceo>0?lt+'span class='+q+'sb-unread-dot'+q+' aria-label='+q+'mensajes sin leer'+q+gt+lt+'/span'+gt:'')
       +lt+'/button'+gt;
   });
   html+=lt+'div class='+q+'sb-footer'+q+gt+lt+'button class='+q+'sb-footer-btn'+q+' onclick='+q+'goBack()'+q+gt+'&#8617; Cambiar perfil'+lt+'/button'+gt+lt+'/div'+gt;
@@ -1649,6 +1812,7 @@ function svgIcon(id){
     compliance:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
     churn:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
     simulacion:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+    canales:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
     comunicacion:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
   };
   return icons[id]||'';
@@ -1656,6 +1820,7 @@ function svgIcon(id){
 
 // ── showS ──
 function showS(id){
+  if(id==='comunicacion')window._clearUnread('ceo','#sidebar');
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   document.querySelectorAll('.sb-btn').forEach(function(b){b.classList.remove('active')});
   var sc=document.getElementById('screen-'+id);
@@ -1954,7 +2119,7 @@ function buildScreens(){
     +lt+'div style='+q+'display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:16px'+q+gt
       +card('Evoluci\xf3n de pacientes 2025',true,lt+'div class='+q+'chart-wrap'+q+gt+lt+'canvas id='+q+'chart-evolucion'+q+gt+lt+'/canvas'+gt+lt+'/div'+gt)
       +card('Adherencia global',true,
-        lt+'div style='+q+'display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:center;width:100%'+q+gt
+        lt+'div class='+q+'donut-wrap-flex'+q+' style='+q+'display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:center;width:100%'+q+gt
           +lt+'div class='+q+'donut-wrap'+q+gt
             +lt+'canvas id='+q+'chart-donut'+q+' width='+q+'110'+q+' height='+q+'110'+q+gt+lt+'/canvas'+gt
             +lt+'div class='+q+'donut-center'+q+gt+lt+'div class='+q+'donut-pct'+q+gt+'94%'+lt+'/div'+gt+lt+'div class='+q+'donut-sub'+q+gt+'Adherencia'+lt+'/div'+gt+lt+'/div'+gt
@@ -2226,7 +2391,7 @@ function buildScreens(){
 
   // ─── SCREEN 6: Churn ───
   html+=scr('churn',false,
-    phdr('Suscripciones y churn','','An\xe1lisis de cohortes y retenci\xf3n. Hims reporta 82% retenci\xf3n pero no ofrece este dashboard al operador.')
+    phdr('Suscripciones y churn','','An\xe1lisis de cohortes y retenci\xf3n. Los competidores del mercado reportan ~82% de retenci\xf3n pero no ofrecen este dashboard al operador.')
     +lt+'div class='+q+'g4 mb14'+q+gt
       +kpi('94%','Retenci\xf3n 3 meses','+6pp vs mercado','up','0,20 12,21 24,22 36,22 48,23 60,24 72,24')
       +kpi('87%','Retenci\xf3n 6 meses','+9pp vs mercado','up','0,18 12,19 24,20 36,20 48,21 60,22 72,22')
@@ -2278,7 +2443,7 @@ function buildScreens(){
         +lt+'div class='+q+'sim-kpi'+q+gt+lt+'div class='+q+'sim-kpi-val'+q+' id='+q+'sim-rev'+q+gt+'--'+lt+'/div'+gt+lt+'div class='+q+'sim-kpi-lbl'+q+gt+'Facturaci\xf3n proyectada'+lt+'/div'+gt+lt+'/div'+gt
         +lt+'div class='+q+'sim-kpi'+q+gt+lt+'div class='+q+'sim-kpi-val'+q+' id='+q+'sim-med'+q+gt+'--'+lt+'/div'+gt+lt+'div class='+q+'sim-kpi-lbl'+q+gt+'M\xe9dicos necesarios'+lt+'/div'+gt+lt+'/div'+gt
       +lt+'/div'+gt
-      +iabox('Este simulador no existe en ning\xfan competidor. Hims, Numan, Evernow operan sin proyecci\xf3n. COAXIONIA es la \xfanica plataforma de telemedicina hormonal con Motor Predictivo Cl\xednico integrado.')
+      +iabox('Este simulador no existe en ning\xfan competidor. Las plataformas tradicionales operan sin proyecci\xf3n. COAXIONIA es la \xfanica plataforma de telemedicina hormonal con Motor Predictivo Cl\xednico integrado.')
     +lt+'/div'+gt
   );
 
@@ -2381,6 +2546,29 @@ function buildScreens(){
     +lt+'/div'+gt;
     return html;
   }
+
+  // ── Canales IA · vista proactiva (REGLA 7 COAXIONIA) ──
+  html+=scr('canales',false,
+    phdr('Canales IA','','Que ha hecho la IA hoy en cada canal. Dashboard proactivo, no chat.')
+    +window.buildCanalesIA({
+      ticker:'Canales IA trabajando 24/7 &middot; 14 acciones automaticas completadas hoy',
+      voz:{futures:[
+        'Briefing ejecutivo a las 8:00 con los 3 datos criticos del holding',
+        'Alertas de valor a inversores sin que tengas que redactar nada',
+        'Calls automaticos a responsables cuando una clinica entre en rojo'
+      ]},
+      wa:{sub:'Clinicas &middot; pacientes VIP &middot; proveedores',kpis:[14,9,5],actions:[
+        'Dra. Sanchez (Teknon) &middot; duda dosis TRT resuelta con protocolo vigente',
+        'Ruber Intl &middot; escalado de caso critico al responsable de red',
+        'LabCorp &middot; confirmacion de 420 muestras recibidas en SLA 24h'
+      ],navFn:'showS(\'comunicacion\')'},
+      email:{sub:'Equipo financiero &middot; partners &middot; reporting',kpis:[38,22,7],actions:[
+        'Resumen ejecutivo Q3 enviado al equipo financiero a las 07:02',
+        'Draft de propuesta Teknon preparado &middot; listo para tu revision',
+        'Informe de cohorte Q3 enviado a inversores con NDA firmado'
+      ],navFn:'showS(\'comunicacion\')'}
+    })
+  );
 
   html+=scr('comunicacion',false,
     phdr('Comunicaci\xf3n','','Voz IA \u2022 WhatsApp \u2022 Email \u2014 EverHealthHormIA gestiona autom\xe1ticamente.')
@@ -2585,6 +2773,9 @@ function _doLoginDashboard(){
   // Médico
   if(pill==='MÉDICO'||pill==='MEDICO'){activateMedicoProfile();return;}
 
+  // Coordinador (usa el mismo shell que Médico)
+  if(pill==='COORDINADOR'){activateMedicoProfile();return;}
+
   // Paciente
   if(pill==='PACIENTE'){activatePacienteProfile();return;}
 
@@ -2782,6 +2973,7 @@ function buildSidebarPac(){
       h+='<button class="sb-btn'+(it.id==='panel'?' active':'')+' " id="sbp-'+it.id+'" data-id="'+it.id+'" onclick="showSPac(this.dataset.id)">'
         +(icons[it.id]||'')+'<span>'+it.label+'</span>'
         +(it.ia?'<span class="sb-ia-badge">IA</span>':'')
+        +(it.id==='comunicacion'&&window._unreadComms&&window._unreadComms.pac>0?'<span class="sb-unread-dot" aria-label="mensajes sin leer"></span>':'')
         +'</button>';
     });
   });
@@ -2789,6 +2981,7 @@ function buildSidebarPac(){
 }
 
 function showSPac(id){
+  if(id==='comunicacion')window._clearUnread('pac','#sidebarPac');
   document.querySelectorAll('#appShellPaciente .screen').forEach(function(s){s.classList.remove('active');});
   document.querySelectorAll('#appShellPaciente .sb-btn').forEach(function(b){b.classList.remove('active');});
   var sc=document.getElementById('pac-screen-'+id);
@@ -2876,7 +3069,7 @@ function buildScreensPac(){
     )
     // Adherencia
     +cardP('Mi adherencia',
-      '<div style="display:flex;align-items:center;gap:24px">'
+      '<div class="donut-wrap-flex" style="display:flex;align-items:center;gap:24px">'
         +'<div style="position:relative;width:90px;height:90px;flex-shrink:0">'
           +'<canvas id="pac-chart-adherencia" width="90" height="90"></canvas>'
           +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">'
@@ -3079,15 +3272,14 @@ function buildScreensPac(){
 
   // ── SCREEN 7: Comunicacion
   html+=scrP('comunicacion',false,
-    phdrP('Comunicacion','Habla con tu medico o con EverHealthHormIA.')
+    phdrP('Comunicacion','Bandeja con tu medico. EverHealthHormIA prepara drafts y acciones automaticas.')
     +'<div class="live-ticker"><div class="live-dot"></div><span class="live-label">IA LIVE</span>'
-    +'<div class="live-text">EverHealthHormIA disponible 24/7 para tus dudas hormonales</div></div>'
+    +'<div class="live-text">Dr. Martinez revisa tus mensajes · respuesta habitual en menos de 4h</div></div>'
     +'<div class="com-grid">'
       +'<div class="card"><div class="card-title">Conversaciones</div>'
         +'<div style="display:flex;flex-direction:column;gap:6px">'
           +[
-            {id:'medico', av:'DM', bg:'#185FA5', n:'Dr. Martinez', sub:'Consulta 21 Abr', online:true},
-            {id:'ia', av:'EH', bg:'#4B5563', n:'EverHealthHormIA', sub:'Siempre activo', online:true}
+            {id:'medico', av:'DM', bg:'#185FA5', n:'Dr. Martinez', sub:'Consulta 21 Abr', online:true}
           ].map(function(c){
             return '<div class="com-conv-item'+(c.id==='medico'?' active':'')+'" data-cid="'+c.id+'" onclick="selectConvPac(this.dataset.cid)">'
               +'<div style="position:relative"><div class="com-conv-av" style="background:'+c.bg+'">'+c.av+'</div>'
@@ -3104,18 +3296,13 @@ function buildScreensPac(){
 
   mc.innerHTML=html;
 
-  // Init chat
+  // Init chat — bandeja 1:1 con Dr. Martinez. IA trabaja en background preparando drafts y acciones.
   var convsPac={
     medico:{av:'DM',bg:'#185FA5',n:'Dr. Martinez',msgs:[
       {t:'ia',txt:'Recordatorio: consulta el lunes 21 de abril a las 10:30. EverHealthHormIA preparara un resumen de tu evolucion.',time:'08:14'},
       {t:'other',sender:'Dr. Martinez',txt:'Maria, tu ultima analitica muestra una mejora excelente. Seguimos con el protocolo actual.',time:'09:18'},
       {t:'own',txt:'Muchas gracias doctor. Me siento con mucho mas energia estos ultimos meses.',time:'09:21'},
       {t:'ia',txt:'IA: testosterona subio 35% desde enero. Proyeccion de alcanzar rango optimo en 6 semanas con dosis actual.',time:'09:21'}
-    ]},
-    ia:{av:'EH',bg:'#4B5563',n:'EverHealthHormIA',msgs:[
-      {t:'ia',txt:'Hola Maria. Tu adherencia esta semana es del 100%. Excelente trabajo. Tu proxima inyeccion es el lunes.',time:'07:12'},
-      {t:'own',txt:'Gracias! Tengo una duda sobre la zona de inyeccion. Puedo alternar muslo y gluteo?',time:'10:34'},
-      {t:'ia',txt:'Si, es recomendable alternar zonas para evitar lipodistrofia. Muslo lateral izquierdo esta semana, derecho la siguiente, luego gluteo. La app te recordara la rotacion.',time:'10:35'}
     ]}
   };
   var activePac='medico';
@@ -3134,9 +3321,24 @@ function buildScreensPac(){
         +'<div class="com-bubble '+m.t+'">'+(m.sender?'<div class="com-bubble-sender">'+m.sender+'</div>':'')+m.txt
         +'<div class="com-bubble-time">'+m.time+'</div></div></div>';
     });
-    h+='</div><div class="com-input-row">'
-      +'<input type="text" class="com-input" id="pac-com-input" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==String.fromCharCode(69,110,116,101,114))sendMsgPac()">'
-      +'<button class="com-send-btn" onclick="sendMsgPac()">Enviar</button></div>';
+    h+='</div>'
+      // Acciones IA preparadas — sustituye al input de chat reactivo (REGLA 0 COAXIONIA)
+      +'<div style="margin-top:12px;padding:12px;background:rgba(10,10,15,.04);border:1px solid rgba(10,10,15,.1);border-radius:10px">'
+        +'<div style="font-size:.58rem;font-weight:800;color:#6B7280;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">'
+          +'<span style="width:6px;height:6px;border-radius:50%;background:#0A0A0F;animation:pulseIA 1.5s infinite"></span>Acciones IA preparadas'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;gap:6px">'
+          +'<button onclick="pacQuickAction(\'cita\')" style="text-align:left;padding:9px 12px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;cursor:pointer;font-size:.67rem;color:#0A0A0F;font-family:inherit;display:flex;align-items:center;gap:8px;line-height:1.4">'
+            +'<span style="width:5px;height:5px;border-radius:50%;background:#0A0A0F;flex-shrink:0"></span>'
+            +'<span>Solicitar nueva cita &middot; IA propone 3 huecos a Dr. Martinez</span></button>'
+          +'<button onclick="pacQuickAction(\'efecto\')" style="text-align:left;padding:9px 12px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;cursor:pointer;font-size:.67rem;color:#0A0A0F;font-family:inherit;display:flex;align-items:center;gap:8px;line-height:1.4">'
+            +'<span style="width:5px;height:5px;border-radius:50%;background:#0A0A0F;flex-shrink:0"></span>'
+            +'<span>Reportar efecto adverso &middot; IA estructura ficha y la envia</span></button>'
+          +'<button onclick="pacQuickAction(\'protocolo\')" style="text-align:left;padding:9px 12px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;cursor:pointer;font-size:.67rem;color:#0A0A0F;font-family:inherit;display:flex;align-items:center;gap:8px;line-height:1.4">'
+            +'<span style="width:5px;height:5px;border-radius:50%;background:#0A0A0F;flex-shrink:0"></span>'
+            +'<span>Consultar mi protocolo activo</span></button>'
+        +'</div>'
+      +'</div>';
     cp.innerHTML=h;
   }
 
@@ -3148,16 +3350,26 @@ function buildScreensPac(){
     renderPacChat(id);
   };
 
-  window.sendMsgPac=function(){
-    var inp=document.getElementById('pac-com-input');if(!inp||!inp.value.trim())return;
-    var txt=inp.value.trim();inp.value='';
-    convsPac[activePac].msgs.push({t:'own',txt:txt,time:new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})});
-    setTimeout(function(){
-      var resp=activePac==='ia'?'EverHealthHormIA: '+txt+' — analizando tu consulta con tu historial clinico.':'IA: Dr. Martinez recibio tu mensaje. Respuesta en menos de 24h.';
-      convsPac[activePac].msgs.push({t:'ia',txt:resp,time:new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})});
-      renderPacChat(activePac);
-    },800);
-    renderPacChat(activePac);
+  // Acciones IA proactivas — sustituye al chat reactivo prohibido por REGLA 0
+  window.pacQuickAction=function(action){
+    var now=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+    if(action==='cita'){
+      convsPac.medico.msgs.push({t:'own',txt:'Solicito nueva cita de seguimiento.',time:now});
+      renderPacChat('medico');
+      setTimeout(function(){
+        convsPac.medico.msgs.push({t:'ia',txt:'IA: propuse a Dr. Martinez 3 huecos compatibles con tu agenda - Lun 28 10:30, Mar 29 11:00, Mie 30 17:00. Confirmaremos el elegido por email.',time:now});
+        renderPacChat('medico');
+      },700);
+    } else if(action==='efecto'){
+      convsPac.medico.msgs.push({t:'own',txt:'Reporte de efecto adverso.',time:now});
+      renderPacChat('medico');
+      setTimeout(function(){
+        convsPac.medico.msgs.push({t:'ia',txt:'IA: ficha de efecto adverso estructurada con tu protocolo actual y enviada a Dr. Martinez. Respuesta priorizada antes de 4h. Tambien registrada en tu historia clinica.',time:now});
+        renderPacChat('medico');
+      },700);
+    } else if(action==='protocolo'){
+      if(typeof showSPac==='function')showSPac('protocolo');
+    }
   };
 
   renderPacChat('medico');
@@ -3361,16 +3573,18 @@ function buildSidebarLab(){
   var sb=document.getElementById('sidebarLab');
   sb.innerHTML=''
     +'<nav class="sb-nav">'+labScreens.map(function(s){
-      return '<button class="sb-btn'+(s.id===labActiveScreen?' active':'')+'" onclick="navLab(\''+s.id+'\')">'
+      return '<button class="sb-btn'+(s.id===labActiveScreen?' active':'')+'" id="sbl-'+s.id+'" onclick="navLab(\''+s.id+'\')">'
         +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="'+s.ico+'"/></svg>'
         +'<span>'+s.lbl+'</span>'
         +(s.ia?'<span class="sb-ia">IA</span>':'')
+        +(s.id==='lab-com'&&window._unreadComms&&window._unreadComms.lab>0?'<span class="sb-unread-dot" aria-label="mensajes sin leer"></span>':'')
         +'</button>';
     }).join('')+'</nav>'
     +'<div class="sb-footer"><button class="sb-footer-btn" onclick="goBackLab()">&#8617; Cambiar perfil</button></div>';
 }
 
 function navLab(id){
+  if(id==='lab-com')window._clearUnread('lab','#sidebarLab');
   labActiveScreen=id;
   document.querySelectorAll('#appShellLab .sb-btn').forEach(function(b){b.classList.remove('active');});
   document.querySelectorAll('#appShellLab .screen').forEach(function(s){s.classList.remove('active');});
@@ -3509,7 +3723,7 @@ function buildLabPedidos(){
     +'<div class="lab-forecast-chip">Hoy: 47 muestras esperadas</div>'
     +'</div></div>'
     +'<div style="overflow-x:auto">'
-    +'<table style="width:100%;border-collapse:collapse;font-size:.65rem;">'
+    +'<table class="lab-tbl-pedidos" style="width:100%;border-collapse:collapse;font-size:.65rem;">'
     +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +['ID Muestra','Paciente','Tipo analítica','Estado','Médico','Clínica','Tiempo restante','Fecha'].map(function(h){
       return '<th style="text-align:left;padding:8px 10px;font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">'+h+'</th>';
@@ -3695,7 +3909,7 @@ function buildLabSLA(){
     +'</div>'
     +'<div class="card" style="padding:20px">'
     +'<div class="card-title" style="margin-bottom:16px">Cumplimiento SLA por tipo de analítica</div>'
-    +'<table style="width:100%;border-collapse:collapse;font-size:.65rem">'
+    +'<table class="lab-tbl-sla" style="width:100%;border-collapse:collapse;font-size:.65rem">'
     +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +['Tipo analítica','Objetivo','Tiempo medio','Estado','Cumplimiento'].map(function(h){
       return '<th style="text-align:left;padding:8px 10px;font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">'+h+'</th>';
@@ -3761,7 +3975,7 @@ function buildLabForecast(){
     +'</div>'
     +'<div class="card" style="padding:20px">'
     +'<div class="card-title" style="margin-bottom:14px">Previsión por zona geográfica</div>'
-    +'<table style="width:100%;border-collapse:collapse;font-size:.65rem">'
+    +'<table class="lab-tbl-forecast" style="width:100%;border-collapse:collapse;font-size:.65rem">'
     +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +['Zona','Muestras previstas','Variación','Nivel demanda','Acción recomendada'].map(function(h){
       return '<th style="text-align:left;padding:8px 10px;font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">'+h+'</th>';
@@ -3799,7 +4013,7 @@ function buildLabFacturacion(){
     +'</div>'
     +'<div class="card" style="padding:20px">'
     +'<div class="card-title" style="margin-bottom:14px">Historial de facturas — conciliación automática EverHealthHormIA</div>'
-    +'<table style="width:100%;border-collapse:collapse;font-size:.65rem">'
+    +'<table class="lab-tbl-fac" style="width:100%;border-collapse:collapse;font-size:.65rem">'
     +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +['Nº Factura','Fecha','Importe','Estado','Muestras','Pago'].map(function(h){
       return '<th style="text-align:left;padding:8px 10px;font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">'+h+'</th>';
@@ -3847,7 +4061,7 @@ function buildLabLogistica(){
     +'<div class="lab-forecast-chip">IA optimiza rutas en tiempo real</div>'
     +'</div>'
     +'<div style="overflow-x:auto">'
-    +'<table style="width:100%;border-collapse:collapse;font-size:.65rem">'
+    +'<table class="lab-tbl-logistica" style="width:100%;border-collapse:collapse;font-size:.65rem">'
     +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +['ID Envío','Destinatario','Dirección','Contenido','Estado','ETA'].map(function(h){
       return '<th style="text-align:left;padding:8px 10px;font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">'+h+'</th>';
@@ -4111,7 +4325,7 @@ var alertsDataInv=[
   {sec:'Mercado',tipo:'blue',txt:'Pivot masivo de GLP-1 a hormonal detectado por IA — tendencia confirmada.'},
   {sec:'Financiero',tipo:'green',txt:'MRR alcanza 2.4M€ — crecimiento +18% interanual.'},
   {sec:'Financiero',tipo:'amber',txt:'CAC subió 8% este mes — IA recomienda optimizar canal WhatsApp.'},
-  {sec:'Competencia',tipo:'blue',txt:'Hims & Hers reporta pérdidas — oportunidad de posicionamiento premium.'}
+  {sec:'Competencia',tipo:'blue',txt:'Principal competidor del mercado reporta pérdidas — oportunidad de posicionamiento premium.'}
 ];
 var _readAlertsInv={};
 
@@ -4149,7 +4363,8 @@ function buildSidebarInversor(){
     {id:'moat',label:'Moat y ventaja competitiva',ia:true,sec:'ESTRATEGIA'},
     {id:'regulatorio',label:'Marco regulatorio',ia:false},
     {id:'casos',label:'Casos de éxito',ia:false,sec:'EVIDENCIA'},
-    {id:'comunicacion',label:'Comunicación',ia:false,sec:'CANALES'}
+    {id:'canales',label:'Canales IA',ia:true,sec:'CANALES'},
+    {id:'comunicacion',label:'Comunicación',ia:false}
   ];
   var icons={
     mercado:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
@@ -4159,6 +4374,7 @@ function buildSidebarInversor(){
     proyeccion:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
     moat:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
     regulatorio:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    canales:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
     comunicacion:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'
   };
   var html='';
@@ -4168,6 +4384,7 @@ function buildSidebarInversor(){
       +'<span class="sb-icon">'+icons[it.id]+'</span>'
       +it.label
       +(it.ia?'<span class="sb-ia">IA</span>':'')
+      +(it.id==='comunicacion'&&window._unreadComms&&window._unreadComms.inv>0?'<span class="sb-unread-dot" aria-label="mensajes sin leer"></span>':'')
       +'</button>';
   });
   html+='<div class="sb-footer"><button class="sb-footer-btn" onclick="goBackInv()">↩ Cambiar perfil</button></div>';
@@ -4175,6 +4392,7 @@ function buildSidebarInversor(){
 }
 
 function showSInv(id){
+  if(id==='comunicacion')window._clearUnread('inv','#sidebarInv');
   document.querySelectorAll('#appShellInversor .screen').forEach(function(s){s.classList.remove('active')});
   document.querySelectorAll('#appShellInversor .sb-btn').forEach(function(b){b.classList.remove('active')});
   var sc=document.getElementById('inv-screen-'+id);
@@ -4216,8 +4434,8 @@ function initChartsInv(){
       labels:['Mes 1','Mes 2','Mes 3','Mes 4','Mes 5','Mes 6','Mes 7','Mes 8','Mes 9','Mes 10','Mes 11','Mes 12'],
       datasets:[
         {label:'EverHealthHormIA',data:[100,97,94,92,90,88,87,86,85,84,83,82],borderColor:'#0A0A0F',backgroundColor:'rgba(10,10,15,.06)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
-        {label:'Hims & Hers',data:[100,91,82,76,72,69,67,65,63,61,60,59],borderColor:'#E04668',borderDash:[5,5],backgroundColor:'rgba(224,70,104,.04)',fill:true,tension:.4,borderWidth:1.5,pointRadius:0},
-        {label:'Numan',data:[100,88,78,72,68,65,63,61,59,57,56,55],borderColor:'#F59E0B',borderDash:[3,3],fill:false,tension:.4,borderWidth:1.5,pointRadius:0}
+        {label:'Competidor A',data:[100,91,82,76,72,69,67,65,63,61,60,59],borderColor:'#E04668',borderDash:[5,5],backgroundColor:'rgba(224,70,104,.04)',fill:true,tension:.4,borderWidth:1.5,pointRadius:0},
+        {label:'Competidor B',data:[100,88,78,72,68,65,63,61,59,57,56,55],borderColor:'#F59E0B',borderDash:[3,3],fill:false,tension:.4,borderWidth:1.5,pointRadius:0}
       ]
     },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:10},usePointStyle:true}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{min:50,grid:{color:'rgba(10,10,15,.05)'},ticks:{font:{size:10},callback:function(v){return v+'%'}}}}}});
   }
@@ -4265,16 +4483,16 @@ function buildScreensInversor(){
       +kpiInv('€27.5B','HRT Global 2026','CAGR 6.12%','up','0,20 12,18 24,16 36,14 48,10 60,7 72,4')
       +kpiInv('€1.9B','TRT Global','Crecimiento acelerado','up','0,22 12,20 24,18 36,16 48,13 60,10 72,6')
       +kpiInv('0','Líderes digitales ES','Mercado sin conquistar','up','0,24 12,24 24,24 36,24 48,24 60,24 72,24')
-      +kpiInv('€41B','Market cap Hims','Comparable directo','up','0,18 12,16 24,14 36,12 48,10 60,8 72,5')
+      +kpiInv('€41B','Market cap competidor líder','Comparable directo','up','0,18 12,16 24,14 36,12 48,10 60,8 72,5')
     +'</div>'
     +'<div class="g2 mb14">'
       +cardInv('Tamaño de mercado',true,'<div class="chart-wrap"><canvas id="chart-inv-mercado"></canvas></div>')
       +cardInv('Comparables del sector',true,
         [
-          {name:'Hims & Hers',desc:'€2.2B revenue · €41B market cap · USA líder TRT/hormonal',cls:'red'},
-          {name:'Numan',desc:'€60M levantados · UK líder · En expansión Europa',cls:'amber'},
-          {name:'Evernow',desc:'Hormonal femenino D2C · USA · Sin presencia España',cls:'blue'},
-          {name:'Midi Health',desc:'Menopausia D2C · USA · Sin gobernanza clínica',cls:'blue'}
+          {name:'Competidor A',desc:'€2.2B revenue · €41B market cap · Líder internacional TRT/hormonal',cls:'red'},
+          {name:'Competidor B',desc:'€60M levantados · Líder europeo · En expansión Europa',cls:'amber'},
+          {name:'Competidor C',desc:'Hormonal femenino D2C · Sin presencia España',cls:'blue'},
+          {name:'Competidor D',desc:'Menopausia D2C · Sin gobernanza clínica',cls:'blue'}
         ].map(function(c){
           return groupInv(c.cls,c.name,null,null,
             '<div style="padding:12px 14px;font-size:.7rem;color:#4B5563;line-height:1.6">'
@@ -4283,7 +4501,7 @@ function buildScreensInversor(){
             +'</div>'
           );
         }).join('')
-        +iaboxInv('Pivot masivo de GLP-1 a hormonal confirmado por STAT News. Ventana de 18 meses para consolidar liderazgo digital en España antes de entrada de Hims.')
+        +iaboxInv('Pivot masivo de GLP-1 a hormonal confirmado por STAT News. Ventana de 18 meses para consolidar liderazgo digital en España antes de entrada de competidores internacionales.')
       )
     +'</div>'
   );
@@ -4314,10 +4532,10 @@ function buildScreensInversor(){
         groupInv('black','EverHealthHormIA',null,null,
           [['LTV/CAC','6.3x'],['Retención 3m','94%'],['Payback CAC','8 meses'],['Margen bruto','68%']].map(function(r){return '<div style="display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #F3F4F6"><span style="font-size:.7rem;color:#4B5563">'+r[0]+'</span><span class="badge b-ok">'+r[1]+'</span></div>'}).join('')
         )
-        +groupInv('black','Hims & Hers',null,null,
+        +groupInv('black','Competidor A',null,null,
           [['LTV/CAC','3.8x'],['Retención 3m','82%'],['Payback CAC','12 meses'],['Margen bruto','59%']].map(function(r){return '<div style="display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #F3F4F6"><span style="font-size:.7rem;color:#4B5563">'+r[0]+'</span><span class="badge b-amber">'+r[1]+'</span></div>'}).join('')
         )
-        +groupInv('black','Numan',null,null,
+        +groupInv('black','Competidor B',null,null,
           [['LTV/CAC','2.1x'],['Retención 3m','74%'],['Payback CAC','18 meses'],['Margen bruto','48%']].map(function(r){return '<div style="display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #F3F4F6"><span style="font-size:.7rem;color:#4B5563">'+r[0]+'</span><span class="badge b-red">'+r[1]+'</span></div>'}).join('')
         )
       )
@@ -4328,14 +4546,14 @@ function buildScreensInversor(){
   html+=scrInv('cohortes',false,
     phdrInv('Análisis de cohortes','','Lo que piden todos los inversores y ninguna plataforma visualiza en tiempo real.')
     +'<div class="g4 mb14">'
-      +kpiInv('94%','Retención mes 3','+12pp vs Hims','up','0,20 12,21 24,22 36,22 48,23 60,24 72,24')
-      +kpiInv('82%','Retención mes 12','+23pp vs Hims','up','0,16 12,17 24,18 36,19 48,20 60,21 72,22')
+      +kpiInv('94%','Retención mes 3','+12pp vs competidores','up','0,20 12,21 24,22 36,22 48,23 60,24 72,24')
+      +kpiInv('82%','Retención mes 12','+23pp vs competidores','up','0,16 12,17 24,18 36,19 48,20 60,21 72,22')
       +kpiInv('2.1%','Churn mensual','Mejor del sector','up','0,22 12,20 24,18 36,16 48,14 60,12 72,10')
       +kpiInv('€892','LTV/paciente','Creciendo +18%','up','0,14 12,16 24,18 36,20 48,21 60,22 72,24')
     +'</div>'
     +'<div class="mb14">'
       +cardInv('Curvas de retención vs. competencia',true,'<div class="chart-wrap" style="height:240px"><canvas id="chart-inv-cohortes"></canvas></div>'
-        +iaboxInv('EverHealthHormIA retiene el 82% a 12 meses vs 59% de Hims. Diferencial de 23pp gracias al protocolo adaptativo IA. Cada punto de retención = +€107K ARR adicional.')
+        +iaboxInv('EverHealthHormIA retiene el 82% a 12 meses vs 59% de los competidores del mercado. Diferencial de 23pp gracias al protocolo adaptativo IA. Cada punto de retención = +€107K ARR adicional.')
       )
     +'</div>'
     +'<div class="g2 mb14">'
@@ -4426,7 +4644,7 @@ function buildScreensInversor(){
 
   // ── 6. MOAT ──
   html+=scrInv('moat',false,
-    phdrInv('Moat y ventaja competitiva','<span class="badge-excl">EXCLUSIVO COAXIONIA</span>','Lo que Hims, Numan y Evernow NO pueden replicar.')
+    phdrInv('Moat y ventaja competitiva','<span class="badge-excl">EXCLUSIVO COAXIONIA</span>','Lo que los competidores del mercado NO pueden replicar.')
     // KPIs moat
     +'<div class="g4 mb14">'
       +kpiInv('€10M+','Coste replicar moat','24-36 meses mínimo','up','0,24 12,24 24,24 36,24 48,24 60,24 72,24')
@@ -4462,7 +4680,7 @@ function buildScreensInversor(){
           ['Compliance AI Act',1,2,0,0,0,0],
           ['Red laboratorios',1,0,0,0,0,0]
         ];
-        var cos=['EverHealth HormIA','Hims & Hers','Numan UK','Evernow USA','Midi Health','Hone Health'];
+        var cos=['EverHealth HormIA','Competidor A','Competidor B','Competidor C','Competidor D','Competidor E'];
         var scores=[{v:'6/6',c:'#10B981',l:'L\xedder'},{v:'1/6',c:'#F59E0B',l:'Parcial'},{v:'0/6',c:'#E04668',l:'Sin moat'},{v:'1/6',c:'#F59E0B',l:'Parcial'},{v:'0/6',c:'#E04668',l:'Sin moat'},{v:'0/6',c:'#E04668',l:'Sin moat'}];
         function tick(t){
           var bg=t===1?'#0A0A0F':t===2?'#F59E0B':'#F3F4F6';
@@ -4549,10 +4767,10 @@ function buildScreensInversor(){
         groupInv('black','Bajo riesgo — EverHealthHormIA',null,null,
           '<div style="padding:10px 14px;font-size:.7rem;color:#4B5563">Compliance integrado desde diseño. Sin deuda técnica regulatoria. Auditado trimestralmente por bufete especializado.</div>'
         )
-        +groupInv('black','Riesgo medio — Hims & Hers',null,null,
+        +groupInv('black','Riesgo medio — Competidor A',null,null,
           '<div style="padding:10px 14px;font-size:.7rem;color:#4B5563">Operando bajo marco US. Entrada en UE requiere adaptación completa a AI Act y RGPD. Coste estimado €3-5M.</div>'
         )
-        +groupInv('black','Riesgo alto — Numan',null,null,
+        +groupInv('black','Riesgo alto — Competidor B',null,null,
           '<div style="padding:10px 14px;font-size:.7rem;color:#4B5563">Post-Brexit sin marco UE claro. Expansión a España bloqueada hasta certificación. Timeline: 18-24 meses.</div>'
         )
       )
@@ -4605,7 +4823,7 @@ function buildScreensInversor(){
       )
     +'</div>'
     +cardInv('Comparativa vs modelo tradicional',true,
-      '<table style="width:100%;border-collapse:collapse;font-size:.65rem">'
+      '<table class="inv-tbl-comp" style="width:100%;border-collapse:collapse;font-size:.65rem">'
       +'<thead><tr style="border-bottom:2px solid var(--border)">'
       +['','EverHealthHormIA','Clínica tradicional','Diferencial'].map(function(h){
         return '<th style="text-align:left;padding:8px 10px;font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase">'+h+'</th>';
@@ -4640,8 +4858,8 @@ function buildScreensInversor(){
     {id:'ia-inv',name:'EverHealthHormIA',sub:'Hoy 08:14 — Automático',canal:'voz',canalColor:'#FF6B2B',av:'EH',avBg:'#4B5563',online:true,
       msgs:[
         {t:'ia',txt:'Buenos días. El MRR de ayer alcanzó €2.41M — nuevo máximo histórico. La cohorte Q3 supera el objetivo de retención. ¿Desea el informe completo?',time:'08:14'},
-        {t:'own',txt:'Sí, y compara con Hims del último trimestre.',time:'08:02'},
-        {t:'ia',txt:'Informe generado. EverHealthHormIA supera a Hims en retención (+12pp), LTV/CAC (+2.5x) y margen bruto (+9pp). Adjunto en email.',time:'08:03'}
+        {t:'own',txt:'Sí, y compara con el principal competidor del último trimestre.',time:'08:02'},
+        {t:'ia',txt:'Informe generado. EverHealthHormIA supera a los competidores del mercado en retención (+12pp), LTV/CAC (+2.5x) y margen bruto (+9pp). Adjunto en email.',time:'08:03'}
       ]
     },
     {id:'lab-inv',name:'LabCorp Partner',sub:'Ayer 16:00 — Lab',canal:'whatsapp',canalColor:'#25D366',av:'LC',avBg:'#6B7280',online:false,
@@ -4713,6 +4931,29 @@ function buildScreensInversor(){
     },800);
     var cp=document.getElementById('inv-chat-panel');if(cp)cp.innerHTML=renderChatPanelInv(activeConvInv);
   };
+
+  // ── Canales IA · vista proactiva (REGLA 7 COAXIONIA) ──
+  html+=scrInv('canales',false,
+    phdrInv('Canales IA','','Que ha hecho la IA hoy en cada canal. Vista proactiva, sin chat.')
+    +window.buildCanalesIA({
+      ticker:'Canales IA 24/7 &middot; 8 acciones de inversion automatizadas hoy',
+      voz:{futures:[
+        'Briefing diario a las 7:45 con MRR, cohortes y alertas de inversion',
+        'Llamada automatica al board cuando la IA detecte riesgo contractual',
+        'Recordatorio de due diligence a fondos con pipeline en Evaluacion'
+      ]},
+      wa:{sub:'CFO &middot; partners &middot; fondos en pipeline',kpis:[8,5,3],actions:[
+        'CFO &middot; resumen MRR del dia enviado automaticamente a las 08:14',
+        'LabCorp &middot; confirmacion de capacidad Q4 +15% recibida y registrada',
+        'Fondo Iberis &middot; agenda de due diligence propuesta y confirmada'
+      ],navFn:'showSInv(\'comunicacion\')'},
+      email:{sub:'Board &middot; inversores &middot; reporting mensual',kpis:[26,18,6],actions:[
+        'Informe mensual MRR &middot; nuevo maximo 2.41M enviado al board',
+        'Dashboard de cohorte Q3 compartido con NDA firmado con 3 fondos',
+        'Draft de term sheet preparado &middot; listo para tu revision'
+      ],navFn:'showSInv(\'comunicacion\')'}
+    })
+  );
 
   html+=scrInv('comunicacion',false,
     phdrInv('Comunicación','','Voz IA · WhatsApp · Email — Coordinación con equipo directivo y reporting automático.')
@@ -4787,7 +5028,7 @@ function activateInversorProfile(){
       {t:'MRR alcanza nuevo máximo €2.41M — EverHealthHormIA',cls:'green'},
       {t:'Cohorte Q3 supera objetivo retención — análisis disponible',cls:'blue'},
       {t:'CAC subió 8% este mes — IA optimizando canales',cls:'amber'},
-      {t:'Hims reporta pérdidas Q3 — oportunidad de posicionamiento',cls:'blue'}
+      {t:'Principal competidor reporta pérdidas Q3 — oportunidad de posicionamiento',cls:'blue'}
     ];
     var idx=0;
     function showN(msg){
@@ -4859,6 +5100,26 @@ function activateInversorProfile(){
 @media(max-width:600px){
   #gd-bio{grid-template-columns:1fr!important;}
 }
+/* Gemelo · lista de pacientes colapsable en 480px (doc responsive COAXIONIA) */
+#gd-list-toggle{display:none;}
+@media(max-width:480px){
+  #gd-list-toggle{
+    display:flex!important;align-items:center;justify-content:space-between;
+    padding:10px 14px;width:100%;
+    border:1px solid #E5E7EB;border-radius:8px;background:#fff;
+    font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:700;color:#0A0A0F;
+    cursor:pointer;text-align:left;
+  }
+  #gd-list-toggle-ico{transition:transform .25s ease;flex-shrink:0;}
+  #gd-list-wrap.open #gd-list-toggle-ico{transform:rotate(180deg);}
+  #gd-list-wrap #gd-list-inner{
+    transition:max-height .3s ease,opacity .2s ease;
+    max-height:700px;opacity:1;overflow:hidden;
+  }
+  #gd-list-wrap:not(.open) #gd-list-inner{
+    max-height:0;opacity:0;pointer-events:none;
+  }
+}
 
 /* Semáforos pacientes */
 .pac-semaforo{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
@@ -4900,6 +5161,341 @@ function activateInversorProfile(){
   #appShellMedico .g3{grid-template-columns:1fr!important;gap:10px!important;}
   #appShellMedico .com-grid{grid-template-columns:1fr!important;}
   #appShellMedico .content{padding:16px 12px!important;}
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* COAXIONIA · RESPONSIVE SAFETY NET · EverHealthHormIA 2026-04-21  */
+/* Añade lo que faltaba: safety-net, escalado móvil, grids Paciente,*/
+/* tablas con columnas ocultas en móvil y donut wrap flexible.      */
+/* No toca nada que ya funcione.                                    */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* ── 4. SAFETY NET GLOBAL ── */
+html,body{overflow-x:hidden;max-width:100vw;}
+#roleScreen,#loginScreen,#appShell,#appShellInversor,#appShellMedico,#appShellPaciente,#appShellLab{max-width:100vw;}
+img,svg,video,canvas{max-width:100%;}
+input,textarea,select,button{max-width:100%;}
+
+/* ── BREAKPOINT 1100px · Desktop estrecho / tablet landscape (doc responsive COAXIONIA) ── */
+/* Sidebar más estrecha · grids 4col→2col · grids 3col→2col · grids 2col mantienen · content padding reducido */
+@media(max-width:1100px){
+  .sidebar{width:190px;}
+  #appShell .g4,
+  #appShellInversor .g4,
+  #appShellMedico .g4,
+  #appShellLab .g4,
+  #appShellPaciente .g4{grid-template-columns:1fr 1fr!important;}
+  #appShell .g3,
+  #appShellInversor .g3,
+  #appShellMedico .g3,
+  #appShellLab .g3,
+  #appShellPaciente .g3{grid-template-columns:1fr 1fr!important;}
+  .content{padding:20px 22px!important;}
+  /* Canales IA tarjetas a 2 cols en 1100 */
+  #appShell .canal-card,
+  #appShellInversor .canal-card,
+  #appShellMedico .canal-card{min-height:300px;}
+}
+
+/* ── 5. FONT-SIZE ESCALADO MÓVIL (REGLA 2 COAXIONIA) ── */
+@media(max-width:768px){html{font-size:18.5px;}}
+@media(max-width:480px){html{font-size:19.2px;}}
+
+/* ── 2. RESPONSIVE GRIDS PACIENTE ── */
+@media(max-width:768px){
+  #appShellPaciente .g3{grid-template-columns:1fr!important;gap:10px!important;}
+  #appShellPaciente .g2{grid-template-columns:1fr!important;gap:10px!important;}
+  #appShellPaciente .content{padding:14px 10px!important;}
+  #appShellPaciente div[style*="grid-template-columns"]{grid-template-columns:1fr!important;}
+}
+@media(max-width:480px){
+  #appShellPaciente .g4{grid-template-columns:1fr 1fr!important;gap:8px!important;}
+  #appShellPaciente .content{padding:12px 8px!important;}
+}
+
+/* ── 6. DONUT WRAP EN MÓVIL ── */
+@media(max-width:768px){
+  .donut-wrap-flex{flex-direction:column!important;align-items:center!important;gap:14px!important;grid-template-columns:1fr!important;}
+}
+
+/* ── REGLA 4 COAXIONIA · Badge mensajes sin leer en Comunicación ── */
+.sb-unread-dot{
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#C65D4A;
+  flex-shrink:0;
+  margin-left:auto;
+  animation:pulseRed 1.5s infinite;
+}
+.sb-ia + .sb-unread-dot{margin-left:6px;}
+@keyframes pulseRed{
+  0%  { box-shadow:0 0 0 0 rgba(198,93,74,0.55); }
+  70% { box-shadow:0 0 0 8px rgba(198,93,74,0); }
+  100%{ box-shadow:0 0 0 0 rgba(198,93,74,0); }
+}
+.sb-btn.active .sb-unread-dot{display:none;}
+
+/* ── REGLA 9 COAXIONIA · Toast global ── */
+.toast-root{
+  position:fixed;left:50%;bottom:32px;transform:translateX(-50%);
+  z-index:100000;display:flex;flex-direction:column;gap:8px;align-items:center;
+  pointer-events:none;max-width:calc(100vw - 32px);
+}
+.toast{
+  background:#0A0A0F;color:#fff;
+  border-radius:10px;padding:10px 16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  font-size:.72rem;line-height:1.4;
+  display:flex;align-items:center;gap:10px;
+  pointer-events:auto;
+  animation:toastIn .25s cubic-bezier(.4,0,.2,1);
+  max-width:calc(100vw - 32px);
+  font-family:'DM Sans',sans-serif;
+}
+.toast-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.toast-dot.ok{background:#22A06B}
+.toast-dot.info{background:#2E5A8C}
+.toast-dot.warn{background:#D4A574}
+.toast-dot.error{background:#C65D4A}
+.toast.out{animation:toastOut .25s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes toastOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(8px)}}
+
+/* ── REGLA 7 COAXIONIA · Sección Canales IA (vista proactiva, NO chat) ── */
+.canal-card{display:flex;flex-direction:column;gap:12px;padding:18px;min-height:340px;}
+.canal-head{display:flex;align-items:flex-start;gap:10px;}
+.canal-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.canal-name{font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:900;color:var(--black);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.canal-sub{font-size:.6rem;color:var(--text3);line-height:1.4;}
+.canal-state{margin-left:auto;flex-shrink:0;font-size:.52rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+.canal-state.active{background:rgba(16,185,129,.1);color:#10B981;border:1px solid rgba(16,185,129,.2);}
+.canal-state.soon{background:rgba(156,163,175,.1);color:#6B7280;border:1px solid rgba(156,163,175,.3);}
+.canal-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.canal-kpi{text-align:center;padding:4px 2px;min-width:0;}
+.canal-kpi-val{display:block;font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:900;color:var(--black);line-height:1;}
+.canal-kpi-lbl{display:block;font-size:.5rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;font-weight:600;line-height:1.2;}
+.canal-intro{font-size:.66rem;color:var(--text2);line-height:1.55;}
+.canal-actions-title{font-size:.54rem;font-weight:800;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;}
+.canal-actions{list-style:none;display:flex;flex-direction:column;gap:8px;margin:0;padding:0;}
+.canal-actions li{display:flex;align-items:flex-start;gap:8px;font-size:.66rem;color:var(--text2);line-height:1.5;}
+.canal-actions li::before{content:'';width:5px;height:5px;border-radius:50%;background:#0A0A0F;flex-shrink:0;margin-top:6px;}
+.canal-futures{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0;padding:0;}
+.canal-futures li{display:flex;align-items:flex-start;gap:8px;font-size:.66rem;color:var(--text3);line-height:1.5;}
+.canal-futures li::before{content:'';width:5px;height:5px;border-radius:50%;background:#D1D5DB;flex-shrink:0;margin-top:6px;}
+.canal-cta{margin-top:auto;padding:11px;background:var(--black);color:#fff;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;font-family:inherit;}
+.canal-cta:hover{opacity:.85;}
+.canal-cta.voz{background:#FF6B2B;}
+@media(max-width:768px){
+  .canal-card{min-height:auto;}
+  .canal-kpi-val{font-size:1rem;}
+}
+
+/* ── Módulos premium bloqueados · Modal reutilizable (doc responsive COAXIONIA) ── */
+.premium-modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(10,10,15,.6);z-index:100001;
+  align-items:center;justify-content:center;padding:20px;
+  animation:premiumFade .25s ease;
+}
+.premium-modal-overlay.open{display:flex;}
+@keyframes premiumFade{from{opacity:0}to{opacity:1}}
+.premium-modal{
+  display:flex;width:min(720px,95vw);max-height:90vh;
+  background:#fff;border-radius:18px;overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.4);
+  animation:premiumSlide .28s cubic-bezier(.4,0,.2,1);
+}
+@keyframes premiumSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.premium-hero{
+  width:260px;flex-shrink:0;
+  padding:28px 24px;
+  display:flex;flex-direction:column;gap:16px;
+  color:#fff;position:relative;overflow:hidden;
+}
+.premium-hero::before{
+  content:'';position:absolute;
+  top:-40%;right:-30%;width:200%;height:200%;
+  background:radial-gradient(circle at top right,rgba(255,255,255,.18),transparent 55%);
+  pointer-events:none;
+}
+.premium-hero-ico{
+  width:52px;height:52px;border-radius:14px;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;position:relative;z-index:1;
+}
+.premium-hero-pill{
+  display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);
+  border-radius:20px;padding:4px 12px;
+  font-size:.52rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  position:relative;z-index:1;
+}
+.premium-hero-title{
+  font-family:'Montserrat',sans-serif;font-size:1.5rem;font-weight:900;
+  line-height:1.1;letter-spacing:-.01em;position:relative;z-index:1;
+}
+.premium-hero-tagline{
+  font-size:.72rem;line-height:1.55;
+  color:rgba(255,255,255,.85);position:relative;z-index:1;
+}
+.premium-close{
+  position:absolute;top:12px;right:12px;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  z-index:2;padding:0;
+}
+.premium-close:hover{background:rgba(255,255,255,.25);}
+.premium-body{
+  flex:1;display:flex;flex-direction:column;
+  overflow-y:auto;max-height:90vh;min-width:0;
+}
+.premium-body-inner{
+  padding:26px 28px;display:flex;flex-direction:column;gap:18px;
+}
+.premium-body-head{
+  font-family:'Montserrat',sans-serif;
+  font-size:.6rem;font-weight:800;
+  color:#6B7280;letter-spacing:.12em;text-transform:uppercase;
+}
+.premium-features{
+  list-style:none;padding:0;margin:0;
+  display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;
+}
+.premium-features li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:.72rem;color:#1F2937;line-height:1.5;
+}
+.premium-features li::before{
+  content:'';width:16px;height:16px;border-radius:50%;
+  background:#10B981;flex-shrink:0;margin-top:1px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  background-size:10px;background-position:center;background-repeat:no-repeat;
+}
+.premium-meta{
+  background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;
+  padding:12px 14px;font-size:.66rem;color:#4B5563;line-height:1.55;
+}
+.premium-ctas{display:flex;gap:10px;margin-top:4px;}
+.premium-cta{
+  padding:11px 18px;border-radius:9px;border:none;cursor:pointer;
+  font-family:'Montserrat',sans-serif;
+  font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  transition:opacity .2s,transform .15s;
+}
+.premium-cta.primary{background:#0A0A0F;color:#fff;flex:1;}
+.premium-cta.ghost{background:#F3F4F6;color:#0A0A0F;}
+.premium-cta:hover{opacity:.88;}
+
+@media(max-width:768px){
+  .premium-modal{max-width:95vw;width:auto;}
+  .premium-hero{width:130px;padding:20px 14px;gap:10px;}
+  .premium-hero-ico{width:42px;height:42px;}
+  .premium-hero-title{font-size:1rem;}
+  .premium-hero-tagline{display:none;}
+  .premium-body-inner{padding:20px 20px;gap:14px;max-height:60vh;}
+  .premium-features{grid-template-columns:1fr;gap:8px;}
+  .premium-ctas{flex-direction:column;}
+  .premium-cta.primary,.premium-cta.ghost{width:100%;}
+  .premium-cta.ghost{order:2;}
+}
+@media(max-width:480px){
+  .premium-modal{flex-direction:column;max-height:90vh;}
+  .premium-hero{
+    width:100%;height:auto;min-height:80px;
+    padding:14px 18px;flex-direction:row;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .premium-hero-title{font-size:.95rem;}
+  .premium-hero-pill{font-size:.48rem;padding:2px 8px;}
+  .premium-close{top:8px;right:8px;}
+  .premium-body-inner{padding:16px;}
+}
+
+/* ── 3. TABLAS — COLUMNAS SECUNDARIAS OCULTAS EN MÓVIL ── */
+@media(max-width:768px){
+  /* Lab Pedidos (8 cols) → mantenemos ID, Paciente, Estado, SLA. Ocultamos Tipo(3), Médico(5), Clínica(6), Fecha(8) */
+  .lab-tbl-pedidos th:nth-child(3),.lab-tbl-pedidos td:nth-child(3),
+  .lab-tbl-pedidos th:nth-child(5),.lab-tbl-pedidos td:nth-child(5),
+  .lab-tbl-pedidos th:nth-child(6),.lab-tbl-pedidos td:nth-child(6),
+  .lab-tbl-pedidos th:nth-child(8),.lab-tbl-pedidos td:nth-child(8){display:none;}
+  /* Lab SLA (5 cols) → ocultamos Objetivo(2) */
+  .lab-tbl-sla th:nth-child(2),.lab-tbl-sla td:nth-child(2){display:none;}
+  /* Lab Forecast (5 cols) → ocultamos Variación(3) y Acción recomendada(5) */
+  .lab-tbl-forecast th:nth-child(3),.lab-tbl-forecast td:nth-child(3),
+  .lab-tbl-forecast th:nth-child(5),.lab-tbl-forecast td:nth-child(5){display:none;}
+  /* Lab Facturación (6 cols) → ocultamos Fecha(2), Muestras(5), Pago(6) */
+  .lab-tbl-fac th:nth-child(2),.lab-tbl-fac td:nth-child(2),
+  .lab-tbl-fac th:nth-child(5),.lab-tbl-fac td:nth-child(5),
+  .lab-tbl-fac th:nth-child(6),.lab-tbl-fac td:nth-child(6){display:none;}
+  /* Lab Logística (6 cols) → ocultamos Dirección(3), Contenido(4) */
+  .lab-tbl-logistica th:nth-child(3),.lab-tbl-logistica td:nth-child(3),
+  .lab-tbl-logistica th:nth-child(4),.lab-tbl-logistica td:nth-child(4){display:none;}
+  /* Inversor comparativa (4 cols) → ocultamos Diferencial(4) — ya implícito en valores */
+  .inv-tbl-comp th:nth-child(4),.inv-tbl-comp td:nth-child(4){display:none;}
+  /* Médico bandeja pacientes (6 cols .tbl) → ocultamos Última interacción(4) y Motivo IA(5) */
+  #appShellMedico .tbl th:nth-child(4),#appShellMedico .tbl td:nth-child(4),
+  #appShellMedico .tbl th:nth-child(5),#appShellMedico .tbl td:nth-child(5){display:none;}
+  /* CEO red clínicas (.tbl g4) — ya protegido por .content overflow-x. Sin cambios. */
+}
+@media(max-width:480px){
+  /* A 480 ocultamos Tiempo medio en SLA y Nivel en Forecast para aliviar más */
+  .lab-tbl-sla th:nth-child(3),.lab-tbl-sla td:nth-child(3){display:none;}
+  .lab-tbl-forecast th:nth-child(4),.lab-tbl-forecast td:nth-child(4){display:none;}
+}
+
+/* ── BREAKPOINT 360px · iPhone SE y Android pequeño (REGLA 3 COAXIONIA 360-1920) ── */
+@media(max-width:360px){
+  /* Content padding mínimo */
+  #appShell .content,
+  #appShellInversor .content,
+  #appShellMedico .content,
+  #appShellPaciente .content,
+  #appShellLab .content{padding:10px 8px!important;}
+  /* Sidebar drawer aún más ancho relativo */
+  .sidebar{width:86vw!important;}
+  /* KPI reducción final */
+  .kpi{padding:14px 12px!important;}
+  .kpi-val{font-size:1.5rem!important;}
+  .kpi-big{font-size:1.7rem!important;}
+  .kpi-label{font-size:.62rem!important;}
+  /* Tablas: padding de celdas aún más reducido */
+  .tbl th,.tbl td{padding:6px 6px!important;}
+  .lab-tbl-pedidos td,.lab-tbl-sla td,.lab-tbl-forecast td,.lab-tbl-fac td,.lab-tbl-logistica td,.inv-tbl-comp td{padding:7px 6px!important;}
+  .lab-tbl-pedidos th,.lab-tbl-sla th,.lab-tbl-forecast th,.lab-tbl-fac th,.lab-tbl-logistica th,.inv-tbl-comp th{padding:6px 6px!important;}
+  /* Canales IA tarjetas más compactas */
+  .canal-card{padding:14px!important;gap:10px!important;}
+  .canal-name{font-size:.76rem!important;}
+  .canal-kpi-val{font-size:.95rem!important;}
+  .canal-cta{padding:10px!important;font-size:.58rem!important;}
+  /* Page header más compacto */
+  .page-hdr h2{font-size:.92rem!important;}
+  .page-hdr p{font-size:.7rem!important;}
+  /* Live ticker sin nowrap agresivo */
+  .live-text{font-size:.66rem!important;}
+  /* Modal premium: safe padding 360 */
+  .premium-modal{max-width:calc(100vw - 16px)!important;}
+  .premium-body-inner{padding:14px!important;}
+  .premium-hero{padding:12px 14px!important;}
+  /* Canvas Chart.js aún más compacto en 360 (doc responsive COAXIONIA) */
+  .chart-wrap{height:100px!important;}
+  .chart-wrap canvas{max-height:100px!important;max-width:100%!important;}
+  /* Donut canvas (fijos) ajustados al viewport 360 */
+  #chart-donut{max-width:88px!important;}
+  #pac-chart-adherencia{max-width:80px!important;}
+  .donut-wrap{width:80px!important;height:80px!important;}
+}
+
+/* ── Canvas Chart.js height reducido en 480 (refuerzo sobre regla existente) ── */
+@media(max-width:480px){
+  /* Asegura que inline style="height:220px/240px" se anula también para charts con inline */
+  .chart-wrap[style*="height:"]{height:120px!important;}
+  /* Canvas width max para charts con width fijo en attribute */
+  #chart-inv-mercado,#chart-inv-cohortes,#chart-inv-mrr,#chart-inv-proyeccion,
+  #chart-med-hormonal,#chart-med-metricas,#chart-med-metricas2,
+  #pac-chart-hormonal,#chart-protocolos,#chart-cohortes{max-width:100%!important;}
 }
 </style>
 
@@ -5000,6 +5596,7 @@ function renderAlertsMed(){
 }
 
 function showSMed(id){
+  if(id==='comunicacion')window._clearUnread('med','#sidebarMed');
   document.querySelectorAll('#appShellMedico .screen').forEach(function(s){s.classList.remove('active')});
   document.querySelectorAll('#appShellMedico .sb-btn').forEach(function(b){b.classList.remove('active')});
   var sc=document.getElementById('med-screen-'+id);
@@ -5024,7 +5621,8 @@ function buildSidebarMedico(){
     {id:'alertas',label:'Alertas clínicas',ia:true,sec:'ALERTAS'},
     {id:'agenda',label:'Agenda y kits',ia:false,sec:'GESTIÓN'},
     {id:'metricas',label:'Mis métricas',ia:false},
-    {id:'comunicacion',label:'Comunicación',ia:true,sec:'CANALES'}
+    {id:'canales',label:'Canales IA',ia:true,sec:'CANALES'},
+    {id:'comunicacion',label:'Comunicación',ia:true}
   ];
   var icons={
     hero:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
@@ -5035,6 +5633,7 @@ function buildSidebarMedico(){
     alertas:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>',
     agenda:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
     metricas:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    canales:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
     comunicacion:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'
   };
   var html='';
@@ -5044,6 +5643,7 @@ function buildSidebarMedico(){
       +'<span class="sb-icon">'+icons[it.id]+'</span>'
       +it.label
       +(it.ia?'<span class="sb-ia">IA</span>':'')
+      +(it.id==='comunicacion'&&window._unreadComms&&window._unreadComms.med>0?'<span class="sb-unread-dot" aria-label="mensajes sin leer"></span>':'')
       +'</button>';
   });
   html+='<div class="sb-footer"><button class="sb-footer-btn" onclick="goBackMed()">↩ Cambiar perfil</button></div>';
@@ -5303,6 +5903,8 @@ function gdAprobar(){
   btn.style.opacity='.5';btn.style.pointerEvents='none';
   var ia=document.getElementById('gd-ia-txt');
   if(ia)ia.textContent='Ajuste aprobado — EverHealthHormIA aplicando protocolo actualizado.';
+  var pac=(typeof gdPacs!=='undefined'&&typeof gdSelIdx!=='undefined'&&gdPacs[gdSelIdx])?gdPacs[gdSelIdx].n:'paciente';
+  if(window.showToast)window.showToast('Ajuste IA aprobado · protocolo '+pac+' actualizado y notificado por email','ok');
 }
 
 function aprobarProtocolo(btn){
@@ -5314,6 +5916,9 @@ function aprobarProtocolo(btn){
   t.style.cssText='font-size:.65rem;font-weight:700;color:#10B981;margin-top:6px';
   t.textContent='✓ Protocolo aprobado — EverHealthHormIA aplicando ajuste';
   item.appendChild(t);
+  var title=item.querySelector('.proto-action-title');
+  var ctx=title?title.textContent.trim():'protocolo';
+  if(window.showToast)window.showToast('Aprobado: '+ctx+' · IA aplicando ajuste y avisando al paciente','ok');
 }
 
 function rechazarProtocolo(btn){
@@ -5324,6 +5929,18 @@ function rechazarProtocolo(btn){
   t.style.cssText='font-size:.65rem;font-weight:700;color:#E04668;margin-top:6px';
   t.textContent='✗ Protocolo rechazado — registrado en historial';
   item.appendChild(t);
+  var title=item.querySelector('.proto-action-title');
+  var ctx=title?title.textContent.trim():'protocolo';
+  if(window.showToast)window.showToast('Rechazado: '+ctx+' · registrado en historial clinico','warn');
+}
+
+// Handler para los botones Modificar de protocolos (antes eran stubs inline)
+function modificarProtocolo(btn){
+  btn.textContent='Modificando...';
+  var item=btn.closest('.proto-action');
+  var title=item?item.querySelector('.proto-action-title'):null;
+  var ctx=title?title.textContent.trim():'protocolo';
+  if(window.showToast)window.showToast('Modo edicion: '+ctx+' · ajusta dosis o frecuencia','info');
 }
 
 function buildScreensMedico(){
@@ -5442,7 +6059,7 @@ function buildScreensMedico(){
 
   // ── SCREEN 2: Bandeja pacientes ──
   html+=scrM('bandeja',false,
-    phdrM('Bandeja de pacientes IA','','Priorizada automáticamente por IA. Hims muestra lista plana. COAXIONIA ordena por urgencia clínica.')
+    phdrM('Bandeja de pacientes IA','','Priorizada automáticamente por IA. Las plataformas tradicionales muestran lista plana. COAXIONIA ordena por urgencia clínica.')
     +'<div class="g4 mb14">'
       +kpiM('342','Total asignados','+3 este mes','up','0,20 12,21 24,22 36,22 48,23 60,23 72,24')
       +kpiM('2','Urgentes hoy','Requieren acción inmediata','down','0,4 12,3 24,5 36,2 48,4 60,3 72,2')
@@ -5467,7 +6084,7 @@ function buildScreensMedico(){
           +'</tr>';
       }).join('')
       +'</tbody></table>'
-      +iaboxM('COAXIONIA ordena por urgencia clínica automáticamente. Hims muestra lista plana sin priorización. Ahorro estimado: 45 min/día por médico.')
+      +iaboxM('COAXIONIA ordena por urgencia clínica automáticamente. Las plataformas tradicionales muestran lista plana sin priorización. Ahorro estimado: 45 min/día por médico.')
     )
   );
 
@@ -5496,14 +6113,20 @@ function buildScreensMedico(){
       +kpiM('91%','Adherencia media','Panel completo','up','0,18 12,19 24,20 36,21 48,22 60,23 72,24')
     +'</div>'
     +'<div id="gd-shell" style="display:grid!important;grid-template-columns:152px 1fr!important;gap:12px!important;width:100%!important;box-sizing:border-box!important;min-width:0!important">'
-      // Lista pacientes con buscador
-      +'<div style="display:flex;flex-direction:column;gap:6px">'
-        +'<div style="position:relative">'
-          +'<svg style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:12px;height:12px;color:#9CA3AF;pointer-events:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
-          +'<input id="gd-search" type="text" placeholder="Buscar..." oninput="gdFilter(this.value)" style="width:100%;padding:7px 8px 7px 26px;font-size:.68rem;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font-family:DM Sans,sans-serif;outline:none">'
+      // Lista pacientes con buscador — colapsable en ≤480 (doc responsive COAXIONIA)
+      +'<div id="gd-list-wrap" style="display:flex;flex-direction:column;gap:6px">'
+        +'<button id="gd-list-toggle" type="button" onclick="gdToggleList()" aria-expanded="false">'
+          +'<span id="gd-list-toggle-lbl">Ver lista de pacientes</span>'
+          +'<svg id="gd-list-toggle-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>'
+        +'</button>'
+        +'<div id="gd-list-inner" style="display:flex;flex-direction:column;gap:6px">'
+          +'<div style="position:relative">'
+            +'<svg style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:12px;height:12px;color:#9CA3AF;pointer-events:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+            +'<input id="gd-search" type="text" placeholder="Buscar..." oninput="gdFilter(this.value)" style="width:100%;padding:7px 8px 7px 26px;font-size:.68rem;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font-family:DM Sans,sans-serif;outline:none">'
+          +'</div>'
+          +'<div id="gd-pac-list" style="display:flex;flex-direction:column;gap:3px;max-height:500px;overflow-y:auto"></div>'
+          +'<div id="gd-no-results" style="font-size:.68rem;color:#9CA3AF;padding:8px;display:none">Sin resultados</div>'
         +'</div>'
-        +'<div id="gd-pac-list" style="display:flex;flex-direction:column;gap:3px;max-height:500px;overflow-y:auto"></div>'
-        +'<div id="gd-no-results" style="font-size:.68rem;color:#9CA3AF;padding:8px;display:none">Sin resultados</div>'
       +'</div>'
       // Panel derecho
       +'<div class="card" id="gd-panel">'
@@ -5564,7 +6187,7 @@ function buildScreensMedico(){
 
   // ── SCREEN 5: Protocolos adaptativos ──
   html+=scrM('protocolos',false,
-    phdrM('Protocolos adaptativos IA','<span class="badge-excl">EXCLUSIVO COAXIONIA</span>','MedMatch de Hims sugiere tratamiento inicial. COAXIONIA ajusta en continuo. Apruebe, modifique o rechace con un click.')
+    phdrM('Protocolos adaptativos IA','<span class="badge-excl">EXCLUSIVO COAXIONIA</span>','Los sistemas de triaje tradicionales sugieren tratamiento inicial. COAXIONIA ajusta en continuo. Apruebe, modifique o rechace con un click.')
     +'<div class="g4 mb14">'
       +kpiM('3','Propuestas IA hoy','Pendientes de aprobación','up','0,3 12,3 24,3 36,3 48,3 60,3 72,3')
       +kpiM('94%','Tasa aprobación','Mis propuestas IA','up','0,20 12,21 24,22 36,22 48,23 60,23 72,24')
@@ -5580,7 +6203,7 @@ function buildScreensMedico(){
         +'<div class="proto-action-sub">Subir TRT de 50mg a 75mg gel transdérmico. Testosterona libre bajó 15% en 8 semanas con dosis actual. Hematocrito proyectado a 75mg: 49% (dentro de límite). Probabilidad de éxito: 91%.</div>'
         +'<div class="proto-btns">'
           +'<button class="proto-btn btn-aprobar" onclick="aprobarProtocolo(this)">✓ Aprobar</button>'
-          +'<button class="proto-btn btn-modificar" onclick="this.textContent=\'Modificando...\'">Modificar</button>'
+          +'<button class="proto-btn btn-modificar" onclick="modificarProtocolo(this)">Modificar</button>'
           +'<button class="proto-btn btn-rechazar" onclick="rechazarProtocolo(this)">✗ Rechazar</button>'
         +'</div>'
       +'</div>'
@@ -5592,7 +6215,7 @@ function buildScreensMedico(){
         +'<div class="proto-action-sub">Aumentar levotiroxina de 75mcg a 100mcg. TSH 8.2 mU/L (rango objetivo: 0.5-2.5). Última revisión hace 6 semanas. Ajuste recomendado por IA basado en curva de respuesta individual.</div>'
         +'<div class="proto-btns">'
           +'<button class="proto-btn btn-aprobar" onclick="aprobarProtocolo(this)">✓ Aprobar</button>'
-          +'<button class="proto-btn btn-modificar" onclick="this.textContent=\'Modificando...\'">Modificar</button>'
+          +'<button class="proto-btn btn-modificar" onclick="modificarProtocolo(this)">Modificar</button>'
           +'<button class="proto-btn btn-rechazar" onclick="rechazarProtocolo(this)">✗ Rechazar</button>'
         +'</div>'
       +'</div>'
@@ -5604,11 +6227,11 @@ function buildScreensMedico(){
         +'<div class="proto-action-sub">Interacción detectada: warfarina + estradiol oral. IA bloqueó prescripción preventivamente. Recomendación: cambiar a estradiol transdérmico para reducir riesgo trombótico.</div>'
         +'<div class="proto-btns">'
           +'<button class="proto-btn btn-aprobar" onclick="aprobarProtocolo(this)">✓ Aprobar cambio</button>'
-          +'<button class="proto-btn btn-modificar" onclick="this.textContent=\'Modificando...\'">Modificar</button>'
+          +'<button class="proto-btn btn-modificar" onclick="modificarProtocolo(this)">Modificar</button>'
           +'<button class="proto-btn btn-rechazar" onclick="rechazarProtocolo(this)">✗ Rechazar</button>'
         +'</div>'
       +'</div>'
-      +iaboxM('COAXIONIA ajusta protocolos en continuo — no solo en el inicio. MedMatch de Hims solo sugiere el tratamiento inicial. Diferencial clave para calidad clínica y reducción de riesgo.')
+      +iaboxM('COAXIONIA ajusta protocolos en continuo — no solo en el inicio. Los sistemas de triaje tradicionales solo sugieren el tratamiento inicial. Diferencial clave para calidad clínica y reducción de riesgo.')
     )
   );
 
@@ -5704,7 +6327,7 @@ function buildScreensMedico(){
 
   // ── SCREEN 8: Mis métricas ──
   html+=scrM('metricas',false,
-    phdrM('Mis métricas','','Tu rendimiento clínico en tiempo real. Benchmarking anónimo con la red. Sin equivalente en Hims ni Numan.')
+    phdrM('Mis métricas','','Tu rendimiento clínico en tiempo real. Benchmarking anónimo con la red. Sin equivalente en plataformas tradicionales.')
     // KPIs personales
     +'<div class="g4 mb14">'
       +kpiM('42','Pacientes activos','+3 este mes','up','0,20 12,21 24,22 36,22 48,23 60,23 72,24')
@@ -6030,6 +6653,29 @@ function vcHangUp(){
     },800);
     var cp=document.getElementById('med-chat-panel');if(cp)cp.innerHTML=renderChatPanelMed(activeConvMed);
   };
+
+  // ── Canales IA · vista proactiva (REGLA 7 COAXIONIA) ──
+  html+=scrM('canales',false,
+    phdrM('Canales IA','','Que ha hecho la IA hoy en cada canal. Vista proactiva, sin chat.')
+    +window.buildCanalesIA({
+      ticker:'Canales IA trabajando 24/7 &middot; 11 acciones clinicas automatizadas hoy',
+      voz:{futures:[
+        'Llamadas automaticas a pacientes con analitica pendiente mas de 30 dias',
+        'Recordatorio de consulta 24h antes con resumen de biomarcadores',
+        'Escalado urgente al medico de guardia cuando IA detecta valor critico'
+      ]},
+      wa:{sub:'Pacientes &middot; coordinador &middot; derivaciones',kpis:[22,15,7],actions:[
+        'Carlos M. &middot; duda dosis resuelta con protocolo vigente y ficha enviada',
+        'Ana R. &middot; recordatorio de analitica enviado &middot; kit confirmado',
+        'Jorge B. &middot; cita de seguimiento reprogramada a mar 29 11:00'
+      ],navFn:'showSMed(\'comunicacion\')'},
+      email:{sub:'Informes clinicos &middot; derivaciones &middot; direccion',kpis:[28,19,9],actions:[
+        'Informe de adherencia enviado al director para board del martes',
+        'Draft de derivacion Luis F. al especialista preparado para tu revision',
+        'Alta clinica Roberto S. generada y enviada al paciente y al historial'
+      ],navFn:'showSMed(\'comunicacion\')'}
+    })
+  );
 
   html+=scrM('comunicacion',false,
     phdrM('Comunicación','','Pacientes · Director · EverHealthHormIA — Voz IA, Chat, Email.')

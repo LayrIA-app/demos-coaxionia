@@ -3912,22 +3912,30 @@ function animateCounters(){
 var ic=function(p){return '\x3Csvg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"\x3E'+p+'\x3C/svg\x3E';};
 
 function demoIA(titulo,desc){
-  var lt=String.fromCharCode(60),gt=String.fromCharCode(62),q=String.fromCharCode(34);
-  var existing=document.getElementById('demoIA-overlay');
-  if(existing) existing.parentNode.removeChild(existing);
-  var ov=document.createElement('div');
-  ov.id='demoIA-overlay';
-  ov.style.cssText='position:fixed;inset:0;background:rgba(26,8,16,.6);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:modalFadeIn .25s ease forwards;';
-  ov.innerHTML=lt+'div style="background:#fff;border-radius:20px;padding:36px;max-width:480px;width:90%;box-shadow:0 40px 80px rgba(26,8,16,.25);position:relative;text-align:center"'+gt
-    +lt+'div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#E8386D,#c41f52);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;"'+gt
-      +lt+'svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'+gt+lt+'polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/'+gt+lt+'/svg'+gt
-    +lt+'/div'+gt
-    +lt+'div style="font-family:Montserrat,sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.14em;color:#E8386D;margin-bottom:8px"'+gt+'IA ADAPTATIVA 4\u00aa GENERACION'+lt+'/div'+gt
-    +lt+'div style="font-family:Montserrat,sans-serif;font-size:1.1rem;font-weight:900;color:#1a0810;margin-bottom:10px"'+gt+(titulo||'Accion IA en curso')+lt+'/div'+gt
-    +lt+'div style="font-size:.78rem;color:#5a3a44;line-height:1.6;margin-bottom:24px"'+gt+(desc||'TalentHuman IA esta ejecutando esta accion de forma autonoma.')+lt+'/div'+gt
-    +lt+'button onclick="document.getElementById(\'demoIA-overlay\').remove()" style="background:#E8386D;border:none;color:#fff;padding:12px 32px;border-radius:10px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;box-shadow:0 4px 16px rgba(232,56,109,.35)"'+gt+'Entendido'+lt+'/button'+gt
-  +lt+'/div'+gt;
-  document.body.appendChild(ov);
+  // Upgrade R10: toda accion IA genera un modal R10 completo con Editar + Email + WhatsApp.
+  // Sin contexto especifico de cliente, usa Grupo Nexo como fallback (cliente de referencia de la demo).
+  var c=CONTACTOS.cliente_gruponexo;
+  var t=titulo||'Accion IA en curso';
+  var d=desc||'TalentHuman IA esta ejecutando esta accion de forma autonoma.';
+  r10Modal({
+    titulo:t,
+    fecha:'Accion IA ejecutada · '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long'}),
+    estadoLabel:'IA EJECUTADA',
+    estadoColor:'#E8386D',
+    bodyHTML:r10Section('Resumen de la accion')
+      +'<div style="font-size:.76rem;color:#1a0810;line-height:1.7;margin-bottom:10px">'+d+'</div>'
+      +r10Section('Trazabilidad')
+      +r10Row('Ejecutado por','TalentHuman IA · 4a Generacion')
+      +r10Row('Modo','Autonomo')
+      +r10Row('Estado','Completado · verificable en Documentos')
+      +r10Note('Puedes editar el resultado antes de compartir, o enviarlo directamente por Email o WhatsApp. La IA ya prerellena el destinatario del cliente en contexto.'),
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:t+' · TalentHuman IA',
+    cuerpoEmail:'Hola '+c.nombre+',\n\n'+d+'\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:t+' · '+d,
+    nombreElemento:t
+  });
 }
 
 function showToast(msg){
@@ -3936,6 +3944,559 @@ function showToast(msg){
   t.textContent=msg;
   document.body.appendChild(t);
   setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2800);
+}
+
+// ── REGLA 10 · CTAs y modales con Email + WhatsApp ──
+var CONTACTOS={
+  cliente_gruponexo:{email:'pedro.garcia@gruponexo.es',telefono:'34912845620',nombre:'Pedro Garcia',empresa:'Grupo Nexo'},
+  consultora_laura:{email:'laura.sanchez@talenthuman-ia.es',telefono:'34667543821',nombre:'Laura Sanchez',empresa:'TalentHuman IA'},
+  director_carlos:{email:'carlos.martinez@talenthuman-ia.es',telefono:'34617234589',nombre:'Carlos Martinez',empresa:'TalentHuman IA'},
+  equipo_iberia:{email:'rrhh@grupofinancieroiberia.es',telefono:'34918456712',nombre:'Marta Sanchez',empresa:'Grupo Financiero Iberia'},
+  equipo_retail:{email:'talento@retailatlantico.com',telefono:'34935789021',nombre:'Pedro Diaz',empresa:'Retail Atlantico'},
+  equipo_pharma:{email:'people@pharmasolutions.es',telefono:'34914567823',nombre:'Lucia Ramos',empresa:'Pharma Solutions'},
+  equipo_logistica:{email:'rrhh@logisticamediterraneo.com',telefono:'34963214578',nombre:'Javier Moreno',empresa:'Logistica Mediterraneo'},
+  equipo_tech:{email:'hiring@techfactory.io',telefono:'34686543219',nombre:'Elena Vidal',empresa:'TechFactory'},
+  equipo_energia:{email:'rrhh@energiaverde.es',telefono:'34917654321',nombre:'Julia Serrano',empresa:'Energia Verde'}
+};
+
+function r10Close(){
+  var ov=document.getElementById('r10-overlay');
+  if(ov&&ov.parentNode) ov.parentNode.removeChild(ov);
+}
+function r10Editar(nombreElemento){
+  r10Close();
+  showToast('Abriendo editor · '+nombreElemento);
+}
+function r10Email(emailCliente,asunto,cuerpo){
+  var destino=emailCliente||'';
+  var mailto='mailto:'+destino+'?subject='+encodeURIComponent(asunto||'')+'&body='+encodeURIComponent(cuerpo||'');
+  window.open(mailto,'_blank');
+}
+function r10Whatsapp(telefonoCliente,texto){
+  var num=(telefonoCliente||'').replace(/[^0-9]/g,'');
+  var url='https://wa.me/'+num+'?text='+encodeURIComponent(texto||'');
+  window.open(url,'_blank');
+}
+
+function r10Modal(cfg){
+  r10Close();
+  var lt=String.fromCharCode(60),gt=String.fromCharCode(62),q=String.fromCharCode(34);
+  var estado=cfg.estadoLabel?lt+'span style='+q+'padding:4px 10px;border-radius:20px;font-size:.56rem;font-weight:800;letter-spacing:.08em;background:'+(cfg.estadoColor||'#E8386D')+';color:#fff;flex-shrink:0;text-transform:uppercase'+q+gt+cfg.estadoLabel+lt+'/span'+gt:'';
+  var icon=cfg.iconSvg||lt+'svg width='+q+'18'+q+' height='+q+'18'+q+' viewBox='+q+'0 0 24 24'+q+' fill='+q+'none'+q+' stroke='+q+'#fff'+q+' stroke-width='+q+'2'+q+' stroke-linecap='+q+'round'+q+gt+lt+'path d='+q+'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'+q+'/'+gt+lt+'polyline points='+q+'14 2 14 8 20 8'+q+'/'+gt+lt+'/svg'+gt;
+  var infoContacto=cfg.emailCliente||cfg.telefonoCliente?lt+'div style='+q+'font-size:.62rem;color:#9a7a84;margin-bottom:14px;padding:8px 12px;background:rgba(232,56,109,.04);border-radius:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap'+q+gt+lt+'span style='+q+'font-size:.52rem;font-weight:800;color:#E8386D;letter-spacing:.08em;text-transform:uppercase'+q+gt+'IA prerellena destinatario'+lt+'/span'+gt+lt+'span style='+q+'color:#5a3a44;font-weight:600'+q+gt+(cfg.nombreContacto||'')+(cfg.empresaContacto?' · '+cfg.empresaContacto:'')+lt+'/span'+gt+(cfg.emailCliente?lt+'span style='+q+'color:#378ADD'+q+gt+cfg.emailCliente+lt+'/span'+gt:'')+(cfg.telefonoCliente?lt+'span style='+q+'color:#25D366'+q+gt+'+'+cfg.telefonoCliente+lt+'/span'+gt:'')+lt+'/div'+gt:'';
+
+  var ov=document.createElement('div');
+  ov.id='r10-overlay';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(26,8,16,.6);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;animation:modalFadeIn .25s ease forwards;';
+  ov.onclick=function(e){if(e.target===ov) r10Close();};
+  ov.innerHTML=lt+'div style='+q+'background:#fff;border-radius:16px;width:100%;max-width:min(640px,calc(100vw - 32px));max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(26,8,16,.4);animation:fadeUp .3s ease'+q+gt
+    +lt+'div style='+q+'padding:18px 22px;background:linear-gradient(135deg,#1a0810,#3d0a1e);color:#fff;display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap'+q+gt
+      +lt+'div style='+q+'width:38px;height:38px;border-radius:10px;background:rgba(232,56,109,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0'+q+gt+icon+lt+'/div'+gt
+      +lt+'div style='+q+'flex:1;min-width:0'+q+gt
+        +lt+'div style='+q+'font-family:Montserrat,sans-serif;font-size:.98rem;font-weight:900;margin-bottom:2px;line-height:1.2'+q+gt+(cfg.titulo||'Detalle')+lt+'/div'+gt
+        +(cfg.fecha?lt+'div style='+q+'font-size:.6rem;color:rgba(255,255,255,.55);letter-spacing:.06em'+q+gt+cfg.fecha+lt+'/div'+gt:'')
+      +lt+'/div'+gt
+      +estado
+      +lt+'button onclick='+q+'r10Close()'+q+' aria-label='+q+'Cerrar'+q+' style='+q+'width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;font-size:18px;line-height:1;flex-shrink:0'+q+gt+'×'+lt+'/button'+gt
+    +lt+'/div'+gt
+    +lt+'div style='+q+'padding:22px;overflow-y:auto;flex:1;background:#fff;color:#1a0810;font-size:.76rem;line-height:1.55;min-height:0'+q+gt+(cfg.bodyHTML||'')+lt+'/div'+gt
+    +lt+'div style='+q+'padding:14px 22px 18px;background:#fdf5f7;border-top:1px solid #f0e0e6;flex-shrink:0'+q+gt
+      +infoContacto
+      +lt+'div style='+q+'display:flex;gap:8px;flex-wrap:wrap'+q+gt
+        +lt+'button onclick='+q+"r10Editar('"+(cfg.nombreElemento||'elemento').replace(/'/g,"\\'")+"')"+q+' style='+q+'flex:1;min-width:120px;padding:11px 14px;background:#fff;border:1.5px solid #E8386D;color:#E8386D;border-radius:10px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.04em;cursor:pointer'+q+gt+'✎ Editar'+lt+'/button'+gt
+        +lt+'button onclick='+q+"r10Email("+JSON.stringify(cfg.emailCliente||'')+","+JSON.stringify(cfg.asuntoEmail||'')+","+JSON.stringify(cfg.cuerpoEmail||'')+")"+q+' style='+q+'flex:1;min-width:120px;padding:11px 14px;background:#378ADD;color:#fff;border:none;border-radius:10px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px'+q+gt+lt+'svg width='+q+'13'+q+' height='+q+'13'+q+' viewBox='+q+'0 0 24 24'+q+' fill='+q+'none'+q+' stroke='+q+'currentColor'+q+' stroke-width='+q+'2'+q+' stroke-linecap='+q+'round'+q+gt+lt+'path d='+q+'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'+q+'/'+gt+lt+'polyline points='+q+'22,6 12,13 2,6'+q+'/'+gt+lt+'/svg'+gt+'Email'+lt+'/button'+gt
+        +lt+'button onclick='+q+"r10Whatsapp("+JSON.stringify(cfg.telefonoCliente||'')+","+JSON.stringify(cfg.textoWhatsapp||'')+")"+q+' style='+q+'flex:1;min-width:120px;padding:11px 14px;background:#25D366;color:#fff;border:none;border-radius:10px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px'+q+gt+lt+'svg width='+q+'13'+q+' height='+q+'13'+q+' viewBox='+q+'0 0 24 24'+q+' fill='+q+'currentColor'+q+gt+lt+'path d='+q+'M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.1-1.3c1.5.8 3.2 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm5 14c-.2.6-1.2 1.1-1.7 1.2-.4.1-1 .1-1.6-.1-.4-.1-.8-.3-1.4-.5-2.5-1.1-4.1-3.6-4.2-3.8-.1-.2-1-1.3-1-2.5s.6-1.8.9-2c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.4.2.5.7 1.7.8 1.8 0 .1.1.3 0 .4l-.3.4c-.1.2-.2.3-.4.5-.1.1-.2.3-.1.5s.6 1 1.3 1.7c.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1.1-.2.5-.6.7-.8.2-.2.3-.2.5-.1.3.1 1.6.8 1.9.9.3.1.4.2.5.3 0 .2 0 .8-.2 1.2z'+q+'/'+gt+lt+'/svg'+gt+'WhatsApp'+lt+'/button'+gt
+      +lt+'/div'+gt
+    +lt+'/div'+gt
+  +lt+'/div'+gt;
+  document.body.appendChild(ov);
+}
+
+// ── R10 · Builders de contenido por tipo de elemento ──
+
+function r10Section(titulo){return '<div style="font-family:Montserrat,sans-serif;font-size:.58rem;font-weight:800;color:#E8386D;letter-spacing:.12em;text-transform:uppercase;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(232,56,109,.15)">'+titulo+'</div>';}
+function r10Row(label,val){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0e0e6;gap:10px;flex-wrap:wrap"><span style="color:#5a3a44;font-size:.7rem">'+label+'</span><span style="font-weight:700;color:#1a0810;font-size:.72rem;text-align:right">'+val+'</span></div>';}
+function r10Note(txt){return '<div style="background:rgba(232,56,109,.06);border:1px solid rgba(232,56,109,.15);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:.7rem;color:#5a3a44;line-height:1.55"><b style="color:#E8386D">IA:</b> '+txt+'</div>';}
+function r10Badge(txt,col){return '<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:.56rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:'+col+';color:#fff">'+txt+'</span>';}
+
+function verProceso(i){
+  var arr=window.procesos||[]; var p=arr[i]; if(!p) return;
+  var c=p[7]||CONTACTOS.cliente_gruponexo;
+  var body=''
+    +r10Section('Datos del proceso')
+    +r10Row('Cliente',p[0])
+    +r10Row('Puesto',p[1])
+    +r10Row('Fase actual',p[2])
+    +r10Row('Plazo',p[3])
+    +r10Row('Honorarios','<strong style="color:#1a9e4a">'+p[4]+'</strong>')
+    +r10Row('Estado',p[6])
+    +r10Section('Contacto del cliente')
+    +r10Row('Responsable',c.nombre)
+    +r10Row('Empresa',c.empresa)
+    +r10Row('Email',c.email)
+    +r10Row('Telefono','+'+c.telefono)
+    +r10Section('Insight IA')
+    +r10Note('TalentHuman IA esta ejecutando este proceso en autopiloto. Ultimo movimiento registrado hace menos de 24h. Todas las acciones pendientes estan asignadas.');
+  r10Modal({
+    titulo:p[0]+' · '+p[1],
+    fecha:'Proceso '+p[2]+' · '+p[3],
+    estadoLabel:p[6],
+    estadoColor:p[5]==='b-ok'?'#1a9e4a':p[5]==='b-amber'?'#e8a010':p[5]==='b-red'?'#C8102E':'#1E4DB7',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Proceso '+p[1]+' · '+p[0]+' · estado '+p[2],
+    cuerpoEmail:'Hola '+c.nombre+',\n\nTe escribo con el estado del proceso de seleccion para '+p[1]+' en '+p[0]+'.\n\nFase actual: '+p[2]+'.\nPlazo: '+p[3]+'.\nEstado: '+p[6]+'.\nHonorarios previstos: '+p[4]+'.\n\nTalentHuman IA gestiona la actividad en tiempo real. Te adjunto el detalle completo cuando quieras.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Hola '+c.nombre+', actualizacion del proceso '+p[1]+' en '+p[0]+'. Estado: '+p[2]+'. Plazo: '+p[3]+'. Honorarios: '+p[4]+'. Detalle completo en tu panel cliente.',
+    nombreElemento:'Proceso '+p[0]
+  });
+}
+
+function verFinalista(cual){
+  var isAna=cual==='ana';
+  var nombre=isAna?'Ana Garcia Reyes':'Pedro Martinez Lopez';
+  var score=isAna?'94%':'88%';
+  var color=isAna?'#E8386D':'#1a9e4a';
+  var c=CONTACTOS.equipo_iberia;
+  var body=''
+    +r10Section('Candidato')
+    +r10Row('Nombre','<strong>'+nombre+'</strong>')
+    +r10Row('Puesto objetivo','Director Financiero')
+    +r10Row('Cliente','Grupo Financiero Iberia')
+    +r10Row('Score IA global','<span style="color:'+color+';font-weight:900">'+score+'</span>')
+    +r10Section('Scoring por dimension')
+    +(isAna
+      ?r10Row('Experiencia directiva financiera','94% · Santander Intl · 8 anos')
+       +r10Row('Encaje cultural','88% · Valores y liderazgo')
+       +r10Row('Competencias tecnicas','96% · CFO, M&A, regulatorio')
+       +r10Row('Estabilidad y retencion','91% · Sin cambios en 5 anos')
+       +r10Row('Disponibilidad','100% · Inmediata')
+      :r10Row('Experiencia directiva financiera','85% · Retail Espana · 6 anos')
+       +r10Row('Encaje cultural','79% · Perfil ejecutivo')
+       +r10Row('Competencias tecnicas','88% · CFO, transformacion')
+       +r10Row('Estabilidad y retencion','82% · 1 cambio en 6 anos')
+       +r10Row('Disponibilidad','80% · 30 dias')
+    )
+    +r10Section('Insight IA')
+    +r10Note(isAna?'Ana Garcia supera los criterios en 7/8 dimensiones. Retencion estimada a 12 meses: 91%. Recomendada como primera opcion.':'Pedro tiene mas experiencia en transformacion pero menos en banca internacional. Segunda opcion solida.')
+    +r10Section('Accion al avanzar')
+    +r10Note('Al pulsar Enviar, TalentHuman IA notifica a '+c.nombre+' ('+c.empresa+') que '+nombre+' avanza a la fase final, adjunta el informe completo de scoring y agenda llamada de feedback.');
+  r10Modal({
+    titulo:nombre+' · avance a final',
+    fecha:'Score global '+score+' · Grupo Financiero Iberia',
+    estadoLabel:'LISTO PARA ENVIAR',
+    estadoColor:color,
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Finalista '+nombre+' avanza a fase final · Director Financiero GFI',
+    cuerpoEmail:'Hola '+c.nombre+',\n\nTe confirmo que '+nombre+' avanza a la fase final del proceso de Director Financiero.\n\nScore IA: '+score+'.\n'+(isAna?'Fortalezas: experiencia directiva financiera, competencias tecnicas (CFO, M&A, regulatorio) y disponibilidad inmediata. Retencion estimada 12m: 91%.':'Fortalezas: experiencia en transformacion financiera y perfil ejecutivo. Disponibilidad en 30 dias.')+'\n\nTe adjunto informe completo de scoring por dimensiones y agenda la llamada de feedback que prefieras.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Hola '+c.nombre+', '+nombre+' avanza a final del proceso Director Financiero. Score IA: '+score+'. '+(isAna?'Primera opcion (retencion 91%).':'Segunda opcion solida.')+' Te envio el informe completo.',
+    nombreElemento:nombre
+  });
+}
+
+function verBriefing(i){
+  var arr=window.entrevistas||[]; var e=arr[i]; if(!e) return;
+  var c=CONTACTOS.consultora_laura;
+  var body=''
+    +r10Section('Datos de la entrevista')
+    +r10Row('Candidato','<strong>'+e[2]+'</strong>')
+    +r10Row('Puesto',e[3])
+    +r10Row('Fecha',e[0])
+    +r10Row('Hora',e[1])
+    +r10Row('Estado',e[4])
+    +r10Section('Briefing IA · preparacion')
+    +r10Row('Perfil del candidato','Experiencia en sector financiero · CFO internacional')
+    +r10Row('Duracion prevista','90 minutos')
+    +r10Row('Formato','Presencial · Paseo de la Castellana 95, Madrid')
+    +r10Section('3 preguntas clave recomendadas por IA')
+    +'<ul style="margin:8px 0 0 20px;font-size:.72rem;color:#1a0810;line-height:1.7">'
+      +'<li>¿Que aprendiste en tu ultima posicion que aplicarias aqui? <span style="color:#9a7a84;font-size:.6rem">(Alta probabilidad)</span></li>'
+      +'<li>¿Cual fue tu mayor operacion de M&A y que rol tuviste? <span style="color:#9a7a84;font-size:.6rem">(Alta probabilidad)</span></li>'
+      +'<li>¿Como gestionas cuando el CEO y los datos no coinciden? <span style="color:#9a7a84;font-size:.6rem">(Media probabilidad)</span></li>'
+    +'</ul>'
+    +r10Section('Señales a observar')
+    +r10Note('TalentHuman IA ha analizado 12 procesos previos con este cliente. Señales criticas: claridad en gestion de stakeholders, datos preparados con anticipacion, comunicacion tranquila bajo presion. Penalizar: narrativa reactiva o defensiva.');
+  r10Modal({
+    titulo:'Briefing · '+e[2],
+    fecha:e[0]+' · '+e[1]+' · '+e[3],
+    estadoLabel:e[4].toUpperCase(),
+    estadoColor:e[5]==='b-ok'?'#1a9e4a':'#e8a010',
+    bodyHTML:body,
+    emailCliente:e[6]||c.email, telefonoCliente:e[7]||c.telefono,
+    nombreContacto:e[2], empresaContacto:'Candidato',
+    asuntoEmail:'Briefing entrevista · '+e[0]+' '+e[1]+' · '+e[3],
+    cuerpoEmail:'Hola '+e[2]+',\n\nTe comparto el briefing de preparacion para nuestra entrevista del '+e[0]+' a las '+e[1]+'.\n\nPuesto: '+e[3]+'.\nDuracion prevista: 90 minutos.\nSede: Paseo de la Castellana 95, Madrid.\n\nTalentHuman IA ha preparado 3 preguntas clave y las señales a observar. Te adjunto el briefing completo en PDF.\n\nUn saludo,\nLaura Sanchez',
+    textoWhatsapp:'Hola '+e[2]+', confirmo tu entrevista '+e[0]+' a las '+e[1]+' para '+e[3]+'. Te envio el briefing IA completo con las 3 preguntas clave y señales a observar.',
+    nombreElemento:'Briefing '+e[2]
+  });
+}
+
+function verDocumento(i){
+  var arr=window.docs||[]; var d=arr[i]; if(!d) return;
+  var c=CONTACTOS.consultora_laura;
+  var body=''
+    +r10Section('Documento')
+    +r10Row('Titulo','<strong>'+d[0]+'</strong>')
+    +r10Row('Tipo',d[1])
+    +r10Row('Fecha',d[2])
+    +r10Row('Estado',d[4])
+    +r10Section('Contenido')
+    +r10Note(d[0]+' generado automaticamente por TalentHuman IA a partir del expediente completo del proceso. Incluye analisis, scoring y recomendaciones con trazabilidad.')
+    +r10Section('Envio')
+    +r10Note('Al pulsar Email o WhatsApp, TalentHuman IA adjunta el PDF y prerellena el mensaje profesional. El usuario solo valida y envia.');
+  r10Modal({
+    titulo:d[0],
+    fecha:d[1]+' · Generado '+d[2],
+    estadoLabel:d[4],
+    estadoColor:d[4]==='Pendiente'?'#e8a010':'#1a9e4a',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:d[0]+' · TalentHuman IA',
+    cuerpoEmail:'Hola,\n\nTe envio el documento "'+d[0]+'" ('+d[1]+', generado el '+d[2]+').\n\nTalentHuman IA lo ha preparado automaticamente con el contenido completo del proceso.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Te comparto el documento "'+d[0]+'" generado por TalentHuman IA. '+d[1]+'.',
+    nombreElemento:d[0]
+  });
+}
+
+function verContactoPreventivo(){
+  var c=CONTACTOS.equipo_retail;
+  var body=''
+    +r10Section('Candidato en riesgo')
+    +r10Row('Nombre','<strong>Miguel Torres Santos</strong>')
+    +r10Row('Posicion','Head of Marketing · Retail Atlantico')
+    +r10Row('Incorporacion','Hace 9 meses')
+    +r10Row('Probabilidad de abandono','<span style="color:#C8102E;font-weight:900">74%</span>')
+    +r10Row('Ventana critica','48-72 horas')
+    +r10Section('Señales detectadas por IA')
+    +'<ul style="margin:8px 0 0 20px;font-size:.72rem;color:#1a0810;line-height:1.7">'
+      +'<li>Patron de comunicacion reducido (-42% ultimos 30 dias)</li>'
+      +'<li>Actividad en LinkedIn elevada (+68%)</li>'
+      +'<li>Retraso en 2 entregables clave ultima semana</li>'
+      +'<li>Similitud de patron con otros casos de abandono historicos</li>'
+    +'</ul>'
+    +r10Section('Argumentario de retencion IA')
+    +r10Note('TalentHuman IA ha preparado un argumentario personalizado: reconocimiento del trabajo reciente, plan de carrera visible (promocion a CMO en 18 meses), ajuste salarial propuesto (+12%) y flexibilidad horaria. Maria R. (consultora asignada) recibe la notificacion para contacto esta semana.');
+  r10Modal({
+    titulo:'Contacto preventivo · Miguel Torres',
+    fecha:'Detectado hace 2 horas · Urgente',
+    estadoLabel:'VENTANA 48H',
+    estadoColor:'#C8102E',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Alerta retencion · Miguel Torres · Ventana 48h',
+    cuerpoEmail:'Hola '+c.nombre+',\n\nTalentHuman IA ha detectado señales de riesgo de abandono en Miguel Torres (Head of Marketing) con probabilidad estimada del 74% en las proximas 48-72 horas.\n\nHe preparado un argumentario de retencion personalizado (reconocimiento, plan de carrera, ajuste salarial y flexibilidad) y programado contacto con Maria R. esta semana.\n\nTe envio el detalle completo y propongo una llamada de 15 minutos hoy mismo para alinear la estrategia.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Alerta: Miguel Torres (Head of Marketing) tiene 74% de probabilidad de abandono en 48-72h. TalentHuman IA ha preparado argumentario de retencion. Hablamos hoy?',
+    nombreElemento:'Alerta Miguel Torres'
+  });
+}
+
+function verInformeGarantias(){
+  var c=CONTACTOS.director_carlos;
+  var body=''
+    +r10Section('Resumen del informe')
+    +r10Row('Procesos cubiertos','14 colocaciones activas')
+    +r10Row('Periodo','Q1 2026 · Enero-Abril')
+    +r10Row('Colocaciones consolidadas','12 de 14 (86%)')
+    +r10Row('Candidatos en ventana critica','2 · Miguel Torres · Carla Vega')
+    +r10Row('Garantias ejercidas','0 (vs 2 en Q1 2025)')
+    +r10Row('Retencion estimada a 12m','92%')
+    +r10Section('Estado por cliente')
+    +r10Row('Grupo Financiero Iberia','<span style="color:#1a9e4a">3 colocaciones OK</span>')
+    +r10Row('Retail Atlantico','<span style="color:#e8a010">2 OK · 1 alerta</span>')
+    +r10Row('Pharma Solutions','<span style="color:#1a9e4a">2 colocaciones OK</span>')
+    +r10Row('Logistica Mediterraneo','<span style="color:#e8a010">1 alerta · 1 OK</span>')
+    +r10Row('TechFactory','<span style="color:#1a9e4a">3 colocaciones OK</span>')
+    +r10Section('Insight IA')
+    +r10Note('Retencion proyectada 92% supera el benchmark del sector (78%). Riesgo concentrado en 2 perfiles con argumentarios ya preparados. Ningun cliente requiere activar garantia contractual.');
+  r10Modal({
+    titulo:'Informe de garantias · Q1 2026',
+    fecha:'Generado 22 abril 2026',
+    estadoLabel:'LISTO',
+    estadoColor:'#1a9e4a',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Informe de garantias Q1 2026 · TalentHuman IA',
+    cuerpoEmail:'Hola,\n\nTe envio el informe de garantias Q1 2026 con el estado de las 14 colocaciones activas.\n\nPrincipales metricas:\n- 12 de 14 consolidadas (86%)\n- 0 garantias ejercidas (vs 2 en Q1 2025)\n- Retencion proyectada a 12m: 92%\n- 2 candidatos en ventana critica con argumentarios preparados\n\nTe adjunto PDF con el detalle por cliente.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Informe garantias Q1 2026 listo: 12/14 consolidadas (86%), 0 garantias ejercidas, retencion 92%. 2 alertas con argumentario preparado. Te paso el PDF.',
+    nombreElemento:'Informe garantias Q1'
+  });
+}
+
+function verInformeEU(){
+  var c=CONTACTOS.director_carlos;
+  var body=''
+    +r10Section('Informe Directiva EU 2026')
+    +r10Row('Alcance','5 procesos activos · 3 finalizados')
+    +r10Row('Cumplimiento actual','89% · 2 brechas detectadas')
+    +r10Row('Procesos con cumplimiento pleno','7 de 8')
+    +r10Section('Brechas detectadas')
+    +'<ul style="margin:8px 0 0 20px;font-size:.72rem;color:#1a0810;line-height:1.7">'
+      +'<li>Proceso Logistica Mediterraneo · falta documentacion de paridad en shortlist</li>'
+      +'<li>Proceso Pharma Solutions · trazabilidad de descartes incompleta en 3 candidatos</li>'
+    +'</ul>'
+    +r10Section('Plan de accion IA')
+    +r10Note('TalentHuman IA ha generado plantilla de documentacion para las 2 brechas y las enviara automaticamente a las consultoras asignadas. Estimacion de cierre: 5 dias habiles. Sin impacto en plazos de los procesos.');
+  r10Modal({
+    titulo:'Informe Directiva EU 2026',
+    fecha:'Generado 22 abril 2026',
+    estadoLabel:'89% CUMPLIMIENTO',
+    estadoColor:'#e8a010',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Informe Directiva EU 2026 · TalentHuman IA',
+    cuerpoEmail:'Hola,\n\nTe comparto el informe de cumplimiento de la Directiva EU 2026 sobre diversidad en seleccion.\n\nCumplimiento global: 89% (7 de 8 procesos). Se detectan 2 brechas menores con plan de accion automatizado:\n- Logistica Mediterraneo: documentacion paridad en shortlist\n- Pharma Solutions: trazabilidad descartes\n\nEstimacion de cierre: 5 dias habiles, sin impacto en plazos.\n\nTe adjunto PDF completo.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Informe Directiva EU 2026 · cumplimiento 89% · 2 brechas menores con plan automatizado · cierre 5 dias. Te paso el PDF.',
+    nombreElemento:'Informe EU 2026'
+  });
+}
+
+function verBenchmarkDirector(){
+  var c=CONTACTOS.equipo_iberia;
+  var body=''
+    +r10Section('Benchmark salarial · Director Financiero')
+    +r10Row('Cliente','Grupo Financiero Iberia')
+    +r10Row('Mercado','Banca y servicios financieros Iberica')
+    +r10Row('Muestra','142 posiciones equivalentes · ultimos 24 meses')
+    +r10Section('Rangos salariales')
+    +r10Row('Percentil 25','110.000 - 125.000 EUR')
+    +r10Row('Percentil 50 (mediana)','140.000 EUR · <strong style="color:#E8386D">posicion actual cliente</strong>')
+    +r10Row('Percentil 75','160.000 - 175.000 EUR')
+    +r10Row('Percentil 90','195.000+ EUR')
+    +r10Section('Paquete total recomendado')
+    +r10Row('Fijo','140.000 - 155.000 EUR')
+    +r10Row('Variable','20-30% sobre objetivos')
+    +r10Row('Equity / LTIP','0,3-0,8% sobre 4 anos')
+    +r10Row('Otros','Coche · seguro medico familiar · flexibilidad')
+    +r10Section('Recomendacion IA')
+    +r10Note('Posicionar la oferta en el tramo 150-165k fijo + 25% variable + LTIP 0,5% mejora probabilidad de cierre del 62% al 87% segun el historico con perfiles de este nivel. La mediana actual esta por debajo de Santander y BBVA.');
+  r10Modal({
+    titulo:'Benchmark salarial · Director Financiero',
+    fecha:'Mercado Q1 2026 · Grupo Financiero Iberia',
+    estadoLabel:'RECOMENDACION LISTA',
+    estadoColor:'#E8386D',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Benchmark salarial Director Financiero · '+c.empresa,
+    cuerpoEmail:'Hola '+c.nombre+',\n\nTe envio el benchmark salarial del puesto de Director Financiero.\n\nMediana del mercado: 140.000 EUR fijo + variable 20-30%.\nRecomendacion IA: posicionar en tramo 150-165k + 25% variable + LTIP 0,5% para mejorar probabilidad de cierre del 62% al 87%.\n\nLa muestra incluye 142 posiciones equivalentes en banca y servicios financieros iberica en los ultimos 24 meses.\n\nTe adjunto PDF completo con los percentiles por region y sub-sector.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Benchmark Director Financiero · '+c.empresa+': mediana 140k + 20-30% variable. Recomendacion IA: 150-165k + 25% + LTIP 0,5% mejora cierre 62%→87%. Te paso PDF.',
+    nombreElemento:'Benchmark Director Financiero'
+  });
+}
+
+function verConversionRetained(){
+  var c=CONTACTOS.equipo_logistica;
+  var body=''
+    +r10Section('Propuesta de conversion a Retained')
+    +r10Row('Clientes objetivo','Logistica Mediterraneo · Clinica Quiron')
+    +r10Row('Procesos anuales previstos','6-8 posiciones directivas')
+    +r10Row('Honorarios conversion actual','18-28k por posicion · modelo success')
+    +r10Row('Propuesta Retained','120k anuales + success bonus')
+    +r10Row('ROI cliente estimado','3,2x vs modelo actual')
+    +r10Section('Argumentario ROI (preparado por IA)')
+    +'<ul style="margin:8px 0 0 20px;font-size:.72rem;color:#1a0810;line-height:1.7">'
+      +'<li>Tiempo de respuesta 3x mas rapido · prioridad en pipeline</li>'
+      +'<li>Mapping de mercado continuo incluido (sin coste extra)</li>'
+      +'<li>Acceso a base propia de 2.400 perfiles pre-evaluados</li>'
+      +'<li>Garantia de reemplazo ampliada a 12 meses</li>'
+      +'<li>Informes trimestrales de benchmark y mercado</li>'
+    +'</ul>'
+    +r10Section('Siguiente paso')
+    +r10Note('TalentHuman IA ha preparado propuesta personalizada con calculo de ROI 3,2x vs modelo actual. Recomiendo reunion de 30 minutos con direccion de '+c.empresa+' para presentar.');
+  r10Modal({
+    titulo:'Conversion a Retained · '+c.empresa,
+    fecha:'Propuesta lista · 22 abril',
+    estadoLabel:'ARGUMENTARIO IA',
+    estadoColor:'#E8386D',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Propuesta Retained 2026 · '+c.empresa,
+    cuerpoEmail:'Hola '+c.nombre+',\n\nHe preparado una propuesta de conversion a modelo Retained para '+c.empresa+' con calculo de ROI 3,2x vs el modelo actual.\n\nResumen: 120k anuales + success bonus, a cambio de 6-8 posiciones directivas con tiempo de respuesta 3x mas rapido, mapping continuo, acceso a base propia de 2.400 perfiles, garantia ampliada a 12m e informes trimestrales de mercado.\n\n¿Quedamos 30 minutos esta semana para presentarlo?\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Hola '+c.nombre+', he preparado propuesta Retained 2026 para '+c.empresa+' con ROI 3,2x. 120k anuales + success bonus. ¿Quedamos 30 min esta semana?',
+    nombreElemento:'Propuesta Retained '+c.empresa
+  });
+}
+
+function verAnalisisRentabilidad(){
+  var c=CONTACTOS.director_carlos;
+  var body=''
+    +r10Section('Analisis de rentabilidad · Q1 2026')
+    +r10Row('Procesos cerrados','18')
+    +r10Row('Facturacion total','328.500 EUR')
+    +r10Row('Coste directo','102.100 EUR (31% margen)')
+    +r10Row('Coste indirecto','54.200 EUR')
+    +r10Row('Beneficio neto','<strong style="color:#1a9e4a">172.200 EUR (52%)</strong>')
+    +r10Section('Por tipo de contrato')
+    +r10Row('Success-only','11 procesos · 184k · 48% margen')
+    +r10Row('Retained','5 procesos · 104k · 58% margen')
+    +r10Row('Mixto','2 procesos · 40k · 62% margen')
+    +r10Section('Insight IA')
+    +r10Note('Los procesos Retained son un 21% mas rentables que los Success-only. Recomendacion: plan de conversion de 3 clientes Success a Retained en Q2 (identificados: Logistica, Quiron, Energia Verde). Impacto estimado: +42k adicionales Q2.');
+  r10Modal({
+    titulo:'Analisis rentabilidad · Q1 2026',
+    fecha:'Exportado 22 abril 2026 · PDF 12 paginas',
+    estadoLabel:'MARGEN 52%',
+    estadoColor:'#1a9e4a',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Analisis rentabilidad Q1 2026 · TalentHuman IA',
+    cuerpoEmail:'Hola,\n\nTe envio el analisis de rentabilidad Q1 2026.\n\nResumen:\n- 18 procesos cerrados · 328.500 EUR facturados\n- Margen neto: 52% (172k EUR)\n- Retained 21% mas rentable que Success-only\n\nRecomendacion IA: conversion de 3 clientes (Logistica, Quiron, Energia Verde) a Retained en Q2. Impacto estimado: +42k adicionales.\n\nPDF completo adjunto.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Analisis rentabilidad Q1 2026 · 328k facturados · margen 52% · Retained 21% mas rentable · recomendacion: conversion 3 clientes +42k Q2. Te paso PDF.',
+    nombreElemento:'Analisis rentabilidad Q1'
+  });
+}
+
+function verInformeOnboarding(){
+  var c=CONTACTOS.equipo_iberia;
+  var body=''
+    +r10Section('Informe de onboarding')
+    +r10Row('Periodo','Ultimos 90 dias')
+    +r10Row('Candidatos incorporados','9 posiciones')
+    +r10Row('Seguimiento 30d','9 de 9 OK')
+    +r10Row('Seguimiento 60d','8 de 8 OK · 1 pendiente')
+    +r10Row('Seguimiento 90d','6 de 6 OK · 3 pendientes')
+    +r10Section('Alertas tempranas detectadas')
+    +'<ul style="margin:8px 0 0 20px;font-size:.72rem;color:#1a0810;line-height:1.7">'
+      +'<li>1 candidato (Sofia Molina · Retail Atlantico) con score engagement bajo</li>'
+      +'<li>0 abandonos en el periodo</li>'
+      +'<li>Feedback medio del manager: 4,7 / 5</li>'
+    +'</ul>'
+    +r10Section('Insight IA')
+    +r10Note('9 incorporaciones en 90 dias con 0 abandonos y feedback 4,7/5. Solo 1 señal de alerta temprana gestionable. La IA propone llamada de seguimiento con Sofia Molina la proxima semana.');
+  r10Modal({
+    titulo:'Informe de onboarding · 90 dias',
+    fecha:'Generado 22 abril 2026',
+    estadoLabel:'9/9 INTEGRADOS',
+    estadoColor:'#1a9e4a',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Informe onboarding 90 dias · TalentHuman IA',
+    cuerpoEmail:'Hola '+c.nombre+',\n\nTe envio el informe de onboarding de los ultimos 90 dias.\n\n9 incorporaciones · 0 abandonos · feedback manager medio 4,7/5.\n\n1 señal de alerta temprana detectada (Sofia Molina · Retail Atlantico) con llamada de seguimiento IA programada la proxima semana.\n\nPDF completo adjunto.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Informe onboarding 90d: 9 incorporaciones · 0 abandonos · feedback 4,7/5 · 1 alerta gestionable. Te paso PDF.',
+    nombreElemento:'Informe onboarding 90d'
+  });
+}
+
+function verBancoPreguntas(){
+  var c=CONTACTOS.equipo_iberia;
+  var preguntas=[
+    ['¿Que aprendiste en Santander Internacional que aplicarias aqui?','Experiencia directiva · Alta probabilidad'],
+    ['¿Cual fue tu mayor operacion de M&A y que rol tuviste?','Competencias tecnicas · Alta probabilidad'],
+    ['Describe un conflicto con el CEO y como lo resolviste','Encaje cultural · Media probabilidad'],
+    ['¿Como gestionas el reporting a Consejo en situaciones adversas?','Comunicacion · Alta probabilidad'],
+    ['Cuentame un cierre de ejercicio que casi se va al traste','Gestion crisis · Media'],
+    ['¿Como preparas un due diligence desde comprador?','M&A · Alta'],
+    ['¿Cuando has dicho no a un CEO y por que?','Independencia criterio · Media'],
+    ['Describe tu equipo financiero ideal y como lo formas','Liderazgo · Alta'],
+    ['¿Como detectas fraude interno en una organizacion grande?','Control · Media'],
+    ['Cuentame una mejora de EBITDA de la que estes orgulloso','Impacto · Alta'],
+    ['¿Que KPIs consultas todas las mañanas?','Rigor · Media'],
+    ['¿Por que Grupo Financiero Iberia y no otro proyecto?','Motivacion · Alta']
+  ];
+  var body=r10Section('Banco de preguntas · Director Financiero')
+    +r10Row('Cliente','Grupo Financiero Iberia')
+    +r10Row('Puesto','Director Financiero')
+    +r10Row('Total preguntas','12 · adaptadas al puesto y cliente')
+    +r10Section('Preguntas generadas por IA')
+    +'<ol style="margin:8px 0 0 20px;font-size:.72rem;color:#1a0810;line-height:1.8">';
+  for(var pi=0;pi<preguntas.length;pi++){
+    body+='<li><strong>'+preguntas[pi][0]+'</strong><br><span style="color:#9a7a84;font-size:.6rem">'+preguntas[pi][1]+'</span></li>';
+  }
+  body+='</ol>'
+    +r10Section('Insight IA')
+    +r10Note('Preguntas adaptadas al puesto Director Financiero, cultura de Grupo Financiero Iberia (conservadora, consenso, enfasis en compliance) y perfiles de los finalistas. Cada pregunta incluye criterio de evaluacion.');
+  r10Modal({
+    titulo:'Banco de preguntas · 12 para Director Financiero',
+    fecha:'Generado 22 abril · Grupo Financiero Iberia',
+    estadoLabel:'LISTO',
+    estadoColor:'#E8386D',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Banco de preguntas · Director Financiero · GFI',
+    cuerpoEmail:'Hola '+c.nombre+',\n\nTe envio las 12 preguntas adaptadas para las entrevistas de Director Financiero en '+c.empresa+'.\n\nCada pregunta incluye el criterio de evaluacion y la probabilidad de uso. Estan adaptadas al puesto, a la cultura de la empresa (conservadora, consenso, compliance) y a los perfiles de los finalistas.\n\nPDF completo adjunto.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'12 preguntas adaptadas para entrevistas Director Financiero '+c.empresa+' listas. Incluyen criterio de evaluacion y probabilidad de uso. Te paso PDF.',
+    nombreElemento:'Banco preguntas DirFin'
+  });
+}
+
+function verBenchmarkRRHH(){
+  var c=CONTACTOS.equipo_iberia;
+  var body=''
+    +r10Section('Benchmark salarial · equipo interno RRHH')
+    +r10Row('Perfiles analizados','8 roles clave · HRBP · Talent · C&B · People Analytics')
+    +r10Row('Muestra','240 posiciones equivalentes Iberica')
+    +r10Row('Diferencial medio vs mercado','+4% por encima · posicion competitiva')
+    +r10Section('Rangos recomendados por rol')
+    +r10Row('HR Business Partner Senior','55-70k · mediana 62k')
+    +r10Row('Head of Talent','80-105k · mediana 92k')
+    +r10Row('Total Rewards Manager','65-85k · mediana 74k')
+    +r10Row('People Analytics Lead','60-80k · mediana 70k')
+    +r10Row('Chief People Officer','130-175k · mediana 150k')
+    +r10Section('Insight IA')
+    +r10Note('Equipo interno RRHH bien posicionado vs mercado (+4%). Recomendacion: ajuste puntual al rol de People Analytics Lead (-6% vs mediana). Resto de posiciones competitivas.');
+  r10Modal({
+    titulo:'Benchmark RRHH · equipo interno',
+    fecha:'Q1 2026 · 240 posiciones muestra',
+    estadoLabel:'POSICION +4%',
+    estadoColor:'#1a9e4a',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Benchmark salarial equipo RRHH · '+c.empresa,
+    cuerpoEmail:'Hola '+c.nombre+',\n\nTe comparto el benchmark salarial del equipo interno de RRHH (8 roles clave) vs mercado Iberica.\n\nPosicion global: +4% por encima de mercado · competitiva.\nRecomendacion: ajuste puntual al rol People Analytics Lead (-6% vs mediana).\nResto de posiciones alineadas.\n\nPDF completo adjunto con rangos por rol y recomendaciones por tramo.\n\nUn saludo,\nTalentHuman IA',
+    textoWhatsapp:'Benchmark RRHH interno '+c.empresa+' · posicion global +4% vs mercado · solo ajuste puntual a People Analytics Lead. Te paso PDF.',
+    nombreElemento:'Benchmark RRHH'
+  });
+}
+
+function verPlanPreparacion(){
+  var c=CONTACTOS.consultora_laura;
+  var body=''
+    +r10Section('Plan de preparacion · tu entrevista')
+    +r10Row('Cliente','Grupo Financiero Iberia')
+    +r10Row('Puesto','Director Financiero')
+    +r10Row('Entrevistador','CEO + Presidente del Consejo')
+    +r10Row('Fecha prevista','Miercoles 10 abril · 16:00h')
+    +r10Section('12 preguntas clave (probables)')
+    +'<ol style="margin:8px 0 0 20px;font-size:.72rem;color:#1a0810;line-height:1.8">'
+      +'<li>Cuentame tu mayor aprendizaje de los ultimos 3 anos</li>'
+      +'<li>¿Por que Grupo Financiero Iberia y no Santander o BBVA?</li>'
+      +'<li>¿Como gestionarias los primeros 90 dias si te fichamos?</li>'
+      +'<li>Describe una decision que te costo convencer al CEO</li>'
+      +'<li>¿Cual es tu vision del sector bancario 2026-2030?</li>'
+      +'<li>Cuentame un fracaso del que saliste fortalecido</li>'
+      +'<li>¿Que equipo directo formarias y por que?</li>'
+      +'<li>¿Como priorizas compliance vs crecimiento?</li>'
+      +'<li>Describe tu mayor negociacion con un stakeholder critico</li>'
+      +'<li>¿Que KPIs reportarias al Consejo semanalmente?</li>'
+      +'<li>¿Cuales son tus expectativas en los primeros 12 meses?</li>'
+      +'<li>¿Por que deberiamos elegirte sobre el otro finalista?</li>'
+    +'</ol>'
+    +r10Section('Cultura Grupo Financiero Iberia')
+    +r10Note('Perfil conservador, decisiones por consenso, enfasis en compliance y reporting claro. Evita narrativas reactivas o excesivamente agresivas. Prepara ejemplos con datos cuantificados.');
+  r10Modal({
+    titulo:'Plan de preparacion entrevista · Director Financiero',
+    fecha:'Miercoles 10 abril · 16:00h · GFI',
+    estadoLabel:'PREPARACION IA',
+    estadoColor:'#E8386D',
+    bodyHTML:body,
+    emailCliente:c.email, telefonoCliente:c.telefono,
+    nombreContacto:c.nombre, empresaContacto:c.empresa,
+    asuntoEmail:'Plan de preparacion entrevista · Director Financiero GFI',
+    cuerpoEmail:'Hola '+c.nombre+',\n\nHe recibido el plan de preparacion para mi entrevista del miercoles 10 abril a las 16h en Grupo Financiero Iberia.\n\nTalentHuman IA ha generado 12 preguntas probables con analisis de cultura (conservadora, consenso, compliance).\n\n¿Podemos quedar 30 minutos antes para revisar mis ejemplos preparados?\n\nUn saludo',
+    textoWhatsapp:'Hola '+c.nombre+', recibido el plan de preparacion para mi entrevista del miercoles. ¿Quedamos 30 min antes para revisar mis ejemplos?',
+    nombreElemento:'Plan preparacion entrevista'
+  });
 }
 
 // ── DIRECTOR APP ──
@@ -4014,13 +4575,14 @@ function buildDirectorHTML(){
 
   // ── 1. DASHBOARD EJECUTIVO ──
   var procesos=[
-    ['Grupo Financiero Iberia','Director Financiero','Entrevistas','8 dias','18.000\u20AC','b-ok','En plazo'],
-    ['Retail Atlantico S.A.','Head of Marketing','Finalistas','3 dias','14.500\u20AC','b-amber','Urgente'],
-    ['Pharma Solutions','HR Business Partner','Sourcing','22 dias','12.000\u20AC','b-ok','En plazo'],
-    ['Logistica Mediterraneo','Operations Manager','Congelado','-','16.000\u20AC','b-red','Alerta IA'],
-    ['TechFactory S.L.','CTO','Propuesta','12 dias','28.000\u20AC','b-ok','En plazo'],
-    ['Energia Verde S.L.','Resp. RRHH','Kick-off','-','10.000\u20AC','b-blue','Iniciando']
+    ['Grupo Financiero Iberia','Director Financiero','Entrevistas','8 dias','18.000\u20AC','b-ok','En plazo',CONTACTOS.equipo_iberia],
+    ['Retail Atlantico S.A.','Head of Marketing','Finalistas','3 dias','14.500\u20AC','b-amber','Urgente',CONTACTOS.equipo_retail],
+    ['Pharma Solutions','HR Business Partner','Sourcing','22 dias','12.000\u20AC','b-ok','En plazo',CONTACTOS.equipo_pharma],
+    ['Logistica Mediterraneo','Operations Manager','Congelado','-','16.000\u20AC','b-red','Alerta IA',CONTACTOS.equipo_logistica],
+    ['TechFactory S.L.','CTO','Propuesta','12 dias','28.000\u20AC','b-ok','En plazo',CONTACTOS.equipo_tech],
+    ['Energia Verde S.L.','Resp. RRHH','Kick-off','-','10.000\u20AC','b-blue','Iniciando',CONTACTOS.equipo_energia]
   ];
+  window.procesos=procesos;
   var procRows='';
   for(var i=0;i<procesos.length;i++){var p=procesos[i];
     var bg=p[5]==='b-red'?'rgba(232,56,109,.03)':p[5]==='b-amber'?'rgba(232,160,16,.03)':'transparent';
@@ -4067,7 +4629,7 @@ function buildDirectorHTML(){
       +'\x3Ctd style="font-size:.67rem;color:var(--text3)"\x3E'+p[3]+'\x3C/td\x3E'
       +'\x3Ctd style="font-weight:700;color:var(--green);font-family:Montserrat,sans-serif;font-size:.8rem"\x3E'+p[4]+'\x3C/td\x3E'
       +'\x3Ctd\x3E'+badge(p[5],p[6])+'\x3C/td\x3E'
-      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="showToast(\'Abriendo detalle proceso · '+p[0]+'\')"\x3EVer\x3C/button\x3E \x3Cbutton class="tbl-btn tbl-btn-ghost" onclick="showToast(\'Opciones proceso · '+p[0]+'\')"\x3E -  -  - \x3C/button\x3E\x3C/td\x3E'
+      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="verProceso('+i+')"\x3EVer\x3C/button\x3E \x3Cbutton class="tbl-btn tbl-btn-ghost" onclick="verProceso('+i+')"\x3E -  -  - \x3C/button\x3E\x3C/td\x3E'
       +'\x3C/tr\x3E';
   }
 
@@ -4495,8 +5057,8 @@ function buildDirectorHTML(){
     +alert_('green','','Ana Garcia, Sofia Blanco, Pedro Martinez - OK','Integracion correcta. Proximos check-ins programados automaticamente.')
     +iabox('','TalentHuman IA monitoriza cada candidato colocado y detecta senales de riesgo antes de que se active la garantia. Contacto preventivo ahorra de media 1 reemplazo por trimestre.')
     +'\x3Cdiv style="display:flex;gap:8px;margin-top:12px"\x3E'
-    +'\x3Cbutton class="btn btn-pink" onclick="demoIA(\'Contacto preventivo activado\',\'TalentHuman IA ha preparado el argumentario de retencion para Miguel Torres y ha notificado a Maria R. para contacto esta semana.\')"\x3EActivar contacto preventivo\x3C/button\x3E'
-    +'\x3Cbutton class="btn" onclick="demoIA(\'Informe generado\',\'El informe de garantias con el estado de todas las colocaciones ha sido generado y enviado a los clientes correspondientes.\')" style="background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EGenerar informe para clientes\x3C/button\x3E'
+    +'\x3Cbutton class="btn btn-pink" onclick="verContactoPreventivo()"\x3EActivar contacto preventivo\x3C/button\x3E'
+    +'\x3Cbutton class="btn" onclick="verInformeGarantias()" style="background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EGenerar informe para clientes\x3C/button\x3E'
     +'\x3C/div\x3E\x3C/div\x3E'
     +'\x3C/div\x3E'
   );
@@ -4550,8 +5112,8 @@ function buildDirectorHTML(){
     +'\x3Ctable class="tbl"\x3E\x3Cthead\x3E\x3Ctr\x3E\x3Cth\x3EProceso\x3C/th\x3E\x3Cth\x3ERango publicado\x3C/th\x3E\x3Cth\x3EDEI\x3C/th\x3E\x3Cth\x3ECriterios\x3C/th\x3E\x3Cth\x3EScore\x3C/th\x3E\x3C/tr\x3E\x3C/thead\x3E\x3Ctbody\x3E'+transpRows+'\x3C/tbody\x3E\x3C/table\x3E'
     +iabox('!','Operations Manager - Logistica Mediterraneo tiene score 48%. Brecha de genero detectada y criterios sin documentar. Riesgo legal antes de 2026.')
     +'\x3Cdiv style="display:flex;gap:8px;margin-top:12px"\x3E'
-    +'\x3Cbutton class="btn btn-pink" onclick="demoIA(\'Informe EU generado\',\'TalentHuman IA ha generado el informe de cumplimiento de la Directiva EU 2026 con los 5 procesos activos, brechas detectadas y plan de accion.\')"\x3EGenerar informe Directiva EU 2026\x3C/button\x3E'
-    +'\x3Cbutton class="btn" onclick="demoIA(\'Benchmark enviado\',\'El informe de benchmark salarial por perfil ha sido enviado a los clientes correspondientes.\')" style="background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EEnviar benchmark al cliente\x3C/button\x3E'
+    +'\x3Cbutton class="btn btn-pink" onclick="verInformeEU()"\x3EGenerar informe Directiva EU 2026\x3C/button\x3E'
+    +'\x3Cbutton class="btn" onclick="verBenchmarkDirector()" style="background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EEnviar benchmark al cliente\x3C/button\x3E'
     +'\x3C/div\x3E\x3C/div\x3E'
     +'\x3Cdiv class="card"\x3E\x3Cdiv class="card-title"\x3EBenchmark salarial por perfil\x3C/div\x3E'
     +'\x3Ctable class="tbl"\x3E\x3Cthead\x3E\x3Ctr\x3E\x3Cth\x3EPerfil\x3C/th\x3E\x3Cth\x3ERango mercado\x3C/th\x3E\x3Cth\x3ETendencia 12m\x3C/th\x3E\x3C/tr\x3E\x3C/thead\x3E\x3Ctbody\x3E'+benchRows+'\x3C/tbody\x3E\x3C/table\x3E'
@@ -4609,8 +5171,8 @@ function buildDirectorHTML(){
     +'\x3Ctable class="tbl"\x3E\x3Cthead\x3E\x3Ctr\x3E\x3Cth\x3EMetrica\x3C/th\x3E\x3Cth\x3ERetained\x3C/th\x3E\x3Cth\x3ESuccess Fee\x3C/th\x3E\x3Cth\x3EVentaja\x3C/th\x3E\x3C/tr\x3E\x3C/thead\x3E\x3Ctbody\x3E'+retainedRows+'\x3C/tbody\x3E\x3C/table\x3E'
     +iabox('','TalentHuman IA detecta 2 clientes en Success Fee (Logistica Mediterraneo, Clinica Quiron) con perfil idoneo para convertir a Retained. Momento optimo: al cierre del proceso actual.')
     +'\x3Cdiv style="display:flex;gap:8px;margin-top:12px"\x3E'
-    +'\x3Cbutton class="btn btn-pink" onclick="demoIA(\'Conversion activada\',\'TalentHuman IA ha preparado la propuesta de conversion a Retained para Logistica Mediterraneo y Clinica Quiron con el argumentario de ROI personalizado.\')"\x3EActivar conversion a retained\x3C/button\x3E'
-    +'\x3Cbutton class="btn" onclick="demoIA(\'Analisis exportado\',\'El analisis completo de rentabilidad por proceso y tipo de contrato ha sido exportado en PDF.\')" style="background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EExportar analisis de rentabilidad\x3C/button\x3E'
+    +'\x3Cbutton class="btn btn-pink" onclick="verConversionRetained()"\x3EActivar conversion a retained\x3C/button\x3E'
+    +'\x3Cbutton class="btn" onclick="verAnalisisRentabilidad()" style="background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EExportar analisis de rentabilidad\x3C/button\x3E'
     +'\x3C/div\x3E\x3C/div\x3E'
     +'\x3Cdiv class="card"\x3E\x3Cdiv class="card-title"\x3ECoste real por proceso\x3C/div\x3E'
     +'\x3Ctable class="tbl"\x3E\x3Cthead\x3E\x3Ctr\x3E\x3Cth\x3EProceso\x3C/th\x3E\x3Cth\x3EHonorario\x3C/th\x3E\x3Cth\x3ECoste real\x3C/th\x3E\x3Cth\x3EMargen\x3C/th\x3E\x3C/tr\x3E\x3C/thead\x3E\x3Ctbody\x3E'+costeRows+'\x3C/tbody\x3E\x3C/table\x3E'
@@ -5301,7 +5863,7 @@ function buildConsultorHTML(){
       hitosHTML
       +lt+'div style='+q+'display:flex;gap:8px;margin-top:14px'+q+gt
       +lt+'button class='+q+'btn btn-pink'+q+' onclick='+q+'demoIA(\'Protocolo activado\',\'TalentHuman IA ha iniciado el protocolo de seguimiento intensivo para el candidato en riesgo. Se programan check-ins semanales y se notifica al cliente.\')'+q+gt+'Activar protocolo de seguimiento'+lt+'/button'+gt
-      +lt+'button class='+q+'btn'+q+' onclick='+q+'demoIA(\'Informe generado\',\'El informe de onboarding con el estado de cada candidato incorporado ha sido generado y esta listo para enviar al cliente.\')'+q+' style='+q+'background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)'+q+gt+'Generar informe de onboarding'+lt+'/button'+gt
+      +lt+'button class='+q+'btn'+q+' onclick='+q+'verInformeOnboarding()'+q+' style='+q+'background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)'+q+gt+'Generar informe de onboarding'+lt+'/button'+gt
       +lt+'/div'+gt
       +iabox('!','TalentHuman IA detecta riesgo en Miguel Torres Vega (Pharma Solutions). Score de integracion 54% - por debajo del umbral 60%. Contacto preventivo recomendado esta semana.')
     )
@@ -5662,7 +6224,7 @@ function buildConsultorHTML(){
     +lt+'/div'+gt
     +lt+'div class='+q+'g2'+q+gt
     +card('Banco de preguntas generado por IA',true,pregHTML
-      +lt+'button class='+q+'btn btn-pink'+q+' onclick='+q+'demoIA(\'Banco completo generado\',\'TalentHuman IA ha generado las 12 preguntas completas adaptadas al puesto de Director Financiero, la cultura de Grupo Financiero Iberia y el perfil de cada finalista.\')'+q+' style='+q+'width:100%;margin-top:8px'+q+gt+'Generar banco completo (12 preguntas)'+lt+'/button'+gt
+      +lt+'button class='+q+'btn btn-pink'+q+' onclick='+q+'verBancoPreguntas()'+q+' style='+q+'width:100%;margin-top:8px'+q+gt+'Generar banco completo (12 preguntas)'+lt+'/button'+gt
     )
     +card('Scorecard de evaluacion',true,
       lt+'div style='+q+'font-size:.68rem;color:var(--text2);margin-bottom:12px;line-height:1.5'+q+gt+'Ponderacion de competencias para Director Financiero - Grupo Financiero Iberia. La IA ajusta los pesos segun el briefing del cliente.'+lt+'/div'+gt
@@ -5848,7 +6410,7 @@ function buildClienteHTML(){
     +pbar('Estabilidad y retencion','Sin cambios en 5 anos','91%')
     +pbar('Disponibilidad','Inmediata','100%')
     +iabox('','Ana Garcia supera los criterios en 7/8 dimensiones. Retencion estimada a 12 meses: 91%. Recomendada.')
-    +'\x3Cbutton class="btn btn-pink" style="width:100%;margin-top:10px" onclick="showToast(\'\u2713 Ana Garcia Reyes avanza a final - TalentHuman IA notifica a Grupo Nexo\')"\x3E\u2713 Avanzar con Ana Garcia\x3C/button\x3E'
+    +'\x3Cbutton class="btn btn-pink" style="width:100%;margin-top:10px" onclick="verFinalista(\'ana\')"\x3E\u2713 Avanzar con Ana Garcia\x3C/button\x3E'
     +'\x3C/div\x3E'
     +'\x3Cdiv class="card" style="background:rgba(26,158,74,.04);border:1px solid rgba(26,158,74,.25)"\x3E\x3Cdiv style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"\x3E\x3Cdiv class="card-title" style="margin:0"\x3EPedro Martinez Lopez\x3C/div\x3E\x3Cspan style="font-family:Montserrat,sans-serif;font-size:1.3rem;font-weight:900;color:#1a9e4a"\x3E88%\x3C/span\x3E\x3C/div\x3E'
     +pbar('Experiencia directiva financiera','Retail Espana  -  6 anos','85%')
@@ -5857,7 +6419,7 @@ function buildClienteHTML(){
     +pbar('Estabilidad y retencion','1 cambio en 6 anos','82%')
     +pbar('Disponibilidad','30 dias','80%')
     +iabox('','Pedro tiene mas experiencia en transformacion pero menos en banca internacional. Segunda opcion solida.')
-    +'\x3Cbutton class="btn" style="width:100%;margin-top:10px;background:rgba(26,158,74,.08);color:#1a9e4a;border:1px solid rgba(26,158,74,.2)" onclick="showToast(\'\u2713 Pedro Martinez Lopez avanza a final - TalentHuman IA notifica a Grupo Nexo\')"\x3E\u2713 Avanzar con Pedro Martinez\x3C/button\x3E'
+    +'\x3Cbutton class="btn" style="width:100%;margin-top:10px;background:rgba(26,158,74,.08);color:#1a9e4a;border:1px solid rgba(26,158,74,.2)" onclick="verFinalista(\'pedro\')"\x3E\u2713 Avanzar con Pedro Martinez\x3C/button\x3E'
     +'\x3C/div\x3E\x3C/div\x3E'
   );
 
@@ -5882,18 +6444,19 @@ function buildClienteHTML(){
 
   // ── 5. CALENDARIO ENTREVISTAS ──
   var entrevistas=[
-    ['Lun 9 abr','10:00h','Ana Garcia Reyes','Director Financiero','Confirmada','b-ok'],
-    ['Lun 9 abr','12:30h','Pedro Martinez Lopez','Director Financiero','Confirmada','b-ok'],
-    ['Mar 10 abr','09:30h','Carmen Ruiz Molina','Director Financiero','Pendiente confirmar','b-amber'],
-    ['Mie 11 abr','11:00h','Roberto Iglesias Vera','Director Financiero','Pendiente confirmar','b-amber']
+    ['Lun 9 abr','10:00h','Ana Garcia Reyes','Director Financiero','Confirmada','b-ok','ana.garcia@empresa.es','34667123456'],
+    ['Lun 9 abr','12:30h','Pedro Martinez Lopez','Director Financiero','Confirmada','b-ok','pedro.martinez@empresa.es','34678234567'],
+    ['Mar 10 abr','09:30h','Carmen Ruiz Molina','Director Financiero','Pendiente confirmar','b-amber','carmen.ruiz@empresa.es','34689345678'],
+    ['Mie 11 abr','11:00h','Roberto Iglesias Vera','Director Financiero','Pendiente confirmar','b-amber','roberto.iglesias@empresa.es','34691456789']
   ];
+  window.entrevistas=entrevistas;
   var entRows='';
   for(var i=0;i<entrevistas.length;i++){var e=entrevistas[i];
     entRows+='\x3Ctr\x3E\x3Ctd style="font-weight:700;color:var(--navy);font-size:.72rem"\x3E'+e[0]+'\x3C/td\x3E'
       +'\x3Ctd style="font-family:Montserrat,sans-serif;font-weight:700;color:#E8386D"\x3E'+e[1]+'\x3C/td\x3E'
       +'\x3Ctd\x3E\x3Cdiv style="font-size:.72rem;font-weight:600"\x3E'+e[2]+'\x3C/div\x3E\x3Cdiv style="font-size:.6rem;color:var(--text3)"\x3E'+e[3]+'\x3C/div\x3E\x3C/td\x3E'
       +'\x3Ctd\x3E'+badge(e[5],e[4])+'\x3C/td\x3E'
-      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="showToast(\'Briefing IA · '+e[2]+' · '+e[0]+' '+e[1]+'\')"\x3EBriefing\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
+      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="verBriefing('+i+')"\x3EBriefing\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
   }
   o+=scr('entrevistas',false,
     phdr('Calendario de entrevistas','b-pink','9-11 de abril','Entrevistas con candidatos finalistas  -  Briefing IA preparado para cada sesion')
@@ -5961,12 +6524,13 @@ function buildClienteHTML(){
     ['Acta de kick-off','PDF  -  3 paginas','3 mar','b-ok','Disponible'],
     ['Descripcion del puesto validada','PDF  -  2 paginas','3 mar','b-ok','Disponible']
   ];
+  window.docs=docs;
   var docRows='';
   for(var i=0;i<docs.length;i++){var d=docs[i];
     docRows+='\x3Ctr\x3E\x3Ctd\x3E\x3Cdiv style="font-size:.72rem;font-weight:600;color:var(--navy)"\x3E'+d[0]+'\x3C/div\x3E\x3Cdiv style="font-size:.6rem;color:var(--text3)"\x3E'+d[1]+'\x3C/div\x3E\x3C/td\x3E'
       +'\x3Ctd style="font-size:.68rem;color:var(--text3)"\x3E'+d[2]+'\x3C/td\x3E'
       +'\x3Ctd\x3E'+badge(d[3],d[4])+'\x3C/td\x3E'
-      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="showToast(\''+(d[4]==='Pendiente'?'Generando · '+d[0]+' · listo hoy 17:00h':'Descargando · '+d[0])+'\')" '+(d[4]==='Pendiente'?'disabled style="opacity:.4"':'')+'\x3E'+( d[4]==='Pendiente'?'Generando...':'Descargar')+'\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
+      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="verDocumento('+i+')" '+(d[4]==='Pendiente'?'disabled style="opacity:.4"':'')+'\x3E'+( d[4]==='Pendiente'?'Generando...':'Descargar')+'\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
   }
   o+=scr('documentos',false,
     phdr('Documentos del proceso','b-pink','Acceso directo','Todos los informes, briefings y actas generados automaticamente por TalentHuman IA')
@@ -6030,7 +6594,7 @@ function buildClienteHTML(){
       +iabox('','TalentHuman IA recomienda ofertar 158.000\u20AC base + bonus 15% sobre objetivos para maximizar la probabilidad de aceptacion de Ana Garcia Reyes (82%) sin sobrepasar el presupuesto.')
       +'\x3Cdiv style="display:flex;gap:8px;margin-top:12px"\x3E'
       +'\x3Cbutton class="btn btn-pink" onclick="demoIA(\'Estrategia de oferta generada\',\'TalentHuman IA ha preparado la estrategia de oferta personalizada para cada finalista, con el rango optimo y los argumentos de negociacion.\')" style="flex:1"\x3EPreparar estrategia de oferta\x3C/button\x3E'
-      +'\x3Cbutton class="btn" onclick="demoIA(\'Benchmark enviado\',\'El informe de benchmark salarial ha sido enviado al equipo de RRHH con los rangos por perfil y las recomendaciones de la IA.\')" style="flex:1;background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EEnviar al equipo RRHH\x3C/button\x3E'
+      +'\x3Cbutton class="btn" onclick="verBenchmarkRRHH()" style="flex:1;background:rgba(232,56,109,.08);color:#E8386D;border:1px solid rgba(232,56,109,.2)"\x3EEnviar al equipo RRHH\x3C/button\x3E'
       +'\x3C/div\x3E'
     )
     +card('Comparativa candidatos finalistas',true,
@@ -6250,7 +6814,7 @@ function buildCandidatoHTML(){
           +'\x3Cdiv style="font-size:.72rem;color:var(--navy);font-weight:600;margin-top:6px;line-height:1.5"\x3E'+pr[1]+'\x3C/div\x3E'
           +'\x3C/div\x3E';
       }).join('')
-      +'\x3Cbutton class="btn btn-pink" onclick="demoIA(\'Banco completo generado\',\'TalentHuman IA ha generado 12 preguntas adaptadas al CEO entrevistador y al puesto especifico, con criterios de evaluacion para cada una.\')" style="width:100%;margin-top:4px"\x3EGenerar plan de preparacion completo\x3C/button\x3E'
+      +'\x3Cbutton class="btn btn-pink" onclick="verPlanPreparacion()" style="width:100%;margin-top:4px"\x3EGenerar plan de preparacion completo\x3C/button\x3E'
     )
     // Card derecha — resultados ultima simulacion
     +card('Resultados de tu ultima simulacion',true,

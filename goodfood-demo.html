@@ -440,7 +440,7 @@ img,svg,video,canvas{max-width:100%;}
         </div>
         <div class="pc-desc" style="color:rgba(201,168,76,.85);">KPIs, P&L y visión de negocio</div>
         <div class="pc-name" style="color:#E8E0D0;">Director</div>
-        <button class="pc-btn" style="background:#C9A84C;color:#1A1208;">Entrar</button>
+        <button class="pc-btn" style="background:#C9A84C;color:#1A1208;" onclick="event.stopPropagation();goLogin('director')">Entrar</button>
       </div>
 
       <div class="pcard" onclick="goLogin('empleado')" style="background:#C9A84C;box-shadow:0 8px 28px rgba(201,168,76,.35);">
@@ -449,7 +449,7 @@ img,svg,video,canvas{max-width:100%;}
         </div>
         <div class="pc-desc" style="color:rgba(26,18,8,.55);">Sala, cocina y servicio</div>
         <div class="pc-name" style="color:#1A1208;">Empleado</div>
-        <button class="pc-btn" style="background:#1A1208;color:#C9A84C;">Entrar</button>
+        <button class="pc-btn" style="background:#1A1208;color:#C9A84C;" onclick="event.stopPropagation();goLogin('empleado')">Entrar</button>
       </div>
 
       <div class="pcard" onclick="goLogin('cliente')" style="background:rgba(250,247,242,.08);border:1px solid rgba(250,247,242,.18);">
@@ -458,7 +458,7 @@ img,svg,video,canvas{max-width:100%;}
         </div>
         <div class="pc-desc" style="color:rgba(232,224,208,.45);">Reserva y experiencia</div>
         <div class="pc-name" style="color:#E8E0D0;">Cliente</div>
-        <button class="pc-btn" style="background:#D4572A;color:#fff;">Entrar</button>
+        <button class="pc-btn" style="background:#D4572A;color:#fff;" onclick="event.stopPropagation();goLogin('cliente')">Entrar</button>
       </div>
 
       <div class="pcard" onclick="goLogin('proveedor')" style="background:rgba(212,87,42,.08);border:1px solid rgba(212,87,42,.25);">
@@ -467,7 +467,7 @@ img,svg,video,canvas{max-width:100%;}
         </div>
         <div class="pc-desc" style="color:rgba(212,87,42,.55);">Pedidos y entregas</div>
         <div class="pc-name" style="color:#D4572A;">Proveedor</div>
-        <button class="pc-btn" style="background:#D4572A;color:#fff;">Entrar</button>
+        <button class="pc-btn" style="background:#D4572A;color:#fff;" onclick="event.stopPropagation();goLogin('proveedor')">Entrar</button>
       </div>
 
     </div>

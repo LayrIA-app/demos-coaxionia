@@ -7,7 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;font-family:DM Sans,sans-serif;}
+html{font-size:16px;}
+html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;font-family:DM Sans,sans-serif;}
+@media (max-width:768px){ html{font-size:18.5px;} }
+@media (max-width:480px){ html{font-size:19.2px;} }
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 @keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -1558,7 +1561,7 @@ function buildDirectorApp(){
           </div>
         </div>
 
-        <div id="sim-recomendacion" class="ia-box" style="border-left:3px solid #1a9e4a">
+        <div id="sim-recomendacion" class="ia-box">
           <div class="ia-box-icon"></div>
           <div class="ia-box-text" id="sim-rec-txt"><strong>KonGest IA recomienda ejecutar:</strong> La contratación en Q3 maximiza el ahorro fiscal. Esperar a Q1 2026 costaría 4.200€ adicionales en carga tributaria.</div>
         </div>
@@ -1795,7 +1798,7 @@ function buildAsesorApp(){
             </div>
             <div style="font-size:.68rem;color:#7a8899">${v.clientes.join(' · ')}</div>
           </div>
-          <button class="btn btn-blue btn-sm">Ver →</button>
+          <button class="btn btn-blue btn-sm" onclick="iaToast('Abriendo Mod. ${v.modelo} · ' + ${v.clientes.length} + ' clientes · Borrador IA listo para firma')">Ver →</button>
         </div>`).join('')}
       </div>
       <div class="card">
@@ -1955,8 +1958,8 @@ function buildAsesorApp(){
       <div class="card">
         <div class="card-title">Buscar documentos con IA</div>
         <div style="display:flex;gap:8px;margin-bottom:14px">
-          <input type="text" placeholder="Ej: facturas TechPyme marzo 2026..." style="flex:1;padding:10px 14px;background:#F4F7FC;border:1.5px solid #E0E8F4;border-radius:8px;font-size:.85rem;font-family:DM Sans,sans-serif;color:#071830;outline:none">
-          <button class="btn btn-blue">Buscar</button>
+          <input id="as-doc-search" type="text" placeholder="Ej: facturas TechPyme marzo 2026..." style="flex:1;padding:10px 14px;background:#F4F7FC;border:1.5px solid #E0E8F4;border-radius:8px;font-size:.85rem;font-family:DM Sans,sans-serif;color:#071830;outline:none">
+          <button class="btn btn-blue" onclick="var q=document.getElementById('as-doc-search').value.trim()||'todos los documentos';iaToast('KonGest IA buscando: '+q+' · 147 documentos indexados')">Buscar</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
           ${['Facturas pendientes','Contratos 2026','Notificaciones AEAT','Nóminas marzo','Escrituras'].map(t=>`<span style="font-size:.7rem;padding:4px 10px;background:#F4F7FC;border:1px solid #E0E8F4;border-radius:20px;color:#7a8899;cursor:pointer" onmouseover="this.style.background='#EEF5FF';this.style.color='#1A78FF'" onmouseout="this.style.background='#F4F7FC';this.style.color='#7a8899'">${t}</span>`).join('')}
@@ -2001,7 +2004,7 @@ function buildAsesorApp(){
             <td style="font-size:.72rem;font-weight:600;color:${r.includes('ingresar')?'#e03030':r.includes('devolver')?'#1a9e4a':'#7a8899'}">${r}</td>
             <td style="font-size:.65rem;color:#7a8899">${g}</td>
             <td><span class="badge ${b}">${e}</span></td>
-            <td><button class="btn btn-blue btn-sm">Abrir →</button></td>
+            <td><button class="btn btn-blue btn-sm" onclick="iaToast('Abriendo Mod. ${m} · ${c} · ${r}')">Abrir →</button></td>
           </tr>`).join('')}
         </tbody>
       </table>
@@ -2259,7 +2262,7 @@ function simRecalc(){
   if(rec&&recBox){
     const lbl=s.ok?'KonGest IA recomienda ejecutar:':'KonGest IA recomienda revisar:';
     rec.innerHTML='<strong>'+lbl+'</strong> '+s.rec;
-    recBox.style.borderLeftColor=s.ok?'#1a9e4a':'#e8a010';
+    recBox.style.background=s.ok?'rgba(26,158,74,.06)':'rgba(232,160,16,.07)';
     recBox.style.animation='none';void recBox.offsetWidth;recBox.style.animation='iaFlash .8s ease both';
   }
   const hist=el('sim-hist-body');
@@ -2287,7 +2290,6 @@ function buildClienteApp(){
     <button class="sb-btn" id="sb-cl-prevision" onclick="showS('cl-prevision')"><span class="sb-icon"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg></span>Previsión trimestral <span class="sb-ia-badge">IA</span></button>
     <button class="sb-btn" id="sb-cl-simulador" onclick="showS('cl-simulador')"><span class="sb-ia-badge">IA</span> Simulador fiscal <span class="sb-ia-badge">IA</span></button>
     <button class="sb-btn" id="sb-cl-score" onclick="showS('cl-score')"><span class="sb-icon"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='23 6 13.5 15.5 8.5 10.5 1 18'/><polyline points='17 6 23 6 23 12'/></svg></span>Score salud fiscal <span class="sb-ia-badge">IA</span></button>
-    <button class="sb-btn" id="sb-cl-chat" onclick="showS('cl-chat')"><span class="sb-icon"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/></svg></span>Chat con mi asesor <span class=\"sb-ia-badge\">IA</span></button>
     <div class="sb-footer">
       <button class="sb-footer-btn exit" onclick="goBack()">↩ Cambiar perfil</button>
     </div>`;
@@ -2562,7 +2564,7 @@ function buildClienteApp(){
           <div style="background:#EEF5FF;border-radius:8px;padding:11px;text-align:center"><div style="font-size:.56rem;color:#7a8899;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Neto en bolsillo</div><div id="csim-k3" style="font-family:Barlow Condensed,sans-serif;font-size:1.4rem;font-weight:900;color:#1A78FF">+5.400€</div></div>
           <div style="background:#F4F7FC;border-radius:8px;padding:11px;text-align:center"><div style="font-size:.56rem;color:#7a8899;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Tipo efectivo</div><div id="csim-k4" style="font-family:Barlow Condensed,sans-serif;font-size:1.4rem;font-weight:900;color:#071830">46%</div></div>
         </div>
-        <div id="csim-rec" class="ia-box" style="border-left:3px solid #1a9e4a">
+        <div id="csim-rec" class="ia-box">
           <div class="ia-box-icon"></div>
           <div id="csim-rec-txt" class="ia-box-text"><strong>KonGest IA recomienda:</strong> Adelante. Por cada 10.000€ facturados te quedan 5.400€ netos después de todos los impuestos.</div>
         </div>
@@ -2601,35 +2603,6 @@ function buildClienteApp(){
         <div class="ia-box"><div class="ia-box-icon"></div><div class="ia-box-text"><strong>Para subir a 95+:</strong> Aplicar las 3 deducciones IA mejoraría tu score de optimización de 72 a 94.</div></div>
       </div>
     </div>
-  </div>
-
-  <div class="screen" id="screen-cl-chat">
-    <div class="page-hdr"><h2>Chat con mi asesor</h2><p>KonGest IA responde el 80% al instante — el resto va a Laura Sánchez</p></div>
-    <div class="g2">
-      <div class="card" style="display:flex;flex-direction:column;height:460px">
-        <div id="cl-msgs" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 0;margin-bottom:12px">
-          <div style="display:flex;gap:8px;align-items:flex-start">
-            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1A78FF,#00C8FF);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.65rem;font-weight:700;color:#fff">IA</div>
-            <div style="background:#F4F7FC;border-radius:0 10px 10px 10px;padding:10px 14px;max-width:85%">
-              <div style="font-size:.6rem;color:#7a8899;margin-bottom:3px;font-weight:600">KONGEST IA</div>
-              <div style="font-size:.78rem;color:#071830;line-height:1.6">Hola, soy KonGest IA. Puedo responder tus dudas fiscales al instante con tus datos reales. ¿En qué puedo ayudarte?</div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <input id="cl-inp" type="text" placeholder="Escribe tu consulta fiscal..." style="flex:1;padding:10px 14px;background:#F4F7FC;border:1.5px solid #E0E8F4;border-radius:8px;font-size:.85rem;font-family:DM Sans,sans-serif;color:#071830;outline:none" onkeydown="if(event.key===&apos;Enter&apos;)clSend()">
-          <button onclick="clSend()" class="btn btn-blue">Enviar</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Preguntas frecuentes</div>
-        <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px">
-          ${['¿Cuánto IVA tengo que pagar este trimestre?','¿Cuándo vence mi próxima declaración?','¿Puedo deducir los gastos del coche?','¿Cuánto IS voy a pagar este año?','¿Me puede inspeccionar Hacienda?','¿Cuánto me ahorro con las deducciones IA?'].map(q=>`
-          <div style="padding:9px 13px;background:#F4F7FC;border:1px solid #E0E8F4;border-radius:8px;cursor:pointer;font-size:.74rem;color:#1a2a3a;transition:all .2s" onmouseover="this.style.background='#EEF5FF';this.style.borderColor='#1A78FF';this.style.color='#1A78FF'" onmouseout="this.style.background='#F4F7FC';this.style.borderColor='#E0E8F4';this.style.color='#1a2a3a'" onclick="document.getElementById('cl-inp').value='${q}';clSend()">${q}</div>`).join('')}
-        </div>
-        <div class="ia-box" style="margin-top:12px"><div class="ia-box-icon"></div><div class="ia-box-text">KonGest IA responde el <strong>80% de consultas al instante</strong> con datos reales de tu empresa.</div></div>
-      </div>
-    </div>
   </div>`;
 
   setTimeout(()=>{riseKPIs();animateCounters();csimRecalc();},150);
@@ -2652,27 +2625,9 @@ function csimRecalc(){
     const e=el(k.id);if(e){e.style.transition='all .25s';e.style.transform='scale(.85)';e.style.opacity='.3';setTimeout(()=>{e.textContent=k.v;e.style.transform='scale(1)';e.style.opacity='1';},200);}
   });
   const rec=el('csim-rec-txt');const rb=el('csim-rec');
-  if(rec&&rb){rec.innerHTML='<strong>'+(s.ok?'KonGest IA recomienda:':'KonGest IA advierte:')+'</strong> '+s.rec;rb.style.borderLeftColor=s.ok?'#1a9e4a':'#e8a010';rb.style.animation='none';void rb.offsetWidth;rb.style.animation='iaFlash .8s ease both';}
+  if(rec&&rb){rec.innerHTML='<strong>'+(s.ok?'KonGest IA recomienda:':'KonGest IA advierte:')+'</strong> '+s.rec;rb.style.background=s.ok?'rgba(26,158,74,.06)':'rgba(232,160,16,.07)';rb.style.animation='none';void rb.offsetWidth;rb.style.animation='iaFlash .8s ease both';}
 }
 
-function clSend(){
-  const inp=document.getElementById('cl-inp');const msgs=document.getElementById('cl-msgs');
-  if(!inp||!msgs||!inp.value.trim()) return;
-  const txt=inp.value.trim();
-  msgs.innerHTML+=`<div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse"><div style="width:28px;height:28px;border-radius:50%;background:#071830;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.65rem;font-weight:700;color:#fff">TP</div><div style="background:#EEF5FF;border-radius:10px 0 10px 10px;padding:10px 14px;max-width:85%"><div style="font-size:.6rem;color:#1A78FF;margin-bottom:3px;font-weight:600">TECHPYME S.L.</div><div style="font-size:.78rem;color:#071830;line-height:1.6">${txt}</div></div></div>`;
-  inp.value='';msgs.scrollTop=msgs.scrollHeight;
-  setTimeout(()=>{
-    const t=txt.toLowerCase();
-    let r='Entendido. Tu asesor Laura Sánchez te responderá en menos de 2 horas. KonGest IA le ha notificado.';
-    if(t.includes('iva')||t.includes('trimestre')) r='Tu IVA del Q1 es <strong>4.280€</strong>. Vence el 20 de marzo. El borrador del Mod. 303 está listo.';
-    else if(t.includes('inspección')||t.includes('hacienda')) r='Tu score de riesgo es <strong>78/100</strong> — posición tranquila. No hay patrones de riesgo detectados.';
-    else if(t.includes('is')||t.includes('sociedades')) r='El IS 2026 estimado con deducciones IA es <strong>~9.000€</strong> (vs 22.000€ sin optimización). Ahorro: 13.000€.';
-    else if(t.includes('deducción')||t.includes('ahorro')) r='KonGest IA detectó <strong>9.500€ en deducciones</strong>: I+D software (2.800€), reserva capitalización (5.500€) y amortización vehículo (1.200€).';
-    else if(t.includes('vencimiento')||t.includes('cuándo')) r='Próximo vencimiento: <strong>20 de marzo</strong>. Mod. 303 (4.280€) + Mod. 111 (840€) = 5.120€ total.';
-    msgs.innerHTML+=`<div style="display:flex;gap:8px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1A78FF,#00C8FF);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.65rem;font-weight:700;color:#fff">IA</div><div style="background:#F4F7FC;border-radius:0 10px 10px 10px;padding:10px 14px;max-width:85%"><div style="font-size:.6rem;color:#7a8899;margin-bottom:3px;font-weight:600">KONGEST IA</div><div style="font-size:.78rem;color:#071830;line-height:1.6">${r}</div></div></div>`;
-    msgs.scrollTop=msgs.scrollHeight;
-  },700);
-}
 </script>
 
 <!-- ── EFECTOS DINÁMICOS ── -->
@@ -3263,8 +3218,8 @@ function injectCountdownQ1(){
       <div id="lm-conn-label">CONECTA CON</div>
       <div id="lm-pills-wrap"></div>
       <div id="lm-cta-wrap">
-        <button id="lm-cta"></button>
-        <button id="lm-cta2">Ver mas info</button>
+        <button id="lm-cta" onclick="iaToast('Cargando activación del módulo...')"></button>
+        <button id="lm-cta2" onclick="iaToast('Ficha completa del módulo · Catálogo COAXIONIA 2026')">Ver mas info</button>
       </div>
       <div id="lm-note"></div>
     </div>
@@ -3623,7 +3578,7 @@ function buildClienteComScreen(){
     +'<div style="display:flex;align-items:center;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#1a9e4a;animation:dotPulse 1.5s infinite"></div><span style="font-size:.6rem;color:#1a9e4a;font-weight:600">Activa</span></div>'
     +'</div>'
     +'<div id="cl-com-msgs" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:2px 0;margin-bottom:10px"></div>'
-    +'<div style="display:flex;gap:7px"><input id="cl-com-input" type="text" placeholder="Escribe a tu asesora..." style="flex:1;padding:8px 12px;background:var(--cream);border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-family:DM Sans,sans-serif;color:var(--dark);outline:none" onkeydown="if(event.key===String.fromCharCode(13))clComSend()"><button onclick="clComSend()" class="btn btn-blue btn-sm">Enviar</button></div>'
+    +'<div style="display:flex;gap:7px;padding:10px 12px;background:rgba(26,120,255,.05);border:1px solid rgba(26,120,255,.15);border-radius:8px;align-items:center"><div style="width:7px;height:7px;border-radius:50%;background:#1a9e4a;animation:dotPulse 1.5s infinite;flex-shrink:0"></div><div style="font-size:.68rem;color:var(--text2);line-height:1.45;flex:1">KonGest IA mantiene esta bandeja actualizada en tiempo real. Tu asesora Laura Sánchez recibe cada alerta y te responde sin necesidad de que la contactes. <strong>Próximo contacto programado: revisión Mod. 303 · 12 Mar</strong>.</div></div>'
     +'</div></div>';
   mc.appendChild(div);
 
@@ -3632,20 +3587,6 @@ function buildClienteComScreen(){
     var av=document.getElementById('cl-com-av'),nm=document.getElementById('cl-com-name');
     if(av){av.textContent=c.av;av.style.background=c.avCol;}if(nm)nm.textContent=c.nombre;
     renderCLL();renderCLM();
-  };
-  window.clComSend=function(){
-    var inp=document.getElementById('cl-com-input');if(!inp||!inp.value.trim())return;
-    var c=convs.find(function(x){return x.id===window._clActiva;});if(!c)return;
-    c.msgs.push({de:'TechPyme',txt:inp.value.trim(),hora:'Ahora',tuyo:true});
-    inp.value='';renderCLM();
-    setTimeout(function(){
-      var r='Tu consulta ha sido registrada. Laura Sanchez te respondera en menos de 2 horas. KonGest IA le ha notificado.';
-      var t=inp.value||c.msgs[c.msgs.length-1].txt;
-      if(t.toLowerCase().indexOf('iva')>-1)r='Tu IVA Q1 es 4.280 euros. Vence el 20 de marzo. El borrador del Mod. 303 esta listo.';
-      else if(t.toLowerCase().indexOf('is')>-1||t.toLowerCase().indexOf('sociedad')>-1)r='El IS 2026 estimado con deducciones IA es 9.000 euros (vs 22.000 sin optimizacion). Ahorro: 13.000 euros.';
-      else if(t.toLowerCase().indexOf('deduccion')>-1||t.toLowerCase().indexOf('ahorro')>-1)r='KonGest IA detecto 9.500 euros en deducciones: I+D software (2.800), reserva capitalizacion (5.500) y amortizacion vehiculo (1.200).';
-      c.msgs.push({de:'',txt:r,hora:'Ahora',ia:true});renderCLM();
-    },800);
   };
   function renderCLL(){
     var el=document.getElementById('cl-com-list');if(!el)return;
@@ -3929,6 +3870,10 @@ window.showLockedModal = function(id) {
   var isInf=(id==='vr');
   ctaEl.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
     +(isInf?'Activar — 349€/mes  ·  personalizado desde 1.200€':'Activar — desde 65€/mes  ·  personalizado desde 249€');
+  var _mname=names[id]||'modulo',_price=isInf?'349€/mes':'desde 65€/mes';
+  ctaEl.onclick=function(){iaToast('Activación '+_mname+' solicitada · '+_price+' · Un partner COAXIONIA te contactará en 24h');closeLM();};
+  var cta2El=document.getElementById('lm-cta2');
+  if(cta2El){cta2El.onclick=function(){iaToast('Ficha completa de '+_mname+' · Catálogo COAXIONIA 2026');};}
 
   document.getElementById('lm-note').textContent=notes[id]||'';
 
@@ -4784,7 +4729,7 @@ function buildSimuladorScreen(){
           </div>
         </div>
 
-        <div id="sim-recomendacion" class="ia-box" style="border-left:3px solid #1a9e4a">
+        <div id="sim-recomendacion" class="ia-box">
           <div class="ia-box-icon"></div>
           <div class="ia-box-text" id="sim-rec-txt"><strong>KonGest IA recomienda ejecutar:</strong> La contratación en Q3 maximiza el ahorro fiscal. Esperar a Q1 2026 costaría 4.200€ adicionales en carga tributaria.</div>
         </div>

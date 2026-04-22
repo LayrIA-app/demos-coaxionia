@@ -143,6 +143,10 @@ html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;font-fam
 .sb-btn.active{background:linear-gradient(135deg,rgba(26,120,255,.08),rgba(26,120,255,.04));border-color:rgba(26,120,255,.2);color:var(--blue);font-weight:600;}
 .sb-btn.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:55%;background:var(--blue);border-radius:0 2px 2px 0;}
 .sb-ia-badge{margin-left:auto;padding:2px 6px;border-radius:10px;font-size:.54rem;font-weight:700;letter-spacing:.04em;background:rgba(26,120,255,.1);color:var(--blue2);border:1px solid rgba(26,120,255,.2);}
+/* REGLA 4 · badge mensajes sin leer Comunicación */
+.sb-unread-dot{width:8px;height:8px;border-radius:50%;background:#C8102E;flex-shrink:0;margin-left:4px;animation:pulseRed 1.5s infinite;}
+@keyframes pulseRed{0%{box-shadow:0 0 0 0 rgba(200,16,46,.55);}70%{box-shadow:0 0 0 8px rgba(200,16,46,0);}100%{box-shadow:0 0 0 0 rgba(200,16,46,0);}}
+.sb-btn.active .sb-unread-dot{display:none;}
 .sb-footer{margin-top:auto;border-top:1px solid var(--border2);padding-top:10px;}
 .sb-footer-btn{width:100%;text-align:left;padding:8px 10px;background:transparent;border:1px solid transparent;border-radius:7px;font-size:.7rem;color:var(--text3);cursor:pointer;font-family:DM Sans,sans-serif;transition:all .2s;display:flex;align-items:center;gap:8px;}
 .sb-footer-btn.exit:hover{background:#FEF0F0;color:var(--red);}
@@ -1074,6 +1078,11 @@ function showS(id){
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   const scr=document.getElementById('screen-'+id);if(scr)scr.classList.add('active');
   const btn=document.getElementById('sb-'+id);if(btn)btn.classList.add('active');
+  // REGLA 4 · limpia dot rojo al entrar en Comunicación
+  if((id==='as-com'||id==='cl-com') && btn){
+    var dot=btn.querySelector('.sb-unread-dot');
+    if(dot) dot.remove();
+  }
 }
 
 function buildDirectorApp(){
@@ -3314,7 +3323,7 @@ function buildAsesorComScreen(){
     var sec=document.createElement('div');sec.className='sb-section';sec.textContent='Comunicacion';
     footer.parentNode.insertBefore(sec,footer);
     var btn=document.createElement('button');btn.className='sb-btn';btn.id='sb-as-com';
-    btn.innerHTML='<span class="sb-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Comunicacion <span class="sb-ia-badge">IA</span>';
+    btn.innerHTML='<span class="sb-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Comunicacion <span class="sb-unread-dot" aria-label="mensajes sin leer"></span><span class="sb-ia-badge">IA</span>';
     btn.onclick=function(){showS('as-com');};
     footer.parentNode.insertBefore(btn,footer);
   }
@@ -3540,7 +3549,7 @@ function buildClienteComScreen(){
     var sec=document.createElement('div');sec.className='sb-section';sec.textContent='Comunicacion';
     footer.parentNode.insertBefore(sec,footer);
     var btn=document.createElement('button');btn.className='sb-btn';btn.id='sb-cl-com';
-    btn.innerHTML='<span class="sb-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Mi asesor <span class="sb-ia-badge">IA</span>';
+    btn.innerHTML='<span class="sb-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Mi asesor <span class="sb-unread-dot" aria-label="mensajes sin leer"></span><span class="sb-ia-badge">IA</span>';
     btn.onclick=function(){showS('cl-com');};
     footer.parentNode.insertBefore(btn,footer);
   }

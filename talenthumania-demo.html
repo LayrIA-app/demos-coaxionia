@@ -4067,7 +4067,7 @@ function buildDirectorHTML(){
       +'\x3Ctd style="font-size:.67rem;color:var(--text3)"\x3E'+p[3]+'\x3C/td\x3E'
       +'\x3Ctd style="font-weight:700;color:var(--green);font-family:Montserrat,sans-serif;font-size:.8rem"\x3E'+p[4]+'\x3C/td\x3E'
       +'\x3Ctd\x3E'+badge(p[5],p[6])+'\x3C/td\x3E'
-      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary"\x3EVer\x3C/button\x3E \x3Cbutton class="tbl-btn tbl-btn-ghost"\x3E -  -  - \x3C/button\x3E\x3C/td\x3E'
+      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="showToast(\'Abriendo detalle proceso · '+p[0]+'\')"\x3EVer\x3C/button\x3E \x3Cbutton class="tbl-btn tbl-btn-ghost" onclick="showToast(\'Opciones proceso · '+p[0]+'\')"\x3E -  -  - \x3C/button\x3E\x3C/td\x3E'
       +'\x3C/tr\x3E';
   }
 
@@ -5776,7 +5776,7 @@ function buildClienteHTML(){
       +row2('Tiempo respuesta medio','menos de 2 horas')
       +row2('NPS cliente anterior','9.4 / 10')
       +row2('Procesos cerrados con exito','47 en 3 anos')
-      +'\x3Cbutton class="btn btn-pink" style="width:100%;margin-top:12px"\x3EEnviar mensaje a Laura\x3C/button\x3E'
+      +'\x3Cbutton class="btn btn-pink" style="width:100%;margin-top:12px" onclick="showS(\'com-cli\')"\x3EEnviar mensaje a Laura\x3C/button\x3E'
     )
     +card('Proximas acciones',false,
        row2('Presentacion finalistas','5 abr  -  10:00h')
@@ -5848,7 +5848,7 @@ function buildClienteHTML(){
     +pbar('Estabilidad y retencion','Sin cambios en 5 anos','91%')
     +pbar('Disponibilidad','Inmediata','100%')
     +iabox('','Ana Garcia supera los criterios en 7/8 dimensiones. Retencion estimada a 12 meses: 91%. Recomendada.')
-    +'\x3Cbutton class="btn btn-pink" style="width:100%;margin-top:10px"\x3E\u2713 Avanzar con Ana Garcia\x3C/button\x3E'
+    +'\x3Cbutton class="btn btn-pink" style="width:100%;margin-top:10px" onclick="showToast(\'\u2713 Ana Garcia Reyes avanza a final - TalentHuman IA notifica a Grupo Nexo\')"\x3E\u2713 Avanzar con Ana Garcia\x3C/button\x3E'
     +'\x3C/div\x3E'
     +'\x3Cdiv class="card" style="background:rgba(26,158,74,.04);border:1px solid rgba(26,158,74,.25)"\x3E\x3Cdiv style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"\x3E\x3Cdiv class="card-title" style="margin:0"\x3EPedro Martinez Lopez\x3C/div\x3E\x3Cspan style="font-family:Montserrat,sans-serif;font-size:1.3rem;font-weight:900;color:#1a9e4a"\x3E88%\x3C/span\x3E\x3C/div\x3E'
     +pbar('Experiencia directiva financiera','Retail Espana  -  6 anos','85%')
@@ -5857,7 +5857,7 @@ function buildClienteHTML(){
     +pbar('Estabilidad y retencion','1 cambio en 6 anos','82%')
     +pbar('Disponibilidad','30 dias','80%')
     +iabox('','Pedro tiene mas experiencia en transformacion pero menos en banca internacional. Segunda opcion solida.')
-    +'\x3Cbutton class="btn" style="width:100%;margin-top:10px;background:rgba(26,158,74,.08);color:#1a9e4a;border:1px solid rgba(26,158,74,.2)"\x3E\u2713 Avanzar con Pedro Martinez\x3C/button\x3E'
+    +'\x3Cbutton class="btn" style="width:100%;margin-top:10px;background:rgba(26,158,74,.08);color:#1a9e4a;border:1px solid rgba(26,158,74,.2)" onclick="showToast(\'\u2713 Pedro Martinez Lopez avanza a final - TalentHuman IA notifica a Grupo Nexo\')"\x3E\u2713 Avanzar con Pedro Martinez\x3C/button\x3E'
     +'\x3C/div\x3E\x3C/div\x3E'
   );
 
@@ -5872,7 +5872,7 @@ function buildClienteHTML(){
     .map(function(q){
       return '\x3Cdiv\x3E\x3Cdiv style="font-size:.72rem;font-weight:700;color:var(--navy);margin-bottom:6px"\x3E'+q[0]+'\x3C/div\x3E'
         +'\x3Cdiv style="display:flex;gap:6px;flex-wrap:wrap"\x3E'
-        +q[1].map(function(l,i){return '\x3Cbutton class="btn" style="flex:1;min-width:80px;background:'+(i===q[2]?'#E8386D':'var(--bg)')+';color:'+(i===q[2]?'#fff':'var(--text2)')+';border:1px solid '+(i===q[2]?'#E8386D':'var(--border)')+'"\x3E'+l+'\x3C/button\x3E';}).join('')
+        +q[1].map(function(l,i){return '\x3Cbutton class="btn" style="flex:1;min-width:80px;background:'+(i===q[2]?'#E8386D':'var(--bg)')+';color:'+(i===q[2]?'#fff':'var(--text2)')+';border:1px solid '+(i===q[2]?'#E8386D':'var(--border)')+'" onclick="showToast(\'Feedback · '+l+' · IA afina scoring del siguiente candidato\')"\x3E'+l+'\x3C/button\x3E';}).join('')
         +'\x3C/div\x3E\x3C/div\x3E';
     }).join('')
     +'\x3C/div\x3E'
@@ -5893,7 +5893,7 @@ function buildClienteHTML(){
       +'\x3Ctd style="font-family:Montserrat,sans-serif;font-weight:700;color:#E8386D"\x3E'+e[1]+'\x3C/td\x3E'
       +'\x3Ctd\x3E\x3Cdiv style="font-size:.72rem;font-weight:600"\x3E'+e[2]+'\x3C/div\x3E\x3Cdiv style="font-size:.6rem;color:var(--text3)"\x3E'+e[3]+'\x3C/div\x3E\x3C/td\x3E'
       +'\x3Ctd\x3E'+badge(e[5],e[4])+'\x3C/td\x3E'
-      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary"\x3EBriefing\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
+      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="showToast(\'Briefing IA · '+e[2]+' · '+e[0]+' '+e[1]+'\')"\x3EBriefing\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
   }
   o+=scr('entrevistas',false,
     phdr('Calendario de entrevistas','b-pink','9-11 de abril','Entrevistas con candidatos finalistas  -  Briefing IA preparado para cada sesion')
@@ -5966,7 +5966,7 @@ function buildClienteHTML(){
     docRows+='\x3Ctr\x3E\x3Ctd\x3E\x3Cdiv style="font-size:.72rem;font-weight:600;color:var(--navy)"\x3E'+d[0]+'\x3C/div\x3E\x3Cdiv style="font-size:.6rem;color:var(--text3)"\x3E'+d[1]+'\x3C/div\x3E\x3C/td\x3E'
       +'\x3Ctd style="font-size:.68rem;color:var(--text3)"\x3E'+d[2]+'\x3C/td\x3E'
       +'\x3Ctd\x3E'+badge(d[3],d[4])+'\x3C/td\x3E'
-      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" '+(d[4]==='Pendiente'?'disabled style="opacity:.4"':'')+'\x3E'+( d[4]==='Pendiente'?'Generando...':'Descargar')+'\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
+      +'\x3Ctd\x3E\x3Cbutton class="tbl-btn tbl-btn-primary" onclick="showToast(\''+(d[4]==='Pendiente'?'Generando · '+d[0]+' · listo hoy 17:00h':'Descargando · '+d[0])+'\')" '+(d[4]==='Pendiente'?'disabled style="opacity:.4"':'')+'\x3E'+( d[4]==='Pendiente'?'Generando...':'Descargar')+'\x3C/button\x3E\x3C/td\x3E\x3C/tr\x3E';
   }
   o+=scr('documentos',false,
     phdr('Documentos del proceso','b-pink','Acceso directo','Todos los informes, briefings y actas generados automaticamente por TalentHuman IA')

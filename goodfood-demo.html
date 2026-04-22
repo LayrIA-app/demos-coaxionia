@@ -700,6 +700,9 @@ function goBack(){
 .sb-btn.active svg{opacity:1;}
 .sb-ia{margin-left:auto;padding:1px 5px;border-radius:3px;background:#C9A84C;font-size:.42rem;font-weight:700;color:#1A1208;letter-spacing:.06em;animation:pulseIA 2s ease-in-out infinite;}
 .sb-btn.active .sb-ia{background:#1A1208;color:#C9A84C;}
+.sb-unread-dot{width:8px;height:8px;border-radius:50%;background:#C65D4A;flex-shrink:0;margin-left:4px;animation:pulseRed 1.5s infinite;}
+@keyframes pulseRed{0%{box-shadow:0 0 0 0 rgba(198,93,74,0.55);}70%{box-shadow:0 0 0 8px rgba(198,93,74,0);}100%{box-shadow:0 0 0 0 rgba(198,93,74,0);}}
+.sb-btn.active .sb-unread-dot{display:none;}
 @keyframes pulseIA{0%,100%{opacity:1}50%{opacity:.5}}
 .sb-foot{margin-top:auto;border-top:1px solid rgba(201,168,76,.1);padding-top:8px;}
 .screen{display:none;width:100%;}
@@ -790,6 +793,10 @@ function showS(id){
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   const sc=document.getElementById('screen-'+id);if(sc)sc.classList.add('active');
   const bn=document.getElementById('sb-'+id);if(bn)bn.classList.add('active');
+  // REGLA 4 — limpia dot rojo al entrar en Comunicacion
+  if(id==='d-chat'||id==='e-comunicacion'||id==='c-comunicacion'||id==='p-comunicacion'){
+    var dot=bn&&bn.querySelector('.sb-unread-dot'); if(dot) dot.remove();
+  }
   setTimeout(animKPIs,80);
   if(id==='d-ocupacion') setTimeout(initOcupChart,120);
   if(id==='d-costes') setTimeout(initCostesChart,120);
@@ -1185,7 +1192,7 @@ function buildDirector(){
       Modo Inversor <span class="sb-ia">IA</span></button>
     <button class="sb-btn" id="sb-d-chat" onclick="showS('d-chat')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      Comunicaci&#243;n <span class="sb-ia">IA</span></button>
+      Comunicaci&#243;n <span class="sb-unread-dot" aria-label="mensajes sin leer"></span><span class="sb-ia">IA</span></button>
 
     <button class="sb-prem-toggle" onclick="togglePremBlock('prem-gf')">&#128274; M&#211;DULOS PREMIUM <span>&#9660;</span></button>
     <div class="sb-prem-block" id="prem-gf">
@@ -2488,7 +2495,7 @@ function buildEmpleado(){
       Mis tareas del turno <span class="sb-ia">IA</span></button>
     <button class="sb-btn" id="sb-e-comunicacion" onclick="showS('e-comunicacion')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      Comunicaci&#243;n <span class="sb-ia">IA</span></button>
+      Comunicaci&#243;n <span class="sb-unread-dot" aria-label="mensajes sin leer"></span><span class="sb-ia">IA</span></button>
     <button class="sb-prem-toggle" onclick="togglePremBlock('prem-emp')">&#128274; M&#211;DULOS PREMIUM <span>&#9660;</span></button>
     <div class="sb-prem-block" id="prem-emp">
       <div class="sb-prem-cat">Transversales</div>
@@ -3027,7 +3034,7 @@ function buildCliente(){
       Reserva especial <span class="sb-ia">IA</span></button>
     <button class="sb-btn" id="sb-c-comunicacion" onclick="showS('c-comunicacion')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      Comunicaci&#243;n <span class="sb-ia">IA</span></button>
+      Comunicaci&#243;n <span class="sb-unread-dot" aria-label="mensajes sin leer"></span><span class="sb-ia">IA</span></button>
     <div class="sb-foot"><button class="sb-btn" style="color:rgba(201,168,76,.6);font-weight:600" onclick="salir()">&#8617; Salir</button></div>`;
 
   document.getElementById('mainContent').innerHTML=`
@@ -3435,7 +3442,7 @@ function buildProveedor(){
       Entregas y Cobros IA <span class="sb-ia">IA</span></button>
     <button class="sb-btn" id="sb-p-comunicacion" onclick="showS('p-comunicacion')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      Comunicación</button>
+      Comunicación <span class="sb-unread-dot" aria-label="mensajes sin leer"></span></button>
     <div class="sb-foot"><button class="sb-btn" style="color:rgba(201,168,76,.6);font-weight:600" onclick="salir()">↩ Salir</button></div>`;
 
   document.getElementById('mainContent').innerHTML=`

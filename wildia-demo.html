@@ -7,7 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Montserrat',sans-serif;overflow:hidden;background:#0D7A30;}
+html{font-size:16px;overflow-x:hidden;max-width:100vw;}
+html,body{height:100%;font-family:'Montserrat',sans-serif;overflow:hidden;background:#0D7A30;max-width:100vw;}
+img,svg,video,canvas{max-width:100%;}
+input,textarea,select,button{max-width:100%;}
+/* REGLA 2 · Tipografía móvil legible sin zoom */
+@media (max-width:768px){html{font-size:18.5px;}}
+@media (max-width:480px){html{font-size:19.2px;}}
 
 /* ═══════════════════════════════
    PORTADA
@@ -349,7 +355,7 @@ html,body{height:100%;font-family:'Montserrat',sans-serif;overflow:hidden;backgr
   display:flex;align-items:center;justify-content:space-between;
   padding:0 20px;
   background:#0D7A30;
-  border-bottom:2px solid #FF6B2B;
+  box-shadow:0 1px 0 rgba(255,255,255,.08);
   position:relative;z-index:50;
 }
 .tb-logo{display:flex;align-items:center;gap:10px;}
@@ -383,6 +389,11 @@ html,body{height:100%;font-family:'Montserrat',sans-serif;overflow:hidden;backgr
 .sb-item.locked{opacity:.6;cursor:pointer;}
 .sb-item.locked:hover{background:rgba(255,107,43,.08);}
 .sb-ia{margin-left:auto;padding:1px 5px;border-radius:3px;background:rgba(255,107,43,.25);font-size:.42rem;font-weight:700;color:#FF6B2B;letter-spacing:.06em;text-transform:uppercase;}
+
+/* REGLA 4 · Badge mensajes sin leer */
+.sb-unread-dot{width:8px;height:8px;border-radius:50%;background:#C65D4A;flex-shrink:0;margin-left:4px;animation:pulseRed 1.5s infinite;}
+@keyframes pulseRed{0%{box-shadow:0 0 0 0 rgba(198,93,74,.55);}70%{box-shadow:0 0 0 8px rgba(198,93,74,0);}100%{box-shadow:0 0 0 0 rgba(198,93,74,0);}}
+.sb-item.active .sb-unread-dot,.mob-item.active .sb-unread-dot{display:none;}
 
 /* MAIN */
 .main{flex:1;overflow-y:auto;overflow-x:hidden;padding:26px 28px;background:#F5F2EE;}
@@ -718,8 +729,8 @@ html,body{height:100%;font-family:'Montserrat',sans-serif;overflow:hidden;backgr
   .lf-input{padding:12px 14px!important;font-size:.9rem!important;}
   .login-btn{padding:14px!important;}
 
-  /* TOPBAR */
-  .tb{height:44px!important;padding:0 12px!important;gap:8px!important;}
+  /* TOPBAR — REGLA 5 · 56px en móvil */
+  .tb{height:56px!important;padding:0 14px!important;gap:10px!important;}
   .tb-hamburger{display:flex!important;}
   .tb-logo-txt{font-size:18px!important;}
   .tb-badge{font-size:.48rem!important;padding:2px 7px!important;}
@@ -1810,7 +1821,7 @@ function heatmapOcupacion(){
 
 function initHeatmapTooltips(){
   var tip=document.getElementById('hm-tip');
-  if(!tip){tip=document.createElement('div');tip.id='hm-tip';tip.style.cssText='position:fixed;background:#0D2010;color:#fff;padding:8px 12px;border-radius:8px;font-size:.68rem;font-family:Montserrat,sans-serif;font-weight:600;pointer-events:none;opacity:0;transition:opacity .2s;z-index:999;border-left:3px solid #FF6B2B;';document.body.appendChild(tip);}
+  if(!tip){tip=document.createElement('div');tip.id='hm-tip';tip.style.cssText='position:fixed;background:#0D2010;color:#fff;padding:8px 12px;border-radius:8px;font-size:.68rem;font-family:Montserrat,sans-serif;font-weight:600;pointer-events:none;opacity:0;transition:opacity .2s;z-index:999;border:1px solid rgba(255,107,43,.4);';document.body.appendChild(tip);}
   document.querySelectorAll('.hm-cell[data-pct]').forEach(function(cell){
     cell.style.cursor='pointer';
     cell.addEventListener('mouseenter',function(e){
@@ -2715,6 +2726,8 @@ function renderSidebar(items){
   var mob=document.getElementById('mobile-menu-body');
   var html='';var mobHtml='';var secActual='';var mobSecActual='';
   var iaIds=['dashboard','rentabilidad','calendario','guias','actividades','predictor','simulador','briefing','clima','agenda','grupos','material','incidencias','valoraciones','comision','proceso','rutas','preparacion','historial','reservas','comunicacion','panel','disponibilidad','comisiones','catalogo','logros','proyeccion','huespedes','paquetes','rendimiento','com_guia','com_partner','com_dir'];
+  var comIds=['comunicacion','com_dir','com_guia','com_partner'];
+  if(typeof window._unreadComms==='undefined')window._unreadComms=1;
   var normal=items.filter(function(i){return !i.locked;});
   var transversales=items.filter(function(i){return i.locked&&i.sec==='Transversales';});
   var digital=items.filter(function(i){return i.locked&&i.sec==='Digital';});
@@ -2722,17 +2735,22 @@ function renderSidebar(items){
   var otrosPremium=items.filter(function(i){return i.locked&&i.sec!=='Transversales'&&i.sec!=='Digital'&&i.sec!=='Infinitum';});
 
   normal.forEach(function(item){
+    var isCom=comIds.indexOf(item.id)>=0;
+    var showDot=isCom&&window._unreadComms>0;
+    var dotHtml=showDot?lt+'span class='+q+'sb-unread-dot'+q+' aria-label='+q+window._unreadComms+' sin leer'+q+gt+lt+'/span'+gt:'';
     if(item.sec!==secActual){secActual=item.sec;html+=lt+'div class='+q+'sb-sec'+q+gt+item.sec+lt+'/div'+gt;}
     html+=lt+'div class='+q+'sb-item'+q+' id='+q+'sb-'+item.id+q+' onclick='+q+'renderSeccion('+ap+item.id+ap+')'+q+gt;
     html+=ico(item.ico,'rgba(255,255,255,.5)');
     html+=lt+'span class='+q+'sb-item-txt'+q+gt+item.txt+lt+'/span'+gt;
     if(iaIds.indexOf(item.id)>=0){html+=lt+'span class='+q+'sb-ia'+q+gt+'IA'+lt+'/span'+gt;}
+    html+=dotHtml;
     html+=lt+'/div'+gt;
     if(item.sec!==mobSecActual){mobSecActual=item.sec;mobHtml+='<div class="mob-sec">'+item.sec+'</div>';}
     mobHtml+='<div class="mob-item" id="mob-'+item.id+'" onclick="mobNav('+ap+item.id+ap+')">'
       +ico(item.ico,'rgba(255,255,255,.5)')
       +'<span class="mob-item-txt">'+item.txt+'</span>'
       +(iaIds.indexOf(item.id)>=0?'<span class="mob-item-ia">IA</span>':'')
+      +(showDot?'<span class="sb-unread-dot" aria-label="'+window._unreadComms+' sin leer"></span>':'')
       +'</div>';
   });
 
@@ -2791,14 +2809,14 @@ function renderSidebar(items){
   }
 
   if(infinitum.length>0){
-    html+=lt+'div class='+q+'sb-sec'+q+' style='+q+'background:linear-gradient(90deg,rgba(255,200,50,.07),transparent);border-left:2px solid rgba(255,200,50,.35);color:rgba(255,200,50,.75);letter-spacing:.14em'+q+gt
+    html+=lt+'div class='+q+'sb-sec'+q+' style='+q+'background:rgba(255,200,50,.09);border:1px solid rgba(255,200,50,.28);border-radius:6px;color:rgba(255,200,50,.75);letter-spacing:.14em;margin:8px 8px 4px;padding:6px 10px'+q+gt
       +'\u221e\u00a0INFINITUM'
       +lt+'/div'+gt;
     infinitum.forEach(function(item){
       var icoInf=item.ico==='cpu'
         ?lt+'svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,50,.55)" stroke-width="1.5" stroke-linecap="round"'+gt+'<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/><path d="M9 4V2M15 4V2M9 22v-2M15 22v-2M4 9H2M4 15H2M22 9h-2M22 15h-2"/>'+lt+'/svg'+gt
         :icoVRInfinitum();
-      html+=lt+'div class='+q+'sb-item locked'+q+' style='+q+'border-left:1px solid rgba(255,200,50,.12)'+q+' onclick='+q+'abrirModal('+ap+item.id+ap+')'+q+gt
+      html+=lt+'div class='+q+'sb-item locked'+q+' onclick='+q+'abrirModal('+ap+item.id+ap+')'+q+gt
         +icoInf
         +lt+'span class='+q+'sb-item-txt'+q+' style='+q+'color:rgba(255,200,50,.55)'+q+gt+item.txt+lt+'/span'+gt
         +lt+'div class='+q+'sb-lock'+q+gt+lt+'svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,50,.6)" stroke-width="2" stroke-linecap="round"'+gt+'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>'+lt+'/svg'+gt+lt+'/div'+gt
@@ -2880,6 +2898,11 @@ function filtrarCanal(btn, canal){
 }
 
 function renderSeccion(id){
+  /* REGLA 4 · limpiar contador al entrar en Comunicación */
+  if(['comunicacion','com_dir','com_guia','com_partner'].indexOf(id)>=0){
+    window._unreadComms=0;
+    document.querySelectorAll('.sb-unread-dot').forEach(function(d){d.style.display='none';});
+  }
   setActive(id);
   destroyCharts();
   _kpiIdx=0;
@@ -3415,7 +3438,7 @@ function secSimulador(){
     alertas.forEach(function(a){
       var bc2=a.c==='red'?'rgba(192,57,43,.08)':a.c==='orange'?'rgba(255,107,43,.08)':a.c==='amber'?'rgba(255,180,0,.08)':'rgba(13,122,48,.06)';
       var tc2=a.c==='red'?'#c0392b':a.c==='orange'?'#FF6B2B':a.c==='amber'?'#8B6000':'#0D7A30';
-      html+='<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:9px;background:'+bc2+';border-left:3px solid '+tc2+'">'+'<div style="font-size:.7rem;font-weight:900;color:'+tc2+';flex-shrink:0">'+a.ico+'</div>'+'<div><div style="font-size:.65rem;font-weight:800;color:'+tc2+';margin-bottom:2px">'+a.t+'</div><div style="font-size:.62rem;color:rgba(13,32,16,.55);line-height:1.5">'+a.d+'</div></div>'+'</div>';
+      html+='<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:9px;background:'+bc2+';border:1px solid '+tc2+'33">'+'<div style="font-size:.7rem;font-weight:900;color:'+tc2+';flex-shrink:0">'+a.ico+'</div>'+'<div><div style="font-size:.65rem;font-weight:800;color:'+tc2+';margin-bottom:2px">'+a.t+'</div><div style="font-size:.62rem;color:rgba(13,32,16,.55);line-height:1.5">'+a.d+'</div></div>'+'</div>';
     });
     return html+'</div>';
   }
@@ -4764,9 +4787,9 @@ function secComDir(){_kpiIdx=0;
             +(conv?'<div style='+q+'display:flex;align-items:center;gap:5px'+q+'><div style='+q+'width:7px;height:7px;border-radius:50%;background:#0D7A30'+q+'></div><div style='+q+'font-size:.6rem;color:#0D7A30;font-weight:700'+q+'>Activo</div></div>':'')
           +'</div>'
           +'<div style='+q+'background:#F5F2EE;border-radius:10px;padding:8px 10px;max-height:300px;overflow-y:auto;margin-bottom:10px'+q+'>'+msgsHtml+'</div>'
-          +'<div style='+q+'display:flex;gap:8px'+q+'>'
-            +'<input type='+q+'text'+q+' placeholder='+q+'Escribe un mensaje...'+q+' style='+q+'flex:1;padding:10px 14px;border:1px solid rgba(13,32,16,.15);border-radius:8px;font-family:Montserrat,sans-serif;font-size:.7rem;outline:none'+q+'/>'
-            +'<button onclick='+q+'wildToast('+ap+'Mensaje enviado'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:10px 16px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Enviar</button>'
+          +'<div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+'>'
+            +'<div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+'><strong style='+q+'color:#0D7A30'+q+'>WildIA</strong> ha preparado un draft de respuesta para esta conversacion</div>'
+            +'<button onclick='+q+'wildToast('+ap+'Draft IA enviado a '+(conv?(conv.nombre.split(String.fromCharCode(32,8212,32))[0]):'destinatario')+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -4870,9 +4893,9 @@ function secComGuia(){_kpiIdx=0;
             +(conv?'<div style='+q+'display:flex;align-items:center;gap:5px'+q+'><div style='+q+'width:7px;height:7px;border-radius:50%;background:#0D7A30'+q+'></div><div style='+q+'font-size:.6rem;color:#0D7A30;font-weight:700'+q+'>Activo</div></div>':'')
           +'</div>'
           +'<div style='+q+'background:#F5F2EE;border-radius:10px;padding:8px 10px;max-height:300px;overflow-y:auto;margin-bottom:10px'+q+'>'+msgsHtml+'</div>'
-          +'<div style='+q+'display:flex;gap:8px'+q+'>'
-            +'<input type='+q+'text'+q+' placeholder='+q+'Escribe un mensaje...'+q+' style='+q+'flex:1;padding:10px 14px;border:1px solid rgba(13,32,16,.15);border-radius:8px;font-family:Montserrat,sans-serif;font-size:.7rem;outline:none'+q+'/>'
-            +'<button onclick='+q+'wildToast('+ap+'Mensaje enviado'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:10px 16px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Enviar</button>'
+          +'<div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+'>'
+            +'<div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+'><strong style='+q+'color:#0D7A30'+q+'>WildIA</strong> ha preparado un draft de respuesta para esta conversacion</div>'
+            +'<button onclick='+q+'wildToast('+ap+'Draft IA enviado a '+(conv?(conv.nombre.split(String.fromCharCode(32,8212,32))[0]):'destinatario')+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -4977,9 +5000,9 @@ function secComPartner(){_kpiIdx=0;
             +(conv?'<div style='+q+'display:flex;align-items:center;gap:5px'+q+'><div style='+q+'width:7px;height:7px;border-radius:50%;background:#0D7A30'+q+'></div><div style='+q+'font-size:.6rem;color:#0D7A30;font-weight:700'+q+'>Activo</div></div>':'')
           +'</div>'
           +'<div style='+q+'background:#F5F2EE;border-radius:10px;padding:8px 10px;max-height:300px;overflow-y:auto;margin-bottom:10px'+q+'>'+msgsHtml+'</div>'
-          +'<div style='+q+'display:flex;gap:8px'+q+'>'
-            +'<input type='+q+'text'+q+' placeholder='+q+'Escribe un mensaje...'+q+' style='+q+'flex:1;padding:10px 14px;border:1px solid rgba(13,32,16,.15);border-radius:8px;font-family:Montserrat,sans-serif;font-size:.7rem;outline:none'+q+'/>'
-            +'<button onclick='+q+'wildToast('+ap+'Mensaje enviado'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:10px 16px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Enviar</button>'
+          +'<div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+'>'
+            +'<div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+'><strong style='+q+'color:#0D7A30'+q+'>WildIA</strong> ha preparado un draft de respuesta para esta conversacion</div>'
+            +'<button onclick='+q+'wildToast('+ap+'Draft IA enviado a '+(conv?(conv.nombre.split(String.fromCharCode(32,8212,32))[0]):'destinatario')+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -5464,9 +5487,9 @@ function secComunicacion(){_kpiIdx=0;
           lt+'/div'+gt+
         lt+'/div'+gt+
         lt+'div style='+q+'background:#F5F2EE;border-radius:10px;padding:4px 8px;margin-bottom:10px;max-height:280px;overflow-y:auto'+q+gt+chatHtml+lt+'/div'+gt+
-        lt+'div style='+q+'display:flex;gap:8px'+q+gt+
-          lt+'input type='+q+'text'+q+' placeholder='+q+'Escribe un mensaje...'+q+' style='+q+'flex:1;padding:10px 14px;border:1px solid rgba(13,32,16,.15);border-radius:8px;font-family:Montserrat,sans-serif;font-size:.7rem;outline:none'+q+' /'+gt+
-          lt+'button onclick='+q+'wildFeedback(this,'+ap+'Mensaje enviado a Ana R.'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:10px 16px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer'+q+gt+'Enviar'+lt+'/button'+gt+
+        lt+'div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+gt+
+          lt+'div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+gt+lt+'strong style='+q+'color:#0D7A30'+q+gt+'WildIA'+lt+'/strong'+gt+' ha preparado un mensaje para Ana R. listo para enviar'+lt+'/div'+gt+
+          lt+'button onclick='+q+'wildFeedback(this,'+ap+'Draft IA enviado a Ana R.'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+gt+'Ver draft IA →'+lt+'/button'+gt+
         lt+'/div'+gt+
       lt+'/div'+gt+
     lt+'/div'+gt;

@@ -2415,9 +2415,9 @@ function calcSimulador(){
       <button class="tb-salir" onclick="salir()">&larr; Salir</button>
     </div>
   </div>
-  <!-- MOBILE MENU OVERLAY -->
-  <div id="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
-  <div id="mobile-menu">
+  <!-- MOBILE MENU OVERLAY (REGLA 8 · alias sb-overlay + sb-drawer) -->
+  <div id="mobile-menu-overlay" class="sb-overlay" onclick="closeMobileMenu()"></div>
+  <div id="mobile-menu" class="sb-drawer">
     <div id="mobile-menu-header">
       <div id="mobile-menu-user">
         <div class="tb-avatar" id="mobile-avatar">CM</div>
@@ -4291,11 +4291,11 @@ function secAgenda(){_kpiIdx=0;
     +'</div>';
 
   var actividades=[
-    {hora:'08:30',act:'Rafting R&iacute;o Eresma',grupo:'8 personas',nivel:'Medio',estado:'confirmado',color:'#0D7A30',alerta:''},
-    {hora:'11:00',act:'Senderismo Sierra Guadarrama',grupo:'12 personas',nivel:'F&aacute;cil',estado:'confirmado',color:'#0D7A30',alerta:''},
-    {hora:'14:00',act:'Kayak Lago Azul',grupo:'6 personas',nivel:'F&aacute;cil',estado:'alerta',color:'#FF6B2B',alerta:'Viento 38km/h \u2014 IA recomienda revisar'},
-    {hora:'17:30',act:'Barranquismo Sierra Norte',grupo:'4 personas',nivel:'Avanzado',estado:'confirmado',color:'#0D7A30',alerta:''},
-    {hora:'20:00',act:'Orientaci&oacute;n Nocturna',grupo:'10 personas',nivel:'F&aacute;cil',estado:'pendiente',color:'#8B6000',alerta:'Confirmar punto de encuentro'}
+    {id:'GRP-201',hora:'08:30',act:'Rafting R&iacute;o Eresma',grupo:'8 personas',nivel:'Medio',estado:'confirmado',color:'#0D7A30',alerta:'',cliente:'TechCorp Madrid',nota:'Equipo verificado. 2 menores con permiso firmado. 1 alergico a frutos secos. Botiquin especifico cargado.'},
+    {id:'GRP-202',hora:'11:00',act:'Senderismo Sierra Guadarrama',grupo:'12 personas',nivel:'F&aacute;cil',estado:'confirmado',color:'#0D7A30',alerta:'',cliente:'Centro Escolar Pinar',nota:'Grupo escolar 12-14 anos. Rutas adaptadas. 2 profesores acompanantes confirmados.'},
+    {id:'GRP-203',hora:'14:00',act:'Kayak Lago Azul',grupo:'6 personas',nivel:'F&aacute;cil',estado:'alerta',color:'#FF6B2B',alerta:'Viento 38km/h \u2014 IA recomienda revisar',cliente:'Familia Garcia',nota:'Familia con 2 menores. Viento 38km/h por encima del limite operativo. WildIA propone Rio Interior como alternativa.'},
+    {id:'GRP-204',hora:'17:30',act:'Barranquismo Sierra Norte',grupo:'4 personas',nivel:'Avanzado',estado:'confirmado',color:'#0D7A30',alerta:'',cliente:'Grupo Outdoor BCN',nota:'Grupo experimentado, todos certificados. Material avanzado revisado. Sin restricciones.'},
+    {id:'GRP-205',hora:'20:00',act:'Orientaci&oacute;n Nocturna',grupo:'10 personas',nivel:'F&aacute;cil',estado:'pendiente',color:'#8B6000',alerta:'Confirmar punto de encuentro',cliente:'Pareja Lopez',nota:'Pendiente confirmar punto exacto del briefing. WildIA sugiere Albergue Pinar a las 19:30h.'}
   ];
 
   var tablaAg='<div class='+q+'tabla-wrap'+q+'><table class='+q+'tabla'+q+'><thead><tr>'
@@ -4312,7 +4312,7 @@ function secAgenda(){_kpiIdx=0;
       +'<td style='+q+'font-size:.68rem'+q+'>'+a.grupo+'</td>'
       +'<td style='+q+'font-size:.65rem'+q+'>'+a.nivel+'</td>'
       +'<td>'+badge+'</td>'
-      +'<td><button onclick='+q+'wildFeedback(this,'+ap+'Briefing del grupo abierto'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:4px 10px;background:#0D7A30;border:none;border-radius:5px;color:#fff;font-family:Montserrat,sans-serif;font-size:.55rem;font-weight:700;cursor:pointer'+q+'>Ver briefing</button></td>'
+      +'<td><button type='+q+'button'+q+' data-id='+q+a.id+q+' data-act='+q+a.act.replace(/"/g,'&quot;')+q+' data-hora='+q+a.hora+q+' data-cli='+q+(a.cliente||'').replace(/"/g,'&quot;')+q+' data-grupo='+q+a.grupo+q+' data-nivel='+q+a.nivel.replace(/"/g,'&quot;')+q+' data-nota='+q+(a.nota||'').replace(/"/g,'&quot;')+q+' onclick='+q+'verBriefing(this.dataset.id,this.dataset.act,this.dataset.hora,this.dataset.cli,'+ap+'Ana R.'+ap+',this.dataset.grupo,this.dataset.nivel,this.dataset.nota)'+q+' style='+q+'padding:4px 10px;background:#0D7A30;border:none;border-radius:5px;color:#fff;font-family:Montserrat,sans-serif;font-size:.55rem;font-weight:700;cursor:pointer'+q+'>Ver briefing</button></td>'
     +'</tr>';
   });
   tablaAg+='</tbody></table></div>';
@@ -4395,10 +4395,10 @@ function secGrupos(){_kpiIdx=0;
     +'</div>';
 
   var grupos=[
-    {id:'GRP-081',act:'Rafting R&iacute;o Eresma',fecha:'Hoy 08:30',personas:8,nivel:'Medio',perfil:'Familias con ni&ntilde;os +10a',nota:'Un participante con fobia al agua \u2014 protocolo especial activo',color:'#0D7A30',score:92},
-    {id:'GRP-082',act:'Senderismo Guadarrama',fecha:'Hoy 11:00',personas:12,nivel:'F&aacute;cil',perfil:'Grupo corporativo \u00b7 team building',nota:'4 personas con movilidad reducida \u00b7 ritmo adaptado',color:'#2D8A30',score:88},
-    {id:'GRP-083',act:'Barranquismo Sierra Norte',fecha:'Hoy 17:30',personas:4,nivel:'Avanzado',perfil:'Aventureros experimentados',nota:'Todos con certificaci&oacute;n \u00b7 sin restricciones',color:'#4CAF30',score:96},
-    {id:'GRP-084',act:'Kayak Lago Azul',fecha:'Hoy 14:00',personas:6,nivel:'F&aacute;cil',perfil:'Pareja + amigos \u00b7 primera vez',nota:'Alerta clima activa \u2014 decisi&oacute;n pendiente',color:'#FF6B2B',score:74}
+    {id:'GRP-081',act:'Rafting R&iacute;o Eresma',fecha:'Hoy 08:30',personas:8,nivel:'Medio',perfil:'Familias con ni&ntilde;os +10a',nota:'Un participante con fobia al agua \u2014 protocolo especial activo',color:'#0D7A30',score:92,cliente:'Familia Garcia'},
+    {id:'GRP-082',act:'Senderismo Guadarrama',fecha:'Hoy 11:00',personas:12,nivel:'F&aacute;cil',perfil:'Grupo corporativo \u00b7 team building',nota:'4 personas con movilidad reducida \u00b7 ritmo adaptado',color:'#2D8A30',score:88,cliente:'TechCorp Madrid'},
+    {id:'GRP-083',act:'Barranquismo Sierra Norte',fecha:'Hoy 17:30',personas:4,nivel:'Avanzado',perfil:'Aventureros experimentados',nota:'Todos con certificaci&oacute;n \u00b7 sin restricciones',color:'#4CAF30',score:96,cliente:'Grupo Outdoor BCN'},
+    {id:'GRP-084',act:'Kayak Lago Azul',fecha:'Hoy 14:00',personas:6,nivel:'F&aacute;cil',perfil:'Pareja + amigos \u00b7 primera vez',nota:'Alerta clima activa \u2014 decisi&oacute;n pendiente',color:'#FF6B2B',score:74,cliente:'Pareja Lopez'}
   ];
 
   var tarjetas='<div style='+q+'display:flex;flex-direction:column;gap:12px'+q+'>';
@@ -4423,9 +4423,9 @@ function secGrupos(){_kpiIdx=0;
         +lt+'div style='+q+'font-size:.6rem;font-weight:700;flex-shrink:0;padding-top:1px;color:'+g.color+q+gt+'IA:'+lt+'/div'+gt
         +lt+'div style='+q+'font-size:.62rem;color:rgba(13,32,16,.6);line-height:1.5'+q+gt+g.nota+lt+'/div'+gt
       +lt+'/div'+gt
-      +lt+'div style='+q+'display:flex;gap:8px'+q+gt
-        +lt+'button onclick='+q+'wildFeedback(this,'+ap+'Briefing completo del grupo abierto'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:6px 14px;background:#0D7A30;border:none;border-radius:6px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer'+q+gt+'Ver briefing IA'+lt+'/button'+gt
-        +lt+'button onclick='+q+'wildFeedback(this,'+ap+'WhatsApp enviado al grupo'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:6px 14px;background:rgba(13,32,16,.06);border:1px solid rgba(13,32,16,.1);border-radius:6px;color:rgba(13,32,16,.6);font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:600;cursor:pointer'+q+gt+'Contactar grupo'+lt+'/button'+gt
+      +lt+'div style='+q+'display:flex;gap:8px;flex-wrap:wrap'+q+gt
+        +lt+'button type='+q+'button'+q+' data-id='+q+g.id+q+' data-act='+q+g.act.replace(/"/g,'&quot;')+q+' data-hora='+q+g.fecha+q+' data-cli='+q+(g.cliente||g.perfil).replace(/"/g,'&quot;')+q+' data-pers='+q+g.personas+' personas'+q+' data-nivel='+q+g.nivel+q+' data-nota='+q+g.nota.replace(/"/g,'&quot;')+q+' onclick='+q+'verBriefing(this.dataset.id,this.dataset.act,this.dataset.hora,this.dataset.cli,'+ap+'Ana R.'+ap+',this.dataset.pers,this.dataset.nivel,this.dataset.nota)'+q+' style='+q+'padding:6px 14px;background:#0D7A30;border:none;border-radius:6px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer'+q+gt+'Ver briefing IA'+lt+'/button'+gt
+        +lt+'button type='+q+'button'+q+' data-cli='+q+(g.cliente||g.perfil).replace(/"/g,'&quot;')+q+' onclick='+q+'verDraftIA('+ap+'guia'+ap+',this.dataset.cli,'+ap+'Recordatorio de la actividad de hoy'+ap+','+ap+'chat'+ap+')'+q+' style='+q+'padding:6px 14px;background:rgba(13,32,16,.06);border:1px solid rgba(13,32,16,.1);border-radius:6px;color:rgba(13,32,16,.6);font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:600;cursor:pointer'+q+gt+'Contactar grupo'+lt+'/button'+gt
       +lt+'/div'+gt
     +lt+'/div'+gt;
   });
@@ -4675,10 +4675,10 @@ function secIncidencias(){_kpiIdx=0;
     +'</div>';
 
   var incidencias=[
-    {fecha:'Hoy 07:42',tipo:'Preventiva',titulo:'Alerta clima \u2014 Kayak 14:00',desc:'Viento 38km/h supera l\u00edmite operativo. Decisi\u00f3n pendiente.',nivel:'amber',estado:'Pendiente'},
-    {fecha:'Ayer 16:15',tipo:'Seguridad',titulo:'Participante con mareo \u2014 Rafting',desc:'Cliente con v\u00e9rtigo leve en tramo 3. Se detuvo la actividad 8 min. Sin consecuencias. Parte firmado.',nivel:'green',estado:'Resuelta'},
-    {fecha:'12 ago',tipo:'Material',titulo:'Rotura de remo \u2014 Kayak',desc:'Remo partido en ruta. Actividad continuada con remo de repuesto. Material retirado para revisi\u00f3n.',nivel:'green',estado:'Resuelta'},
-    {fecha:'08 ago',tipo:'Seguridad',titulo:'Ca\u00edda leve \u2014 Senderismo',desc:'Participante ca\u00edda en descenso. Rozadura en rodilla. Cura en campo. Parte m\u00e9dico firmado.',nivel:'green',estado:'Resuelta'}
+    {id:'INC-024',fecha:'Hoy 07:42',tipo:'Preventiva',titulo:'Alerta clima \u2014 Kayak 14:00',desc:'Viento 38km/h supera l\u00edmite operativo. Decisi\u00f3n pendiente.',nivel:'amber',estado:'Pendiente',cliente:'Familia Garcia',sev:'leve'},
+    {id:'INC-023',fecha:'Ayer 16:15',tipo:'Seguridad',titulo:'Participante con mareo \u2014 Rafting',desc:'Cliente con v\u00e9rtigo leve en tramo 3. Se detuvo la actividad 8 min. Sin consecuencias. Parte firmado.',nivel:'green',estado:'Resuelta',cliente:'TechCorp Madrid',sev:'leve'},
+    {id:'INC-022',fecha:'12 ago',tipo:'Material',titulo:'Rotura de remo \u2014 Kayak',desc:'Remo partido en ruta. Actividad continuada con remo de repuesto. Material retirado para revisi\u00f3n.',nivel:'green',estado:'Resuelta',cliente:'Pareja Lopez',sev:'leve'},
+    {id:'INC-021',fecha:'08 ago',tipo:'Seguridad',titulo:'Ca\u00edda leve \u2014 Senderismo',desc:'Participante ca\u00edda en descenso. Rozadura en rodilla. Cura en campo. Parte m\u00e9dico firmado.',nivel:'green',estado:'Resuelta',cliente:'Centro Escolar Pinar',sev:'leve'}
   ];
 
   var tablaI='<div class='+q+'tabla-wrap'+q+'><table class='+q+'tabla'+q+'><thead><tr>'
@@ -4693,7 +4693,7 @@ function secIncidencias(){_kpiIdx=0;
       +'<td style='+q+'font-size:.65rem;font-weight:700'+q+'>'+inc.tipo+'</td>'
       +'<td><div style='+q+'font-weight:700;font-size:.7rem'+q+'>'+inc.titulo+'</div><div style='+q+'font-size:.6rem;color:rgba(13,32,16,.45);margin-top:2px'+q+'>'+inc.desc+'</div></td>'
       +'<td>'+estadoBadge+'</td>'
-      +'<td><button onclick='+q+'wildFeedback(this,'+ap+'Parte de incidencia abierto'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:4px 10px;background:rgba(13,32,16,.05);border:1px solid rgba(13,32,16,.1);border-radius:5px;font-family:Montserrat,sans-serif;font-size:.55rem;font-weight:600;cursor:pointer'+q+'>Ver parte</button></td>'
+      +'<td><button type='+q+'button'+q+' data-id='+q+inc.id+q+' data-titulo='+q+inc.titulo.replace(/"/g,'&quot;')+q+' data-fecha='+q+inc.fecha+q+' data-grupo='+q+inc.tipo+q+' data-sev='+q+inc.sev+q+' data-desc='+q+inc.desc.replace(/"/g,'&quot;')+q+' data-cli='+q+(inc.cliente||'').replace(/"/g,'&quot;')+q+' onclick='+q+'verParteIncidencia(this.dataset.id,this.dataset.titulo,this.dataset.fecha,this.dataset.grupo,this.dataset.sev,this.dataset.desc,this.dataset.cli)'+q+' style='+q+'padding:4px 10px;background:rgba(13,32,16,.05);border:1px solid rgba(13,32,16,.1);border-radius:5px;font-family:Montserrat,sans-serif;font-size:.55rem;font-weight:600;cursor:pointer'+q+'>Ver parte</button></td>'
     +'</tr>';
   });
   tablaI+='</tbody></table></div>';
@@ -5123,7 +5123,7 @@ function secComDir(){_kpiIdx=0;
           +'<div style='+q+'background:#F5F2EE;border-radius:10px;padding:8px 10px;max-height:300px;overflow-y:auto;margin-bottom:10px'+q+'>'+msgsHtml+'</div>'
           +'<div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+'>'
             +'<div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+'><strong style='+q+'color:#0D7A30'+q+'>WildIA</strong> ha preparado un draft de respuesta para esta conversacion</div>'
-            +'<button onclick='+q+'wildToast('+ap+'Draft IA enviado a '+(conv?(conv.nombre.split(String.fromCharCode(32,8212,32))[0]):'destinatario')+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
+            +'<button type='+q+'button'+q+' data-cli='+q+(conv?conv.nombre.replace(/"/g,'&quot;'):'destinatario')+q+' data-last='+q+(conv&&conv.msgs&&conv.msgs.length?conv.msgs[conv.msgs.length-1].texto.replace(/"/g,'&quot;'):'')+q+' data-canal='+q+(conv?conv.canal:'email')+q+' onclick='+q+'verDraftIA('+ap+'director'+ap+',this.dataset.cli,this.dataset.last,this.dataset.canal)'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -5229,11 +5229,11 @@ function secComGuia(){_kpiIdx=0;
           +'<div style='+q+'background:#F5F2EE;border-radius:10px;padding:8px 10px;max-height:300px;overflow-y:auto;margin-bottom:10px'+q+'>'+msgsHtml+'</div>'
           +'<div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+'>'
             +'<div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+'><strong style='+q+'color:#0D7A30'+q+'>WildIA</strong> ha preparado un draft de respuesta para esta conversacion</div>'
-            +'<button onclick='+q+'wildToast('+ap+'Draft IA enviado a '+(conv?(conv.nombre.split(String.fromCharCode(32,8212,32))[0]):'destinatario')+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
+            +'<button type='+q+'button'+q+' data-cli='+q+(conv?conv.nombre.replace(/"/g,'&quot;'):'destinatario')+q+' data-last='+q+(conv&&conv.msgs&&conv.msgs.length?conv.msgs[conv.msgs.length-1].texto.replace(/"/g,'&quot;'):'')+q+' data-canal='+q+(conv?conv.canal:'email')+q+' onclick='+q+'verDraftIA('+ap+'guia'+ap+',this.dataset.cli,this.dataset.last,this.dataset.canal)'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
           +'</div>'
         +'</div>'
       +'</div>';
-      
+
   mc.innerHTML += '<div class="ia-box green"><div class="ia-box-ico">!</div><div class="ia-box-txt"><strong>WildIA:</strong> Canal WhatsApp tiene tasa de respuesta 4x mayor. Director prefiere chat para incidencias urgentes.</div></div>';
 
   setTimeout(function(){
@@ -5336,7 +5336,7 @@ function secComPartner(){_kpiIdx=0;
           +'<div style='+q+'background:#F5F2EE;border-radius:10px;padding:8px 10px;max-height:300px;overflow-y:auto;margin-bottom:10px'+q+'>'+msgsHtml+'</div>'
           +'<div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+'>'
             +'<div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+'><strong style='+q+'color:#0D7A30'+q+'>WildIA</strong> ha preparado un draft de respuesta para esta conversacion</div>'
-            +'<button onclick='+q+'wildToast('+ap+'Draft IA enviado a '+(conv?(conv.nombre.split(String.fromCharCode(32,8212,32))[0]):'destinatario')+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
+            +'<button type='+q+'button'+q+' data-cli='+q+(conv?conv.nombre.replace(/"/g,'&quot;'):'destinatario')+q+' data-last='+q+(conv&&conv.msgs&&conv.msgs.length?conv.msgs[conv.msgs.length-1].texto.replace(/"/g,'&quot;'):'')+q+' data-canal='+q+(conv?conv.canal:'email')+q+' onclick='+q+'verDraftIA('+ap+'partner'+ap+',this.dataset.cli,this.dataset.last,this.dataset.canal)'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+'>Ver draft IA →</button>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -5471,7 +5471,7 @@ function secReservas(){_kpiIdx=0;
       +'<td style='+q+'font-size:.62rem'+q+'>'+r.nivel+'</td>'
       +'<td style='+q+'font-size:.7rem;font-weight:700;color:#0D7A30'+q+'>'+r.precio+'</td>'
       +'<td>'+badge+'</td>'
-      +'<td><button onclick='+q+'wildFeedback(this,'+ap+'Detalle de '+r.id+' abierto'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:4px 9px;background:#0D7A30;border:none;border-radius:5px;color:#fff;font-family:Montserrat,sans-serif;font-size:.54rem;font-weight:700;cursor:pointer'+q+'>Ver</button></td>'
+      +'<td><button type='+q+'button'+q+' data-id='+q+r.id+q+' data-cli='+q+'Javi M.'+q+' data-act='+q+r.act.replace(/"/g,'&quot;')+q+' data-fecha='+q+r.fecha+q+' data-guia='+q+r.guia+q+' data-nivel='+q+r.nivel+q+' data-precio='+q+r.precio+q+' data-estado='+q+r.estado+q+' onclick='+q+'verReserva(this.dataset.id,this.dataset.cli,this.dataset.act,this.dataset.fecha,this.dataset.guia,this.dataset.nivel,this.dataset.precio,this.dataset.estado)'+q+' style='+q+'padding:4px 9px;background:#0D7A30;border:none;border-radius:5px;color:#fff;font-family:Montserrat,sans-serif;font-size:.54rem;font-weight:700;cursor:pointer'+q+'>Ver</button></td>'
     +'</tr>';
   });
   tablaR+='</tbody></table></div>';
@@ -5610,7 +5610,7 @@ function secRutas(){_kpiIdx=0;
         +'<div style='+q+'font-size:.65rem;color:rgba(13,32,16,.55);padding:8px 10px;border-radius:8px;background:rgba(13,122,48,.04);border:1px solid rgba(13,122,48,.08);margin-bottom:8px'+q+'><strong style='+q+'color:#0D7A30'+q+'>IA:</strong> '+r.motivo+'</div>'
         +'<div style='+q+'display:flex;align-items:center;justify-content:space-between'+q+'>'
           +'<div style='+q+'font-family:Barlow Condensed,sans-serif;font-size:1.1rem;font-weight:900;color:#0D7A30'+q+'>'+r.precio+'</div>'
-          +'<button onclick='+q+'wildNavReserva('+ap+r.nombre+ap+')'+q+' style='+q+'padding:7px 18px;background:#0D7A30;border:none;border-radius:7px;color:#fff;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Reservar ahora</button>'
+          +'<button type='+q+'button'+q+' data-nom='+q+r.nombre.replace(/"/g,'&quot;')+q+' data-dur='+q+r.dur+q+' data-niv='+q+r.tipo+q+' data-pre='+q+r.precio+q+' data-obs='+q+r.motivo.replace(/"/g,'&quot;')+q+' onclick='+q+'verPropuestaReserva(this.dataset.nom,this.dataset.dur,this.dataset.niv,this.dataset.pre,this.dataset.obs)'+q+' style='+q+'padding:7px 18px;background:#0D7A30;border:none;border-radius:7px;color:#fff;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Reservar ahora</button>'
         +'</div>'
       +'</div>';
   });
@@ -5823,7 +5823,7 @@ function secComunicacion(){_kpiIdx=0;
         lt+'div style='+q+'background:#F5F2EE;border-radius:10px;padding:4px 8px;margin-bottom:10px;max-height:280px;overflow-y:auto'+q+gt+chatHtml+lt+'/div'+gt+
         lt+'div style='+q+'display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(13,122,48,.06);border:1px solid rgba(13,122,48,.18);border-radius:10px'+q+gt+
           lt+'div style='+q+'flex:1;min-width:0;font-size:.64rem;color:rgba(13,32,16,.65);line-height:1.5'+q+gt+lt+'strong style='+q+'color:#0D7A30'+q+gt+'WildIA'+lt+'/strong'+gt+' ha preparado un mensaje para Ana R. listo para enviar'+lt+'/div'+gt+
-          lt+'button onclick='+q+'wildFeedback(this,'+ap+'Draft IA enviado a Ana R.'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+gt+'Ver draft IA →'+lt+'/button'+gt+
+          lt+'button type='+q+'button'+q+' onclick='+q+'verDraftIA('+ap+'cliente'+ap+','+ap+'Ana R. (Guía)'+ap+','+ap+'Te paso el caudal y horarios actualizados'+ap+','+ap+'chat'+ap+')'+q+' style='+q+'padding:9px 14px;background:#0D7A30;border:none;border-radius:8px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap'+q+gt+'Ver draft IA →'+lt+'/button'+gt+
         lt+'/div'+gt+
       lt+'/div'+gt+
     lt+'/div'+gt;
@@ -6080,7 +6080,7 @@ function secDisponibilidad(){_kpiIdx=0;
       +'<td style='+q+'font-size:.7rem;font-weight:700;color:#0D7A30'+q+'>'+a.precio+'</td>'
       +'<td><div style='+q+'display:flex;align-items:center;gap:7px'+q+'><div style='+q+'flex:1;height:5px;background:rgba(13,32,16,.06);border-radius:3px'+q+'><div style='+q+'height:100%;width:'+pct+'%;background:'+barCol+';border-radius:3px'+q+'></div></div><span style='+q+'font-size:.68rem;font-weight:700;color:'+barCol+q+'>'+(a.libres===0?'Completo':a.libres+' libres')+'</span></div></td>'
       +'<td style='+q+'font-size:.6rem;color:rgba(13,32,16,.5)'+q+'>'+a.horas.join(' \u00b7 ')+'</td>'
-      +'<td><button onclick='+q+'wildFeedback(this,'+ap+'Reservando '+a.act+' para hu\u00e9sped'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:4px 10px;background:'+(a.libres===0?'rgba(13,32,16,.1)':'#0D7A30')+';border:none;border-radius:5px;color:'+(a.libres===0?'rgba(13,32,16,.3)':'#fff')+';font-family:Montserrat,sans-serif;font-size:.54rem;font-weight:700;cursor:'+(a.libres===0?'not-allowed':'pointer')+q+'>'+(a.libres===0?'Completo':'Reservar')+'</button></td>'
+      +'<td><button type='+q+'button'+q+' data-act='+q+a.act.replace(/"/g,'&quot;')+q+' data-hora='+q+a.horas.join(' \u00b7 ')+q+' data-lib='+q+a.libres+q+' onclick='+q+'verReservaHuesped('+ap+'Hotel Sierra Nevada'+ap+',this.dataset.act,this.dataset.hora,Number(this.dataset.lib))'+q+' style='+q+'padding:4px 10px;background:'+(a.libres===0?'rgba(13,32,16,.1)':'#0D7A30')+';border:none;border-radius:5px;color:'+(a.libres===0?'rgba(13,32,16,.3)':'#fff')+';font-family:Montserrat,sans-serif;font-size:.54rem;font-weight:700;cursor:'+(a.libres===0?'not-allowed':'pointer')+q+'>'+(a.libres===0?'Completo':'Reservar')+'</button></td>'
     +'</tr>';
   });
   tablaD+='</tbody></table></div>';
@@ -6210,7 +6210,7 @@ function secPredictorPartner(){_kpiIdx=0;
         +'<div style='+q+'font-size:.63rem;color:rgba(13,32,16,.5);margin-bottom:8px'+q+'><strong style='+q+'color:#0D7A30'+q+'>Paquetes recomendados:</strong> '+p.paquetes.join(' \u00b7 ')+'</div>'
         +'<div style='+q+'display:flex;align-items:center;justify-content:space-between'+q+'>'
           +'<div style='+q+'font-size:.7rem;color:rgba(13,32,16,.4)'+q+'>Comisi\u00f3n estimada: <strong style='+q+'color:#FF6B2B;font-size:.85rem'+q+'>'+p.comisionEst+'</strong></div>'
-          +'<button onclick='+q+'wildFeedback(this,'+ap+'Paquetes para '+p.periodo+' enviados a tu email'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:6px 14px;background:#0D7A30;border:none;border-radius:7px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer'+q+'>Activar paquetes</button>'
+          +'<button type='+q+'button'+q+' data-id='+q+'PAQ-'+(Math.floor(Math.random()*900)+100)+q+' data-nom='+q+p.paquetes.join(' + ').replace(/"/g,'&quot;')+q+' data-per='+q+p.periodo.replace(/"/g,'&quot;')+q+' data-act='+q+p.paquetes.join(' · ').replace(/"/g,'&quot;')+q+' data-pla='+q+p.huespedes+q+' data-pre='+q+p.comisionEst+q+' onclick='+q+'verPaquete(this.dataset.id,this.dataset.nom,this.dataset.per,this.dataset.act,this.dataset.pla,this.dataset.pre,'+ap+'Hotel Sierra Nevada'+ap+')'+q+' style='+q+'padding:6px 14px;background:#0D7A30;border:none;border-radius:7px;color:#fff;font-family:Montserrat,sans-serif;font-size:.6rem;font-weight:700;cursor:pointer'+q+'>Activar paquetes</button>'
         +'</div>'
       +'</div>';
   });
@@ -6329,9 +6329,9 @@ function secPaquetes(){_kpiIdx=0;
         +'</div>'
         +'<div style='+q+'font-size:.63rem;color:rgba(13,32,16,.55);margin-bottom:6px'+q+'><strong style='+q+'color:#0D7A30'+q+'>Actividades:</strong> '+p.actividades.join(' + ')+'</div>'
         +'<div style='+q+'font-size:.62rem;color:rgba(13,32,16,.4);margin-bottom:10px'+q+'><strong>Incluye:</strong> '+p.incluye+'</div>'
-        +'<div style='+q+'display:flex;gap:8px'+q+'>'
-          +'<button onclick='+q+'wildFeedback(this,'+ap+'Paquete '+p.nombre+' activado y enviado a tus hu\u00e9spedes'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'flex:1;padding:8px;background:#0D7A30;border:none;border-radius:7px;color:#fff;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Activar paquete</button>'
-          +'<button onclick='+q+'wildFeedback(this,'+ap+'PDF del paquete descargado'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:8px 14px;background:rgba(13,122,48,.08);border:1px solid rgba(13,122,48,.2);border-radius:7px;color:#0D7A30;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Descargar PDF</button>'
+        +'<div style='+q+'display:flex;gap:8px;flex-wrap:wrap'+q+'>'
+          +'<button type='+q+'button'+q+' data-id='+q+'PAQ-'+(Math.floor(Math.random()*900)+100)+q+' data-nom='+q+p.nombre.replace(/"/g,'&quot;')+q+' data-per='+q+p.generado.replace(/"/g,'&quot;')+q+' data-act='+q+p.actividades.join(' + ').replace(/"/g,'&quot;')+q+' data-pla='+q+'hu\u00e9spedes'+q+' data-pre='+q+p.precio+q+' onclick='+q+'verPaquete(this.dataset.id,this.dataset.nom,this.dataset.per,this.dataset.act,this.dataset.pla,this.dataset.pre,'+ap+'Hotel Sierra Nevada'+ap+')'+q+' style='+q+'flex:1;padding:8px;background:#0D7A30;border:none;border-radius:7px;color:#fff;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Activar paquete</button>'
+          +'<button type='+q+'button'+q+' onclick='+q+'wildToast('+ap+'PDF descargado'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:8px 14px;background:rgba(13,122,48,.08);border:1px solid rgba(13,122,48,.2);border-radius:7px;color:#0D7A30;font-family:Montserrat,sans-serif;font-size:.62rem;font-weight:700;cursor:pointer'+q+'>Descargar PDF</button>'
         +'</div>'
       +'</div>';
   });
@@ -6450,7 +6450,7 @@ function secCatalogo(){_kpiIdx=0;
       +'<td style='+q+'font-size:.72rem;font-weight:700;color:#0D7A30'+q+'>'+a.precio+'</td>'
       +'<td style='+q+'font-size:.72rem;font-weight:900;color:#FF6B2B'+q+'>'+a.comision+'</td>'
       +'<td style='+q+'font-size:.7rem;color:#FF6B2B;font-weight:700'+q+'>'+a.estrellas+'\u2605</td>'
-      +'<td><button onclick='+q+'wildFeedback(this,'+ap+'Reservando '+a.act+' para hu\u00e9sped'+ap+','+ap+'ok'+ap+')'+q+' style='+q+'padding:4px 10px;background:#0D7A30;border:none;border-radius:5px;color:#fff;font-family:Montserrat,sans-serif;font-size:.54rem;font-weight:700;cursor:pointer'+q+'>Reservar</button></td>'
+      +'<td><button type='+q+'button'+q+' data-act='+q+a.act.replace(/"/g,'&quot;')+q+' onclick='+q+'verReservaHuesped('+ap+'Hotel Sierra Nevada'+ap+',this.dataset.act,'+ap+'consultar disponibilidad'+ap+',1)'+q+' style='+q+'padding:4px 10px;background:#0D7A30;border:none;border-radius:5px;color:#fff;font-family:Montserrat,sans-serif;font-size:.54rem;font-weight:700;cursor:pointer'+q+'>Reservar</button></td>'
     +'</tr>';
   });
   tablaK+='</tbody></table></div>';
@@ -6633,4 +6633,243 @@ function secActividades(){_kpiIdx=0;
     },150);
   },100);
 }
+
+/* ═══════════════════════════════════
+   REGLA 10 · Helpers de modales contextuales
+═══════════════════════════════════ */
+function verDraftIA(perfilOrigen, clienteRaw, lastMsg, canal){
+  var c = String(clienteRaw||'').replace(/\s+(—|·).*$/,'').trim();
+  var ctx = clienteCtx(c) || {email:'',tel:''};
+  if(!ctx.email && !ctx.tel){
+    // Fallback: cliente no registrado en contexto, usamos placeholder editable
+    ctx = {email:'', tel:''};
+  }
+  var nombre = c.split(' ')[0] || 'hola';
+  var firma = perfilOrigen==='director'?'Equipo WildIA · Carlos D., Director':
+              perfilOrigen==='guia'?'Ana R. · Guía WildIA':
+              perfilOrigen==='cliente'?'Javi M. · Aventurero WildIA':
+              'Hotel Sierra Nevada · WildIA Partner';
+  var ctxLast = lastMsg||'tu mensaje';
+  var draftLargo = 'Hola '+nombre+',\n\nGracias por escribirnos. Hemos revisado tu mensaje:\n\n  "'+ctxLast+'"\n\nWildIA ha preparado esta respuesta para ti — si encaja, envíala tal cual; si quieres ajustarla, pulsa Editar antes de enviar.\n\nTodo está bajo control y nuestro equipo se encarga del resto. Si surge cualquier cambio, te avisaremos por este mismo canal.\n\nUn abrazo,\n'+firma;
+  var draftCorto = 'Hola '+nombre+'! 👋 Recibido tu mensaje. WildIA ya ha gestionado tu solicitud y te confirmamos por aquí cualquier cambio. '+firma.split('·')[0].trim();
+  var canalLabel = canal==='voz'?'VOZ':canal==='chat'?'WhatsApp':'Email';
+  wmOpen({
+    eyebrow:'DRAFT IA · canal '+canalLabel,
+    title:'Borrador para '+c,
+    date:new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long'}),
+    badge:'IA generado',
+    badgeColor:'green',
+    icon:'draft',
+    sections:[
+      {title:'Último mensaje recibido',type:'block',html:'<em style="color:rgba(13,32,16,.6)">"'+wmEsc(ctxLast)+'"</em>'},
+      {title:'Draft propuesto · revisa antes de enviar',type:'block',style:'success',html:wmEsc(draftLargo).replace(/\n/g,'<br>')},
+      {title:'Cliente · prerrellenado por IA',type:'list',items:[
+        {k:'Email',v:ctx.email||'(no registrado · ajusta antes de enviar)'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'(no registrado · ajusta antes de enviar)'}
+      ]}
+    ],
+    editToast:'Editando draft IA · '+c,
+    email:{to:ctx.email,subject:'WildIA · respuesta a tu mensaje',body:draftLargo},
+    whatsapp:{phone:ctx.tel,text:draftCorto}
+  });
+}
+
+function verBriefing(grupoId,actividad,hora,cliente,guia,personas,nivel,nota){
+  var ctx = clienteCtx(cliente) || {email:'',tel:''};
+  var emailBody = 'Hola '+cliente+',\n\nTe enviamos el briefing IA preparado por WildIA para tu actividad:\n\n• Actividad: '+actividad+'\n• Hora: '+hora+'\n• Grupo: '+grupoId+' · '+personas+'\n• Nivel: '+nivel+'\n• Guía asignado: '+guia+'\n\nNotas operativas IA:\n'+nota+'\n\nPunto de encuentro y material en el adjunto. Cualquier duda, respóndenos por este canal o por WhatsApp.\n\nUn abrazo,\nEquipo WildIA';
+  var waText = 'Hola '+cliente.split(' ')[0]+'! Te paso el briefing de '+actividad+' ('+hora+'h, guía '+guia+'). Cualquier duda, dímelo. WildIA 🏕️';
+  wmOpen({
+    eyebrow:'BRIEFING IA · '+grupoId,
+    title:actividad,
+    date:hora+'h · grupo '+personas,
+    badge:'IA preparado',
+    badgeColor:'green',
+    icon:'briefing',
+    sections:[
+      {title:'Resumen del grupo',type:'grid',fields:[
+        {label:'Actividad',value:actividad},
+        {label:'Hora',value:hora+'h'},
+        {label:'Guía',value:guia},
+        {label:'Personas',value:personas},
+        {label:'Nivel',value:nivel||'—'},
+        {label:'ID grupo',value:grupoId,mono:true}
+      ]},
+      {title:'Cliente principal',type:'list',items:[
+        {k:'Cliente',v:cliente},
+        {k:'Email',v:ctx.email||'—'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'—'}
+      ]},
+      {title:'Notas operativas IA',type:'block',style:'success',html:'<strong>WildIA:</strong> '+wmEsc(nota||'Sin notas particulares. Equipo verificado y condiciones óptimas.')}
+    ],
+    editToast:'Abriendo editor del briefing · '+grupoId,
+    email:{to:ctx.email,subject:'Briefing WildIA · '+actividad+' · '+grupoId,body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
+}
+
+function verParteIncidencia(parteId,actividad,hora,grupo,severidad,detalles,cliente){
+  var ctx = clienteCtx(cliente) || {email:'',tel:''};
+  var sev = severidad||'leve';
+  var color = sev==='grave'?'red':sev==='moderada'?'orange':'amber';
+  var emailBody = 'Estimado '+cliente+',\n\nLe informamos formalmente sobre la incidencia registrada en su actividad:\n\n• Parte: '+parteId+'\n• Actividad: '+actividad+'\n• Hora: '+hora+'\n• Grupo: '+grupo+'\n• Severidad: '+sev+'\n\nDetalles:\n'+detalles+'\n\nLa incidencia ha sido registrada conforme al protocolo de seguridad. WildIA ya ha activado los pasos automáticos correspondientes. Para cualquier aclaración o solicitud, responda a este email.\n\nAtentamente,\nEquipo WildIA · Seguridad y Operaciones';
+  var waText = 'Hola '+cliente.split(' ')[0]+'. Te confirmamos parte '+parteId+' ('+severidad+'). Sin lesiones graves. Te llamo si quieres detalle. WildIA';
+  wmOpen({
+    eyebrow:'PARTE DE INCIDENCIA · '+parteId,
+    title:actividad,
+    date:hora,
+    badge:sev.toUpperCase(),
+    badgeColor:color,
+    icon:'incident',
+    sections:[
+      {title:'Datos de la incidencia',type:'grid',fields:[
+        {label:'Parte',value:parteId,mono:true},
+        {label:'Actividad',value:actividad},
+        {label:'Hora',value:hora},
+        {label:'Grupo',value:grupo},
+        {label:'Severidad',value:sev}
+      ]},
+      {title:'Detalles',type:'block',style:color==='red'?'danger':'warn',html:'<strong>Resumen:</strong> '+wmEsc(detalles||'Sin detalles adicionales.')},
+      {title:'Cliente afectado',type:'list',items:[
+        {k:'Cliente',v:cliente},
+        {k:'Email',v:ctx.email||'—'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'—'}
+      ]}
+    ],
+    editToast:'Abriendo editor del parte · '+parteId,
+    email:{to:ctx.email,subject:'WildIA · Parte de incidencia '+parteId,body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
+}
+
+function verReserva(refId,cliente,act,fecha,guia,nivel,precio,estado){
+  var ctx = clienteCtx(cliente) || {email:'',tel:''};
+  var emailBody = 'Hola '+cliente+',\n\nGracias por confiar en WildIA. Aquí tienes el detalle de tu reserva:\n\n• Referencia: '+refId+'\n• Actividad: '+act+'\n• Fecha y hora: '+fecha+'\n• Guía asignado: '+guia+'\n• Nivel: '+nivel+'\n• Importe: '+precio+'\n• Estado: '+estado+'\n\nWildIA gestiona toda la logística automáticamente. Recibirás briefing 48h antes de la actividad y notificación inmediata si hay cualquier cambio.\n\nUn abrazo,\nEquipo WildIA';
+  var waText = 'Hola '+cliente.split(' ')[0]+'! Tu reserva '+refId+' ('+act+', '+fecha+', '+precio+') está '+estado.toLowerCase()+'. WildIA te avisa de cualquier cambio. 🏕️';
+  var badgeColor = estado.toLowerCase().indexOf('confirm')>=0?'green':estado.toLowerCase().indexOf('pend')>=0?'amber':'orange';
+  wmOpen({
+    eyebrow:'RESERVA · '+refId,
+    title:act,
+    date:fecha,
+    badge:estado,
+    badgeColor:badgeColor,
+    icon:'booking',
+    sections:[
+      {title:'Detalle de la reserva',type:'grid',fields:[
+        {label:'Referencia',value:refId,mono:true},
+        {label:'Fecha',value:fecha},
+        {label:'Guía',value:guia},
+        {label:'Nivel',value:nivel},
+        {label:'Importe',value:precio},
+        {label:'Estado',value:estado}
+      ]},
+      {title:'Cliente',type:'list',items:[
+        {k:'Cliente',v:cliente},
+        {k:'Email',v:ctx.email||'—'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'—'}
+      ]},
+      {title:'Próximo paso WildIA',type:'block',style:'success',html:'<strong>IA:</strong> Briefing automático programado para 48h antes. Material reservado en almacén. Recordatorio al cliente activo.'}
+    ],
+    editToast:'Abriendo editor de la reserva · '+refId,
+    email:{to:ctx.email,subject:'WildIA · Tu reserva '+refId+' · '+act,body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
+}
+
+function verPaquete(paqId,nombre,periodo,actividades,plazas,precio,partner){
+  var clienteRef = partner||'Hotel Sierra Nevada';
+  var ctx = clienteCtx(clienteRef) || {email:'',tel:''};
+  var emailBody = 'Estimados,\n\nWildIA ha generado este paquete de actividades para vuestros huéspedes:\n\n• Paquete: '+nombre+'\n• Período: '+periodo+'\n• Actividades incluidas: '+actividades+'\n• Plazas disponibles: '+plazas+'\n• Precio por persona: '+precio+'\n\nEl paquete se incrusta en vuestro flujo de check-in y puede activarse de forma inmediata. WildIA gestiona reservas, briefings y comunicación con los aventureros automáticamente.\n\nPara activar o ajustar, responded a este email o contactad por WhatsApp.\n\nUn saludo,\nEquipo WildIA · Partnerships';
+  var waText = 'Hola! Os enviamos paquete '+nombre+' ('+periodo+', '+plazas+' plazas, '+precio+'/pax). Listo para activar en vuestro check-in. WildIA Partner.';
+  wmOpen({
+    eyebrow:'PAQUETE · '+paqId,
+    title:nombre,
+    date:periodo,
+    badge:plazas+' plazas',
+    badgeColor:'green',
+    icon:'package',
+    sections:[
+      {title:'Detalle del paquete',type:'grid',fields:[
+        {label:'Paquete',value:nombre},
+        {label:'Período',value:periodo},
+        {label:'Plazas',value:plazas},
+        {label:'Precio/pax',value:precio},
+        {label:'Referencia',value:paqId,mono:true}
+      ]},
+      {title:'Actividades incluidas',type:'block',html:'<strong>'+wmEsc(actividades)+'</strong>'},
+      {title:'Partner asociado',type:'list',items:[
+        {k:'Alojamiento',v:clienteRef},
+        {k:'Email',v:ctx.email||'—'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'—'}
+      ]}
+    ],
+    editToast:'Editando paquete · '+nombre,
+    confirm:{label:'Activar paquete',toast:'Paquete '+nombre+' activado · '+plazas+' plazas reservadas'},
+    email:{to:ctx.email,subject:'WildIA · Paquete '+nombre+' listo para activar',body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
+}
+
+function verPropuestaReserva(rutaNombre,duracion,nivel,precio,observaciones){
+  var cliente = 'Javi M.'; // perfil aventurero activo
+  var ctx = clienteCtx(cliente) || {email:'',tel:''};
+  var emailBody = 'Hola Javi,\n\nWildIA ha preparado una propuesta de reserva para ti:\n\n• Ruta: '+rutaNombre+'\n• Duración: '+duracion+'\n• Nivel recomendado: '+nivel+'\n• Precio: '+precio+'\n\n'+(observaciones?'Observaciones IA: '+observaciones+'\n\n':'')+'Si te encaja, confirma con un clic y te asignamos guía + briefing automáticamente.\n\nEquipo WildIA';
+  var waText = 'Hola Javi! WildIA propone: '+rutaNombre+' · '+duracion+' · '+precio+'. ¿Confirmamos?';
+  wmOpen({
+    eyebrow:'PROPUESTA RUTA',
+    title:rutaNombre,
+    date:duracion+' · nivel '+nivel,
+    badge:'IA recomendada',
+    badgeColor:'green',
+    icon:'briefing',
+    sections:[
+      {title:'Detalles de la propuesta',type:'grid',fields:[
+        {label:'Ruta',value:rutaNombre},
+        {label:'Duración',value:duracion},
+        {label:'Nivel',value:nivel},
+        {label:'Precio',value:precio}
+      ]},
+      observaciones?{title:'Observaciones IA',type:'block',style:'success',html:'<strong>WildIA:</strong> '+wmEsc(observaciones)}:null,
+      {title:'Aventurero',type:'list',items:[
+        {k:'Cliente',v:cliente},
+        {k:'Email',v:ctx.email||'—'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'—'}
+      ]}
+    ].filter(Boolean),
+    editToast:'Editando propuesta · '+rutaNombre,
+    confirm:{label:'Confirmar reserva',toast:'Reserva confirmada · '+rutaNombre+' · email enviado'},
+    email:{to:ctx.email,subject:'WildIA · Tu propuesta '+rutaNombre,body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
+}
+
+function verReservaHuesped(huesped,actividad,hora,libres){
+  var ctx = clienteCtx(huesped) || clienteCtx('Hotel Sierra Nevada') || {email:'',tel:''};
+  var emailBody = 'Hola '+huesped+',\n\nDesde el alojamiento te enviamos esta propuesta de actividad WildIA durante tu estancia:\n\n• Actividad: '+actividad+'\n• Hora: '+hora+'\n• Plazas libres: '+libres+'\n\nSi te interesa, respóndenos y reservamos directamente — la actividad se carga a tu habitación y WildIA te enviará el briefing 48h antes.\n\nUn saludo,\nRecepción + WildIA Partner';
+  var waText = 'Hola '+huesped.split(' ')[0]+'! Te proponemos '+actividad+' ('+hora+'). '+libres+' plazas. ¿Te apuntamos?';
+  wmOpen({
+    eyebrow:'RESERVA HUÉSPED',
+    title:actividad,
+    date:hora,
+    badge:libres+' plazas',
+    badgeColor:libres>0?'green':'red',
+    icon:'booking',
+    sections:[
+      {title:'Detalle propuesta',type:'grid',fields:[
+        {label:'Actividad',value:actividad},
+        {label:'Hora',value:hora},
+        {label:'Plazas libres',value:libres}
+      ]},
+      {title:'Huésped',type:'list',items:[
+        {k:'Huésped',v:huesped},
+        {k:'Email',v:ctx.email||'—'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'—'}
+      ]}
+    ],
+    editToast:'Editando propuesta · '+huesped,
+    confirm:{label:libres>0?'Reservar para huésped':'Sin plazas',toast:libres>0?'Reserva enviada · '+huesped+' · '+actividad:'Actividad completa'},
+    email:{to:ctx.email,subject:'Propuesta WildIA · '+actividad,body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
+}
+
 </script>

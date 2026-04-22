@@ -7,7 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;}
+html{font-size:16px;max-width:100vw;overflow-x:hidden;}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;max-width:100vw;}
+img,svg,video,canvas{max-width:100%;}
+input,textarea,select,button{max-width:100%;}
+@media (max-width:768px){html{font-size:18.5px;}}
+@media (max-width:480px){html{font-size:19.2px;}}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.5)}}
@@ -298,10 +303,15 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;}
 .com-bubble.ia{align-self:flex-start;background:rgba(232,56,109,.06);border:1px solid rgba(232,56,109,.15);border-radius:14px 14px 14px 3px;}
 .com-bubble-sender{font-size:.52rem;font-weight:700;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em;}
 .com-bubble-time{font-size:.52rem;margin-top:4px;text-align:right;opacity:.45;}
-.com-input-row{display:flex;gap:8px;}
-.com-input{flex:1;padding:10px 14px;border:1px solid rgba(26,8,16,.15);border-radius:8px;font-size:.7rem;outline:none;font-family:'DM Sans',sans-serif;}
-.com-send-btn{padding:10px 18px;background:#E8386D;border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;transition:all .2s;}
-.com-send-btn:hover{background:#c41f52;}
+.com-ia-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(232,56,109,.05);border:1px solid rgba(232,56,109,.15);border-radius:10px;}
+.com-ia-dot{width:7px;height:7px;border-radius:50%;background:#E8386D;flex-shrink:0;animation:pulseIA 1.5s infinite;}
+.com-ia-txt{flex:1;font-size:.64rem;color:#5a3a44;line-height:1.5;}
+.com-ia-txt b{color:#E8386D;font-weight:800;}
+.com-ia-btn{padding:8px 14px;background:#E8386D;border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:.04em;}
+.com-ia-btn:hover{background:#c41f52;}
+.sb-unread-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E8386D;flex-shrink:0;margin-left:auto;animation:pulseRed 1.5s infinite;}
+@keyframes pulseRed{0%{box-shadow:0 0 0 0 rgba(232,56,109,.55);}70%{box-shadow:0 0 0 8px rgba(232,56,109,0);}100%{box-shadow:0 0 0 0 rgba(232,56,109,0);}}
+.sb-btn.active .sb-unread-dot,.sb-btn.seen .sb-unread-dot{display:none;}
 .com-status{display:flex;align-items:center;gap:5px;font-size:.6rem;color:#1a9e4a;font-weight:700;}
 .com-status-dot{width:6px;height:6px;border-radius:50%;background:#1a9e4a;animation:pulseIA 1.5s infinite;}
 
@@ -3602,9 +3612,10 @@ function buildComSection(perfil, convs, tickerId, tickerMsgs){
             +(conv?lt+'div class='+q+'com-status'+q+gt+lt+'div class='+q+'com-status-dot'+q+gt+lt+'/div'+gt+'En línea'+lt+'/div'+gt:'')
           +lt+'/div'+gt
           +lt+'div class='+q+'com-messages'+q+gt+msgsHtml+lt+'/div'+gt
-          +lt+'div class='+q+'com-input-row'+q+gt
-            +lt+'input type='+q+'text'+q+' class='+q+'com-input'+q+' id='+q+'com-input-'+perfil+q+' placeholder='+q+'Escribe un mensaje...'+q+' /'+gt
-            +lt+'button class='+q+'com-send-btn'+q+' onclick='+q+'comSendTH('+ap+perfil+ap+')'+q+gt+'Enviar'+lt+'/button'+gt
+          +lt+'div class='+q+'com-ia-row'+q+gt
+            +lt+'div class='+q+'com-ia-dot'+q+gt+lt+'/div'+gt
+            +lt+'div class='+q+'com-ia-txt'+q+gt+lt+'b'+gt+'TalentHuman IA'+lt+'/b'+gt+' ha preparado la respuesta en tu nombre. Revísala antes de enviar.'+lt+'/div'+gt
+            +lt+'button class='+q+'com-ia-btn'+q+' onclick='+q+'comReviewDraftTH('+ap+perfil+ap+')'+q+gt+'Revisar draft IA →'+lt+'/button'+gt
           +lt+'/div'+gt
         +lt+'/div'+gt
       +lt+'/div'+gt;
@@ -3622,11 +3633,12 @@ function buildComSection(perfil, convs, tickerId, tickerMsgs){
   render();
 }
 
-function comSendTH(perfil){
-  var inp=document.getElementById('com-input-'+perfil);
-  if(!inp||!inp.value.trim())return;
-  showToast('✓ Mensaje enviado');
-  inp.value='';
+function comReviewDraftTH(perfil){
+  var map={director:'Draft IA: respuesta al director sobre protocolo retención Retail Atlántico · 3 líneas · lista para enviar',
+           consultor:'Draft IA: confirmación a Pedro G. (Grupo Nexo) · informe finalistas entrega mañana 10:00h',
+           cliente:'Draft IA: respuesta a Ana S. · confirmar entrevistas miércoles 16h y jueves 17h',
+           candidato:'Draft IA: confirmación entrevista Grupo Financiero Iberia · miércoles 16h'};
+  demoIA('Revisa el borrador antes de enviar', (map[perfil]||'Draft IA listo para revisar.') + '. TalentHuman IA genera y envía las respuestas automáticamente; tú validas.');
 }
 
 // Com data per role
@@ -3789,6 +3801,19 @@ function doLogin(){
   else if(currentRole==='consultor') buildConsultorApp();
   else if(currentRole==='cliente') buildClienteApp();
   else if(currentRole==='candidato') buildCandidatoApp();
+  injectComUnreadDots();
+}
+
+function injectComUnreadDots(){
+  ['sb-com-dir','sb-com-con','sb-com-cli','sb-com-cand'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b && !b.querySelector('.sb-unread-dot')){
+      var dot=document.createElement('span');
+      dot.className='sb-unread-dot';
+      dot.setAttribute('aria-label','1 sin leer');
+      b.appendChild(dot);
+    }
+  });
 }
 // ── helpers ──
 function h_(tag,attrs,inner){return '\x3C'+tag+(attrs?' '+attrs:'')+'\x3E'+inner+'\x3C/'+tag+'\x3E';}
@@ -3836,7 +3861,7 @@ function showS(id){
   if(comMap[id]){
     document.querySelectorAll('.sb-btn').forEach(function(b){b.classList.remove('active');});
     var sb=document.getElementById('sb-'+id);
-    if(sb)sb.classList.add('active');
+    if(sb){sb.classList.add('active');sb.classList.add('seen');}
     var d=comData[comMap[id]];
     if(d)buildComSection(id.replace('com-',''),d.convs,d.tickerId,d.tickerMsgs);
     var mc=document.getElementById('mainContent');
@@ -3852,6 +3877,7 @@ function showS(id){
     else if(currentRole==='consultor') buildConsultorApp();
     else if(currentRole==='cliente') buildClienteApp();
     else if(currentRole==='candidato') buildCandidatoApp();
+    injectComUnreadDots();
   }
 
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
@@ -3906,7 +3932,7 @@ function demoIA(titulo,desc){
 
 function showToast(msg){
   var t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1a0810;color:#fff;padding:10px 18px;border-radius:10px;font-size:.75rem;font-weight:600;z-index:99998;border-left:3px solid #E8386D;animation:modalFadeIn .3s ease;';
+  t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1a0810;color:#fff;padding:10px 18px;border-radius:10px;font-size:.75rem;font-weight:600;z-index:99998;box-shadow:0 8px 24px rgba(26,8,16,.35);animation:modalFadeIn .3s ease;';
   t.textContent=msg;
   document.body.appendChild(t);
   setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2800);
@@ -5470,13 +5496,13 @@ function buildConsultorHTML(){
     +card('Texto adaptado por canal',true,
       lt+'div style='+q+'margin-bottom:12px'+q+gt
         +lt+'div style='+q+'font-size:.55rem;font-weight:800;color:#1E4DB7;letter-spacing:.1em;margin-bottom:6px'+q+gt+'LINKEDIN \u2014 TONO EJECUTIVO'+lt+'/div'+gt
-        +lt+'div style='+q+'background:#f0f4ff;border-radius:8px;padding:10px 12px;font-size:.68rem;color:var(--navy);line-height:1.6;border-left:3px solid #1E4DB7'+q+gt
+        +lt+'div style='+q+'background:#f0f4ff;border-radius:8px;padding:10px 12px;font-size:.68rem;color:var(--navy);line-height:1.6;border:1px solid rgba(30,77,183,.18)'+q+gt
           +'Buscamos Director Financiero para liderar la estrategia financiera de Grupo Financiero Iberia en su etapa de expansion LATAM. Si tienes experiencia en M&A y liderazgo de equipos en entornos de alta presion, queremos conocerte.'
         +lt+'/div'+gt
       +lt+'/div'+gt
       +lt+'div style='+q+'margin-bottom:14px'+q+gt
         +lt+'div style='+q+'font-size:.55rem;font-weight:800;color:#1a9e4a;letter-spacing:.1em;margin-bottom:6px'+q+gt+'INFOJOBS \u2014 TONO DESCRIPTIVO'+lt+'/div'+gt
-        +lt+'div style='+q+'background:#f0fff4;border-radius:8px;padding:10px 12px;font-size:.68rem;color:var(--navy);line-height:1.6;border-left:3px solid #1a9e4a'+q+gt
+        +lt+'div style='+q+'background:#f0fff4;border-radius:8px;padding:10px 12px;font-size:.68rem;color:var(--navy);line-height:1.6;border:1px solid rgba(26,158,74,.18)'+q+gt
           +'Oferta: Director Financiero. Empresa: Grupo Financiero Iberia. Sector: Banca y servicios financieros. Experiencia requerida: minimo 10 anos en posiciones de direccion financiera. Salario: 140.000-160.000 EUR. Incorporacion: inmediata.'
         +lt+'/div'+gt
       +lt+'/div'+gt
@@ -5605,7 +5631,7 @@ function buildConsultorHTML(){
         +lt+'span style='+q+'font-size:.58rem;color:var(--text3)'+q+gt+'Pregunta '+(i+1)+' de 4'+lt+'/span'+gt
       +lt+'/div'+gt
       +lt+'div style='+q+'font-size:.72rem;font-weight:600;color:var(--navy);line-height:1.55;margin-bottom:8px'+q+gt+pq.texto+lt+'/div'+gt
-      +lt+'div style='+q+'font-size:.62rem;color:var(--text2);font-style:italic;line-height:1.5;padding-left:10px;border-left:2px solid rgba(232,56,109,.2)'+q+gt+pq.criterio+lt+'/div'+gt
+      +lt+'div style='+q+'font-size:.62rem;color:var(--text2);font-style:italic;line-height:1.5;padding:6px 10px;background:rgba(232,56,109,.05);border-radius:6px'+q+gt+pq.criterio+lt+'/div'+gt
     +lt+'/div'+gt;
   }
 
@@ -5815,7 +5841,7 @@ function buildClienteHTML(){
   o+=scr('finalistas',false,
     phdr('Comparador de finalistas','b-pink','IA  -  Scoring explicado','Vista lado a lado  -  Puntuacion por criterio  -  Justificacion de cada score')
     +'\x3Cdiv class="g2 mb14"\x3E'
-    +'\x3Cdiv class="card" style="border-top:3px solid #E8386D"\x3E\x3Cdiv style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"\x3E\x3Cdiv class="card-title" style="margin:0"\x3E\u2605 Ana Garcia Reyes\x3C/div\x3E\x3Cspan style="font-family:Montserrat,sans-serif;font-size:1.3rem;font-weight:900;color:#E8386D"\x3E94%\x3C/span\x3E\x3C/div\x3E'
+    +'\x3Cdiv class="card" style="background:rgba(232,56,109,.04);border:1px solid rgba(232,56,109,.25)"\x3E\x3Cdiv style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"\x3E\x3Cdiv class="card-title" style="margin:0"\x3E\u2605 Ana Garcia Reyes\x3C/div\x3E\x3Cspan style="font-family:Montserrat,sans-serif;font-size:1.3rem;font-weight:900;color:#E8386D"\x3E94%\x3C/span\x3E\x3C/div\x3E'
     +pbar('Experiencia directiva financiera','Santander Internacional  -  8 anos','94%')
     +pbar('Encaje cultural','Valores y estilo de liderazgo','88%')
     +pbar('Competencias tecnicas','CFO, M&A, regulatorio','96%')
@@ -5824,7 +5850,7 @@ function buildClienteHTML(){
     +iabox('','Ana Garcia supera los criterios en 7/8 dimensiones. Retencion estimada a 12 meses: 91%. Recomendada.')
     +'\x3Cbutton class="btn btn-pink" style="width:100%;margin-top:10px"\x3E\u2713 Avanzar con Ana Garcia\x3C/button\x3E'
     +'\x3C/div\x3E'
-    +'\x3Cdiv class="card" style="border-top:3px solid #1a9e4a"\x3E\x3Cdiv style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"\x3E\x3Cdiv class="card-title" style="margin:0"\x3EPedro Martinez Lopez\x3C/div\x3E\x3Cspan style="font-family:Montserrat,sans-serif;font-size:1.3rem;font-weight:900;color:#1a9e4a"\x3E88%\x3C/span\x3E\x3C/div\x3E'
+    +'\x3Cdiv class="card" style="background:rgba(26,158,74,.04);border:1px solid rgba(26,158,74,.25)"\x3E\x3Cdiv style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"\x3E\x3Cdiv class="card-title" style="margin:0"\x3EPedro Martinez Lopez\x3C/div\x3E\x3Cspan style="font-family:Montserrat,sans-serif;font-size:1.3rem;font-weight:900;color:#1a9e4a"\x3E88%\x3C/span\x3E\x3C/div\x3E'
     +pbar('Experiencia directiva financiera','Retail Espana  -  6 anos','85%')
     +pbar('Encaje cultural','Perfil mas ejecutivo','79%')
     +pbar('Competencias tecnicas','CFO, transformacion financiera','88%')
@@ -6176,9 +6202,10 @@ function buildCandidatoHTML(){
       +lt+'div style='+q+'font-size:.62rem;color:#1a9e4a;font-weight:600'+q+gt+'Laura activa ahora'+lt+'/div'+gt
     +lt+'/div'+gt
     +lt+'div style='+q+'max-height:360px;overflow-y:auto;padding:4px 0;margin-bottom:14px'+q+gt+msgsHTML+lt+'/div'+gt
-    +lt+'div style='+q+'border-top:1px solid var(--border);padding-top:12px;display:flex;gap:8px'+q+gt
-      +lt+'div style='+q+'flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:.72rem;color:var(--text3)'+q+gt+'Escribe un mensaje a Laura...'+lt+'/div'+gt
-      +lt+'button class='+q+'btn btn-pink'+q+' style='+q+'padding:10px 18px'+q+gt+'Enviar'+lt+'/button'+gt
+    +lt+'div class='+q+'com-ia-row'+q+' style='+q+'margin-top:4px'+q+gt
+      +lt+'div class='+q+'com-ia-dot'+q+gt+lt+'/div'+gt
+      +lt+'div class='+q+'com-ia-txt'+q+gt+lt+'b'+gt+'TalentHuman IA'+lt+'/b'+gt+' ha preparado la respuesta en tu nombre. Revísala antes de enviar.'+lt+'/div'+gt
+      +lt+'button class='+q+'com-ia-btn'+q+' onclick='+q+'comReviewDraftTH('+ap+'candidato'+ap+')'+q+gt+'Revisar draft IA →'+lt+'/button'+gt
     +lt+'/div'+gt
     +lt+'/div'+gt
   );

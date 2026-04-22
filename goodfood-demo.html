@@ -7,7 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Space+Grotesk:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Space Grotesk',sans-serif;overflow:hidden;}
+html{font-size:16px;max-width:100vw;}
+html,body{height:100%;font-family:'Space Grotesk',sans-serif;overflow:hidden;max-width:100vw;}
+img,svg,video,canvas{max-width:100%;}
+@media(max-width:768px){html{font-size:18.5px;}}
+@media(max-width:480px){html{font-size:19.2px;}}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
@@ -743,7 +747,7 @@ function goBack(){
 .card-ia{background:#C9A84C;color:#1A1208;padding:1px 6px;border-radius:3px;font-size:.42rem;font-weight:700;}
 .card-hdr-gold .card-ia{background:#1A1208;color:#C9A84C;}
 
-.ian{background:#1A1208;border-left:3px solid #C9A84C;border-radius:0 8px 8px 0;padding:11px 14px;margin-top:10px;display:flex;gap:9px;align-items:flex-start;box-shadow:0 4px 14px rgba(26,18,8,.15);cursor:pointer;transition:background .2s,box-shadow .2s;position:relative;}
+.ian{background:#1A1208;border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:11px 14px;margin-top:10px;display:flex;gap:9px;align-items:flex-start;box-shadow:0 4px 14px rgba(26,18,8,.15);cursor:pointer;transition:background .2s,box-shadow .2s;position:relative;}
 .ian:hover{background:#2C1A0E;box-shadow:0 6px 20px rgba(26,18,8,.25);}
 .ian::after{content:'Aplicar';position:absolute;bottom:8px;right:10px;font-size:.48rem;font-weight:700;color:rgba(201,168,76,.45);letter-spacing:.1em;text-transform:uppercase;opacity:0;transition:opacity .2s;}
 .ian:hover::after{opacity:1;}
@@ -1239,8 +1243,8 @@ function buildDirector(){
       </div>
       <div class="card">
         <div class="card-hdr card-hdr-gold">Alertas ejecutivas <span class="card-ia">IA</span></div>
-        <div class="ian" style="margin-bottom:8px;border-left-color:#D4572A"><div class="ian-ico">🔴</div><div class="ian-txt"><strong style="color:#FF8A6B">Food cost desviado +1,4% — lubina</strong><br>IA detectó merma anómala en turno almuerzo. Acción sugerida activa.</div></div>
-        <div class="ian" style="margin-bottom:8px;border-left-color:#C9A84C"><div class="ian-ico">🟡</div><div class="ian-txt"><strong style="color:#E8C96B">Cena de hoy · ocupación prevista 94%</strong><br>IA recomienda añadir 1 camarero extra. Turno ajustado automáticamente.</div></div>
+        <div class="ian" style="margin-bottom:8px;border-color:#D4572A"><div class="ian-ico">🔴</div><div class="ian-txt"><strong style="color:#FF8A6B">Food cost desviado +1,4% — lubina</strong><br>IA detectó merma anómala en turno almuerzo. Acción sugerida activa.</div></div>
+        <div class="ian" style="margin-bottom:8px;border-color:#C9A84C"><div class="ian-ico">🟡</div><div class="ian-txt"><strong style="color:#E8C96B">Cena de hoy · ocupación prevista 94%</strong><br>IA recomienda añadir 1 camarero extra. Turno ajustado automáticamente.</div></div>
         <div class="ian" style="margin-bottom:8px"><div class="ian-ico">📦</div><div class="ian-txt"><strong>Pedido automático generado · proveedor Carnes Ibáñez</strong><br>Stock solomillo para 2 días. IA lanzó pedido sin intervención.</div></div>
         <div class="ian"><div class="ian-ico">✅</div><div class="ian-txt"><strong>Margen bruto +3% sobre objetivo esta semana</strong><br>Ajuste de carta IA en platos de temporada generó +480€ adicionales.</div></div>
       </div>
@@ -2340,7 +2344,7 @@ function _showNotif(role){
   if(!pool) return;
   var n=pool[_ni%pool.length]; _ni++;
   var d=document.createElement('div');
-  d.style.cssText='position:fixed;bottom:24px;right:24px;background:#1A1208;border:1px solid rgba(201,168,76,.35);border-left:3px solid '+n.color+';border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 8px 28px rgba(0,0,0,.35);animation:fadeUp .3s ease both;max-width:320px;';
+  d.style.cssText='position:fixed;bottom:24px;right:24px;background:#1A1208;border:1px solid '+n.color+';border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 8px 28px rgba(0,0,0,.35);animation:fadeUp .3s ease both;max-width:320px;';
   d.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="'+n.color+'" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div><div style="font-size:.6rem;font-weight:700;color:rgba(201,168,76,.5);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">Good Food IA</div><div style="font-size:.68rem;color:#E8E0D0;line-height:1.5;">'+n.txt+'</div></div>';
   document.body.appendChild(d);
   setTimeout(function(){d.style.opacity='0';d.style.transition='opacity .4s';setTimeout(function(){if(d.parentNode)d.remove();},400);},3800);
@@ -2442,57 +2446,6 @@ function simRecalc(){
   }
   var iaEl=document.getElementById('sim-r-ia');
   if(iaEl) iaEl.querySelector('.ian-txt').innerHTML='<strong>Good Food IA analiza '+Math.round(Math.random()*200+800).toLocaleString('es-ES')+' combinaciones:</strong> '+rec+'<br><span style="color:#C9A84C;font-weight:600;">'+accion+'</span>';
-}
-
-// CHAT IA EJECUTIVO con API Anthropic
-const chatContext = `Eres el asistente ejecutivo de Good Food IA, un sistema de gestión de restaurantes con IA de 4ª generación. Respondes preguntas del director/propietario del restaurante con datos concretos y reales.
-
-DATOS ACTUALES DEL RESTAURANTE:
-- Ingresos hoy: 4.280€ (▲+12% vs ayer)
-- Margen bruto hoy: 65,1% (objetivo 60%)
-- Food cost actual: 28,4% (objetivo 27%) — desviación lubina +1,4%
-- Ocupación almuerzo: 78% (42 cubiertos). Cena prevista: 94%
-- Ticket medio: 38,40€
-- Mejor turno semana: Viernes cena — margen 68,4%
-- Peor turno: Lunes cena — margen 58,5% (baja ocupación)
-- Ingresos mensuales: 112.480€ (▲+11% vs febrero)
-- Margen mes: 65,1% — mejor mes del año
-- Cubiertos mes: 2.934 (▲+8%)
-- Plato con peor rentabilidad: foie a la plancha — score IA 3,8/10, rotación baja, margen 60%
-- Plato estrella: chuletón Black Angus — score IA 9,2/10, margen 70%, rotación alta
-- Alertas activas: 3 críticas (food cost lubina, stock solomillo, no-show mesa 8)
-- Pedidos automáticos generados hoy: 3 (sin intervención humana)
-- Domingo: históricamente ocupación 45%, margen 52% — por debajo del umbral rentable
-
-Responde siempre en español, de forma concisa y directa, con datos concretos. Máximo 3-4 líneas. Usa emojis cuando sea natural. Tutea siempre al director.`;
-
-async function sendChat(){
-  const input=document.getElementById('chat-input');
-  const msgs=document.getElementById('chat-msgs');
-  if(!input||!msgs||!input.value.trim()) return;
-  const txt=input.value.trim(); input.value='';
-  msgs.innerHTML+=`<div style="max-width:80%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#C9A84C;color:#1A1208;align-self:flex-end;"><div style="font-size:.5rem;font-weight:700;color:rgba(26,18,8,.5);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Tú</div>${txt}</div>`;
-  msgs.scrollTop=msgs.scrollHeight;
-  const thinking=document.createElement('div');
-  thinking.style.cssText='max-width:85%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:rgba(232,224,208,.5);align-self:flex-start;border-left:3px solid #C9A84C;';
-  thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Good Food IA</div>Analizando datos del restaurante...';
-  msgs.appendChild(thinking); msgs.scrollTop=msgs.scrollHeight;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:chatContext,messages:[{role:'user',content:txt}]})});
-    const data=await res.json();
-    const reply=data.content?.[0]?.text||'No pude obtener datos en este momento.';
-    thinking.style.color='#E8E0D0';
-    thinking.querySelector('div').nextSibling.textContent='';
-    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Good Food IA</div>'+reply.replace(/\n/g,'<br>');
-  }catch(e){
-    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Good Food IA</div>Error de conexión. Inténtalo de nuevo.';
-  }
-  msgs.scrollTop=msgs.scrollHeight;
-}
-
-function chatQuick(q){
-  const input=document.getElementById('chat-input');
-  if(input){input.value=q;sendChat();}
 }
 
 // ══════════════ EMPLEADO ══════════════
@@ -2619,7 +2572,7 @@ function buildEmpleado(){
         <span style="padding:3px 10px;border-radius:20px;font-size:.56rem;font-weight:700;background:rgba(201,168,76,.2);color:#E8C96B;border:1px solid rgba(201,168,76,.35);">&#9679; Lubina &middot; Stock m&#237;nimo</span>
         <span style="padding:3px 10px;border-radius:20px;font-size:.56rem;font-weight:700;background:rgba(26,107,48,.2);color:#6EE7A0;border:1px solid rgba(26,107,48,.35);">&#10003; Cena 94% prevista</span>
       </div>
-      <div style="margin-top:12px;background:rgba(0,0,0,.25);border-radius:10px;padding:10px 14px;border-left:3px solid #C9A84C;">
+      <div style="margin-top:12px;background:rgba(0,0,0,.25);border-radius:10px;padding:10px 14px;border:1px solid rgba(201,168,76,.3);">
         <div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;">Briefing IA &middot; Lo m&#225;s urgente ahora</div>
         <div style="font-size:.68rem;color:rgba(232,224,208,.75);line-height:1.6;">Mesa 5 tiene al&#233;rgeno a gluten activo &mdash; chef notificado autom&#225;ticamente. Lubina para 3 raciones: marcar en sala. Director confirm&#243; camarero extra a las 20:30.</div>
       </div>
@@ -2644,7 +2597,7 @@ function buildEmpleado(){
       <div style="display:flex;flex-direction:column;gap:12px;">
         <div class="card">
           <div class="card-hdr card-hdr-terra">⚠ Alerta alérgeno activa <span class="card-ia">IA</span></div>
-          <div class="ian" style="border-left-color:#D4572A;margin-top:0;">
+          <div class="ian" style="border-color:#D4572A;margin-top:0;">
             <div class="ian-ico">🚨</div>
             <div class="ian-txt"><strong>Mesa 5 · 4 pax · 21:00</strong><br>Comensal con alergia a <strong>gluten y frutos secos</strong>. Good Food IA bloqueó automáticamente los platos con estos alérgenos en la comanda. Chef notificado.</div>
           </div>
@@ -2738,15 +2691,15 @@ function buildEmpleado(){
       <div class="card">
         <div class="card-hdr">Perfil comensales VIP · turno</div>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="background:#FAF7F2;border-radius:8px;padding:12px;border-left:3px solid #C9A84C;">
+          <div style="background:#FAF7F2;border-radius:8px;padding:12px;border:1px solid rgba(201,168,76,.3);">
             <div style="font-size:.72rem;font-weight:700;color:#1A1208;margin-bottom:4px;">García Martín · Mesa 3</div>
             <div style="font-size:.64rem;color:#8B6B3A;line-height:1.6;">12ª visita · último: hace 3 semanas<br>Plato favorito: chuletón poco hecho<br>Vino habitual: Ribera del Duero<br>Alérgenos: ninguno<br><span style="color:#C9A84C;font-weight:600;">→ IA sugiere: ofrecer nueva selección de vinos</span></div>
           </div>
-          <div style="background:#FAF7F2;border-radius:8px;padding:12px;border-left:3px solid #D4572A;">
+          <div style="background:#FAF7F2;border-radius:8px;padding:12px;border:1px solid rgba(212,87,42,.35);">
             <div style="font-size:.72rem;font-weight:700;color:#1A1208;margin-bottom:4px;">Díaz Romero · Mesa 4+5 · Cumpleaños</div>
             <div style="font-size:.64rem;color:#8B6B3A;line-height:1.6;">1ª visita · ocasión especial<br>8 pax · menú cerrado<br>Alérgenos: ninguno<br><span style="color:#D4572A;font-weight:600;">→ Recordatorio: postre con vela a las 22:15</span></div>
           </div>
-          <div style="background:#FAF7F2;border-radius:8px;padding:12px;border-left:3px solid #C9A84C;">
+          <div style="background:#FAF7F2;border-radius:8px;padding:12px;border:1px solid rgba(201,168,76,.3);">
             <div style="font-size:.72rem;font-weight:700;color:#1A1208;margin-bottom:4px;">López Fernández · Mesa 1</div>
             <div style="font-size:.64rem;color:#8B6B3A;line-height:1.6;">7ª visita · siempre piden entrantes<br>Prefieren mesa tranquila · interior<br><span style="color:#C9A84C;font-weight:600;">→ IA asignó mesa 1 por preferencia histórica</span></div>
           </div>
@@ -3092,7 +3045,7 @@ function buildCliente(){
           ${['Quiero cenar el sábado para 2','Mesa para cumpleaños de 8 personas','Somos celíacos, ¿podéis atendernos?','¿Tenéis mesa tranquila para una reunión?','Menú degustación para el viernes'].map(q=>`<button onclick="clienteChatQuick('${q}')" style="padding:4px 10px;border:1px solid rgba(201,168,76,.35);border-radius:6px;background:rgba(201,168,76,.08);font-family:'Space Grotesk',sans-serif;font-size:.58rem;color:#8B6B3A;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(201,168,76,.18)';this.style.color='#1A1208'" onmouseout="this.style.background='rgba(201,168,76,.08)';this.style.color='#8B6B3A'">${q}</button>`).join('')}
         </div>
         <div id="cliente-chat-msgs" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px;padding:2px 0;">
-          <div style="max-width:88%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:#E8E0D0;align-self:flex-start;border-left:3px solid #C9A84C;">
+          <div style="max-width:88%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:#E8E0D0;align-self:flex-start;border:1px solid rgba(201,168,76,.3);">
             <div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Good Food IA</div>
             ¡Hola Laura! 👋 Encantados de verte de nuevo. Llevas <strong style="color:#C9A84C;">7 visitas</strong> con nosotros. ¿Cuándo quieres venir y para cuántas personas? Puedes escribirme con total naturalidad.
           </div>
@@ -3162,7 +3115,7 @@ function buildCliente(){
       </div>
       <div class="card">
         <div class="card-hdr card-hdr-terra">No disponible para ti <span class="card-ia">IA</span></div>
-        <div class="ian" style="margin-bottom:10px;border-left-color:#D4572A;margin-top:0;">
+        <div class="ian" style="margin-bottom:10px;border-color:#D4572A;margin-top:0;">
           <div class="ian-ico">ℹ️</div>
           <div class="ian-txt">Good Food IA ha filtrado los platos que contienen alérgenos de tu perfil. Puedes pedirlos con modificaciones si lo deseas.</div>
         </div>
@@ -3419,34 +3372,37 @@ function buildCliente(){
   `;
 }
 
-// Chat reserva cliente con API Anthropic
-const clienteChatContext=`Eres el asistente de reservas de Good Food IA, un restaurante de alta cocina en España. Respondes en español, de forma cálida y natural, como si fuera un maître digital. El cliente se llama Laura García, tiene 7 visitas, es alérgica a gluten y frutos secos, le gusta el chuletón y el vino de Ribera del Duero. Cuando el cliente pide reserva, propones opciones concretas con día, hora y mesa disponible. Máximo 3-4 líneas. Usa emojis con moderación.`;
-
-async function clienteSendChat(){
-  const input=document.getElementById('cliente-chat-input');
-  const msgs=document.getElementById('cliente-chat-msgs');
+// Reserva cliente — respuestas IA simuladas (Fase 1, sin API externa)
+var _clienteReplies=[
+  'He revisado la agenda · <strong style="color:#C9A84C;">Martes 21:00 · Mesa 3 (interior tranquila)</strong>. Mesa reservada a tu nombre · sin gluten ni frutos secos confirmado con cocina. Confirmación enviada al email. ✓',
+  'Tengo 2 opciones para ti · <strong style="color:#C9A84C;">Jueves 13:00</strong> o <strong style="color:#C9A84C;">Jueves 21:00</strong>. He avisado a sala para preparar tu sitio habitual. Avisa con un click cuál prefieres y la dejo confirmada.',
+  'Reservado ✓ · he dejado anotada la alergia a gluten y frutos secos para cocina. Te he añadido el maridaje Ribera del Duero que te gustó la última vez. Código de reserva GF-2024-092.',
+  'Hecho · mesa grande reservada para el sábado 21:00. He avisado a Carlos (jefe de sala) para que prepare decoración de cumpleaños. Menú sin gluten adaptado para ti.',
+  'He cruzado tu perfil con la carta de esta semana. <strong style="color:#C9A84C;">Chuletón Black Angus · risotto de setas · vino Ribera del Duero</strong> — todo apto y en tu línea. Reserva abierta para cuando quieras.'
+];
+var _clienteReplyIdx=0;
+function clienteSendChat(){
+  var input=document.getElementById('cliente-chat-input');
+  var msgs=document.getElementById('cliente-chat-msgs');
   if(!input||!msgs||!input.value.trim()) return;
-  const txt=input.value.trim(); input.value='';
-  msgs.innerHTML+=`<div style="max-width:80%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#C9A84C;color:#1A1208;align-self:flex-end;"><div style="font-size:.5rem;font-weight:700;color:rgba(26,18,8,.5);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Tú</div>${txt}</div>`;
+  var txt=input.value.trim(); input.value='';
+  msgs.innerHTML+='<div style="max-width:80%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#C9A84C;color:#1A1208;align-self:flex-end;"><div style="font-size:.5rem;font-weight:700;color:rgba(26,18,8,.5);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Tú</div>'+txt+'</div>';
   msgs.scrollTop=msgs.scrollHeight;
-  const thinking=document.createElement('div');
-  thinking.style.cssText='max-width:88%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:rgba(232,224,208,.5);align-self:flex-start;border-left:3px solid #C9A84C;';
+  var thinking=document.createElement('div');
+  thinking.style.cssText='max-width:88%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:rgba(232,224,208,.5);align-self:flex-start;border:1px solid rgba(201,168,76,.3);';
   thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>Buscando disponibilidad...';
   msgs.appendChild(thinking); msgs.scrollTop=msgs.scrollHeight;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:clienteChatContext,messages:[{role:'user',content:txt}]})});
-    const data=await res.json();
-    const reply=data.content?.[0]?.text||'No pude procesar tu petición. Inténtalo de nuevo.';
+  setTimeout(function(){
+    var reply=_clienteReplies[_clienteReplyIdx%_clienteReplies.length];
+    _clienteReplyIdx++;
     thinking.style.color='#E8E0D0';
-    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>'+reply.replace(/\n/g,'<br>');
-  }catch(e){
-    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>Error de conexión. Inténtalo de nuevo.';
-  }
-  msgs.scrollTop=msgs.scrollHeight;
+    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>'+reply;
+    msgs.scrollTop=msgs.scrollHeight;
+  }, 900);
 }
 
 function clienteChatQuick(q){
-  const input=document.getElementById('cliente-chat-input');
+  var input=document.getElementById('cliente-chat-input');
   if(input){input.value=q;clienteSendChat();}
 }
 
@@ -3820,7 +3776,7 @@ function buildProveedor(){
           <div class="com-chat-status"><div class="com-chat-status-dot"></div>En l&#237;nea</div>
         </div>
         <div class="com-messages" id="prov-chat-msgs">
-        <div style="max-width:88%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:#E8E0D0;align-self:flex-start;border-left:3px solid #C9A84C;">
+        <div style="max-width:88%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:#E8E0D0;align-self:flex-start;border:1px solid rgba(201,168,76,.3);">
           <div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Good Food IA</div>
           Hola 👋 Tienes un pedido pendiente de confirmación (#GF-2025-089 · solomillo 8kg). ¿Puedes confirmar disponibilidad para entrega mañana a las 10:00?
         </div>
@@ -3828,7 +3784,7 @@ function buildProveedor(){
           <div style="font-size:.5rem;font-weight:700;color:rgba(26,18,8,.5);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Carnes Ibáñez</div>
           Confirmado. Entregamos mañana entre 10:00 y 10:30. Piezas de 28-30 días maduración como siempre.
         </div>
-        <div style="max-width:88%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:#E8E0D0;align-self:flex-start;border-left:3px solid #C9A84C;">
+        <div style="max-width:88%;padding:11px 14px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:#E8E0D0;align-self:flex-start;border:1px solid rgba(201,168,76,.3);">
           <div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:4px;text-transform:uppercase;">Good Food IA</div>
           Perfecto, pedido confirmado ✓. Una nota: el último lote de lubina presentó calibrado irregular (score bajó a 7,2). Para el próximo pedido, ¿podéis garantizar piezas de 500-600g uniformes?
         </div>
@@ -3853,34 +3809,37 @@ function buildProveedor(){
   },120);
 }
 
-// Chat proveedor con API Anthropic
-const provChatContext=`Eres el asistente de Good Food IA gestionando la comunicación con el proveedor Carnes Ibáñez S.L. Respondes en español, de forma profesional y directa. Tienes información sobre pedidos activos, historial de entregas y valoración del proveedor (score 9,1/10). Si el proveedor confirma entregas o informa de retrasos, responde de forma eficiente y actualiza el estado. Máximo 2-3 líneas.`;
-
-async function provSendChat(){
-  const input=document.getElementById('prov-chat-input');
-  const msgs=document.getElementById('prov-chat-msgs');
+// Comunicación proveedor — respuestas IA simuladas (Fase 1, sin API externa)
+var _provReplies=[
+  'Recibido ✓ · he actualizado el estado del pedido <strong style="color:#C9A84C;">#GF-2025-089</strong> a «confirmado». Aviso a Miguel R. (director) por notificación push. Tu score semanal se mantiene en 9,1/10.',
+  'Anotado · he desplazado el resto de pedidos de la ruta para amortiguar el retraso. He avisado al jefe de cocina con 2h de antelación para reorganizar el mise en place.',
+  'Registrado en el sistema. Si puedes servir piezas calibradas 500-600g uniformes, tu score volvería a 9,3 la próxima semana. He reservado hueco para un pedido extra el lunes.',
+  'He agendado el siguiente pedido para <strong style="color:#C9A84C;">lunes 10:00</strong>. Basado en consumo real: solomillo 6kg + lubina 4kg calibrada. Confirmación automática enviada a tu email.',
+  'Recibido ✓ · he notificado a sala para que adapten la carta del especial. Buen aviso · así evitamos romper stock en la cena.'
+];
+var _provReplyIdx=0;
+function provSendChat(){
+  var input=document.getElementById('prov-chat-input');
+  var msgs=document.getElementById('prov-chat-msgs');
   if(!input||!msgs||!input.value.trim()) return;
-  const txt=input.value.trim(); input.value='';
-  msgs.innerHTML+=`<div style="max-width:80%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#C9A84C;color:#1A1208;align-self:flex-end;"><div style="font-size:.5rem;font-weight:700;color:rgba(26,18,8,.5);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Carnes Ibáñez</div>${txt}</div>`;
+  var txt=input.value.trim(); input.value='';
+  msgs.innerHTML+='<div style="max-width:80%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#C9A84C;color:#1A1208;align-self:flex-end;"><div style="font-size:.5rem;font-weight:700;color:rgba(26,18,8,.5);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Carnes Ibáñez</div>'+txt+'</div>';
   msgs.scrollTop=msgs.scrollHeight;
-  const thinking=document.createElement('div');
-  thinking.style.cssText='max-width:88%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:rgba(232,224,208,.5);align-self:flex-start;border-left:3px solid #C9A84C;';
+  var thinking=document.createElement('div');
+  thinking.style.cssText='max-width:88%;padding:10px 13px;border-radius:12px;font-size:.7rem;line-height:1.7;background:#1A1208;color:rgba(232,224,208,.5);align-self:flex-start;border:1px solid rgba(201,168,76,.3);';
   thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>Procesando...';
   msgs.appendChild(thinking); msgs.scrollTop=msgs.scrollHeight;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:provChatContext,messages:[{role:'user',content:txt}]})});
-    const data=await res.json();
-    const reply=data.content?.[0]?.text||'No pude procesar tu mensaje.';
+  setTimeout(function(){
+    var reply=_provReplies[_provReplyIdx%_provReplies.length];
+    _provReplyIdx++;
     thinking.style.color='#E8E0D0';
-    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>'+reply.replace(/\n/g,'<br>');
-  }catch(e){
-    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>Error de conexión.';
-  }
-  msgs.scrollTop=msgs.scrollHeight;
+    thinking.innerHTML='<div style="font-size:.5rem;font-weight:700;color:rgba(201,168,76,.6);letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase;">Good Food IA</div>'+reply;
+    msgs.scrollTop=msgs.scrollHeight;
+  }, 900);
 }
 
 function provChatQuick(q){
-  const input=document.getElementById('prov-chat-input');
+  var input=document.getElementById('prov-chat-input');
   if(input){input.value=q;provSendChat();}
 }
 

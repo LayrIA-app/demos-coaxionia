@@ -1192,6 +1192,90 @@ input,textarea,select,button{max-width:100%;}
 .excl-bar-sep{opacity:.5;margin:0 4px;}
 .excl-bar-desc{font-weight:400;opacity:.9;}
 
+/* ═══════════════════════════════════
+   REGLA 10 · Modal universal de elemento
+═══════════════════════════════════ */
+#wmOverlay{display:none;position:fixed;inset:0;z-index:1200;background:rgba(13,32,16,.55);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:18px;}
+#wmOverlay.show{display:flex;animation:modalFadeIn .2s ease;}
+.wm-box{background:#fff;border-radius:18px;width:100%;max-width:640px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:modalSlideIn .25s cubic-bezier(.22,.61,.36,1);}
+.wm-head{display:flex;align-items:flex-start;gap:14px;padding:20px 22px 16px;background:linear-gradient(135deg,#0D7A30,#0A5C22);color:#fff;flex-shrink:0;}
+.wm-head-ico{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,.18);}
+.wm-head-ico svg{width:22px;height:22px;}
+.wm-head-text{flex:1;min-width:0;}
+.wm-head-eyebrow{font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:3px;}
+.wm-head-title{font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:900;line-height:1.1;letter-spacing:.01em;}
+.wm-head-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;align-items:center;}
+.wm-head-date{font-size:.62rem;color:rgba(255,255,255,.7);font-weight:600;}
+.wm-head-badge{font-family:'Montserrat',sans-serif;font-size:.5rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.18);color:#fff;}
+.wm-head-badge.green{background:rgba(76,175,48,.85);}
+.wm-head-badge.amber{background:rgba(255,180,0,.85);color:#3a2900;}
+.wm-head-badge.red{background:rgba(192,57,43,.85);}
+.wm-head-badge.orange{background:rgba(255,107,43,.85);}
+.wm-head-close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.12);border:none;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.wm-head-close:hover{background:rgba(255,107,43,.45);}
+.wm-body{padding:20px 22px;overflow-y:auto;flex:1;background:#FAF7F2;}
+.wm-body::-webkit-scrollbar{width:5px;}
+.wm-body::-webkit-scrollbar-thumb{background:rgba(13,122,48,.2);border-radius:3px;}
+.wm-section{margin-bottom:18px;}
+.wm-section:last-child{margin-bottom:0;}
+.wm-section-title{font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#0D7A30;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.wm-section-title::before{content:'';width:3px;height:12px;background:#FF6B2B;border-radius:2px;display:block;}
+.wm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+.wm-field{background:#fff;border:1px solid rgba(13,122,48,.1);border-radius:10px;padding:10px 12px;}
+.wm-field-lbl{font-size:.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(13,32,16,.45);margin-bottom:3px;}
+.wm-field-val{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:800;color:#0D2010;line-height:1.2;}
+.wm-field-val.mono{font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:600;}
+.wm-block{background:#fff;border:1px solid rgba(13,122,48,.1);border-radius:10px;padding:14px 16px;font-size:.72rem;line-height:1.6;color:rgba(13,32,16,.7);}
+.wm-block strong{color:#0D2010;font-weight:700;}
+.wm-block.warn{background:rgba(255,107,43,.05);border-color:rgba(255,107,43,.2);}
+.wm-block.success{background:rgba(13,122,48,.05);border-color:rgba(13,122,48,.18);}
+.wm-block.danger{background:rgba(192,57,43,.05);border-color:rgba(192,57,43,.2);}
+.wm-list{display:flex;flex-direction:column;gap:8px;}
+.wm-list-row{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;background:#fff;border:1px solid rgba(13,122,48,.08);border-radius:8px;font-size:.7rem;}
+.wm-list-row strong{color:#0D2010;font-weight:700;}
+.wm-list-row span{color:#0D7A30;font-weight:700;}
+.wm-line{height:1px;background:rgba(13,122,48,.08);margin:14px 0;}
+.wm-edit-input,.wm-edit-textarea{width:100%;padding:9px 11px;background:#fff;border:1px solid rgba(13,122,48,.18);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:.72rem;color:#0D2010;outline:none;transition:border-color .15s;}
+.wm-edit-input:focus,.wm-edit-textarea:focus{border-color:#0D7A30;}
+.wm-edit-textarea{resize:vertical;min-height:64px;line-height:1.5;}
+.wm-edit-row{margin-bottom:10px;}
+.wm-edit-row label{display:block;font-size:.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(13,32,16,.45);margin-bottom:4px;}
+.wm-foot{padding:14px 22px;background:#fff;border-top:1px solid rgba(13,122,48,.08);display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-shrink:0;flex-wrap:wrap;}
+.wm-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:9px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;transition:transform .12s,box-shadow .12s,background .12s;}
+.wm-btn:hover{transform:translateY(-1px);}
+.wm-btn-edit{background:rgba(13,122,48,.08);color:#0D7A30;border:1px solid rgba(13,122,48,.2);}
+.wm-btn-edit:hover{background:rgba(13,122,48,.15);}
+.wm-btn-send{background:linear-gradient(135deg,#0D7A30,#4CAF30);color:#fff;box-shadow:0 4px 14px rgba(13,122,48,.3);position:relative;}
+.wm-btn-send:hover{box-shadow:0 6px 18px rgba(13,122,48,.4);}
+.wm-btn-confirm{background:linear-gradient(135deg,#FF6B2B,#FF8c5b);color:#fff;box-shadow:0 4px 14px rgba(255,107,43,.32);}
+.wm-btn-confirm:hover{box-shadow:0 6px 18px rgba(255,107,43,.4);}
+.wm-btn-ghost{background:transparent;color:rgba(13,32,16,.5);border:1px solid rgba(13,32,16,.12);}
+.wm-btn-ghost:hover{background:rgba(13,32,16,.04);}
+.wm-send-menu{position:relative;display:inline-flex;}
+.wm-send-pop{display:none;position:absolute;bottom:calc(100% + 8px);right:0;background:#fff;border:1px solid rgba(13,122,48,.15);border-radius:10px;padding:6px;box-shadow:0 14px 36px rgba(0,0,0,.18);z-index:10;min-width:200px;animation:modalFadeIn .15s ease;}
+.wm-send-menu.open .wm-send-pop{display:block;}
+.wm-send-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.7rem;font-weight:700;color:#0D2010;background:transparent;border:none;width:100%;text-align:left;transition:background .12s;}
+.wm-send-opt:hover{background:rgba(13,122,48,.06);}
+.wm-send-opt-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;}
+.wm-send-opt.email .wm-send-opt-ico{background:#378ADD;}
+.wm-send-opt.wapp .wm-send-opt-ico{background:#25D366;}
+.wm-send-opt-meta{display:block;font-size:.55rem;color:rgba(13,32,16,.4);font-weight:500;margin-top:1px;letter-spacing:.04em;}
+
+@media (max-width:768px){
+  #wmOverlay{padding:0;align-items:flex-end;}
+  .wm-box{max-height:96vh;border-radius:18px 18px 0 0;max-width:100%;}
+  .wm-head{padding:16px 16px 14px;}
+  .wm-body{padding:14px 16px;}
+  .wm-foot{padding:12px 14px;flex-direction:column;align-items:stretch;}
+  .wm-btn,.wm-send-menu{width:100%;}
+  .wm-btn{justify-content:center;}
+  .wm-send-pop{position:fixed;bottom:auto;top:auto;right:14px;left:14px;min-width:0;width:auto;}
+}
+@media (max-width:480px){
+  .wm-head-title{font-size:1.2rem;}
+  .wm-grid{grid-template-columns:1fr;}
+}
+
 </style>
 <script>
 function kpisData(){
@@ -1242,14 +1326,14 @@ function entrarDesdeLogin(){
 
 var lt=String.fromCharCode(60),gt=String.fromCharCode(62),q=String.fromCharCode(34),ap=String.fromCharCode(39);
 var actividadesData=[
-  ['09:00','Rafting Sierra Nevada','AR','#0D7A30','Ana R.','12 pers','green','Confirmado','Nivel medio. 2 menores. Alergias: 1 participante. Equipo completo revisado.'],
-  ['11:30','Barranquismo Ruta 3','CM','#FF6B2B','Carlos M.','8 pers','green','Confirmado','Todos nivel avanzado. Equipamiento completo. Sin incidencias previas.'],
-  ['14:00','Kayak Lago Azul','AR','#0D7A30','Ana R.','6 pers','amber','Pendiente','Grupo familiar. Nivel iniciación. Confirmar material infantil. 2 menores.'],
-  ['16:00','Senderismo Pico Norte','PL','#4CAF30','Pedro L.','14 pers','green','Confirmado','Grupo mixto nivel medio. Ruta de 12km. Botiquiín extra recomendado.'],
-  ['17:30','Tirolina Aventura','CM','#FF6B2B','Carlos M.','10 pers','red','Riesgo clima','ALERTA: Viento 45km/h previsto. IA recomienda actividad alternativa: Escalada cubierta.'],
-  ['18:00','Escalada Viña','AR','#0D7A30','Ana R.','4 pers','green','Confirmado','Grupo avanzado. Vía equipada. Arneses revisados.'],
-  ['19:00','Parapente Vuelo','EB','#2D8A30','Expert B.','3 pers','amber','Pendiente','Pendiente confirmación condiciones meteorológicas. Vuelo biplaza.'],
-  ['20:00','Orientación Nocturna','PL','#4CAF30','Pedro L.','8 pers','green','Confirmado','Grupo adultos. Linternas frontales incluidas. Ruta 6km.']
+  ['09:00','Rafting Sierra Nevada','AR','#0D7A30','Ana R.','12 pers','green','Confirmado','Nivel medio. 2 menores. Alergias: 1 participante. Equipo completo revisado.','TechCorp Madrid','RES-2841','130€'],
+  ['11:30','Barranquismo Ruta 3','CM','#FF6B2B','Carlos M.','8 pers','green','Confirmado','Todos nivel avanzado. Equipamiento completo. Sin incidencias previas.','Grupo Outdoor BCN','RES-2902','170€'],
+  ['14:00','Kayak Lago Azul','AR','#0D7A30','Ana R.','6 pers','amber','Pendiente','Grupo familiar. Nivel iniciación. Confirmar material infantil. 2 menores.','Familia García','RES-2950','90€'],
+  ['16:00','Senderismo Pico Norte','PL','#4CAF30','Pedro L.','14 pers','green','Confirmado','Grupo mixto nivel medio. Ruta de 12km. Botiquín extra recomendado.','Centro Escolar Pinar','RES-3010','70€'],
+  ['17:30','Tirolina Aventura','CM','#FF6B2B','Carlos M.','10 pers','red','Riesgo clima','ALERTA: Viento 45km/h previsto. IA recomienda actividad alternativa: Escalada cubierta.','Aventureros Norte','RES-3055','140€'],
+  ['18:00','Escalada Viña','AR','#0D7A30','Ana R.','4 pers','green','Confirmado','Grupo avanzado. Vía equipada. Arneses revisados.','Pareja Martínez','RES-3070','150€'],
+  ['19:00','Parapente Vuelo','EB','#2D8A30','Expert B.','3 pers','amber','Pendiente','Pendiente confirmación condiciones meteorológicas. Vuelo biplaza.','Aventura Solo','RES-3088','220€'],
+  ['20:00','Orientación Nocturna','PL','#4CAF30','Pedro L.','8 pers','green','Confirmado','Grupo adultos. Linternas frontales incluidas. Ruta 6km.','Pareja Lopez','RES-3102','70€']
 ];
 var charts={};
 var _kpiIdx=0;
@@ -1303,6 +1387,186 @@ function wildNavReserva(nombre){
 function notifNuevaParte(){addNotif('Nueva incidencia abierta · Director notificado','red','Incidencias');}
 function notifCancelada(){addNotif('Actividad cancelada · Grupo notificado automáticamente','amber','Incidencias');}
 function notifAlternativa(){addNotif('Alternativa asignada · Grupo notificado','green','Incidencias');}
+
+/* ═══════════════════════════════════
+   REGLA 10 · Sistema de modal universal
+   wmOpen({eyebrow,title,date,badge,badgeColor,icon,sections[],editToast,sendEmailTo,sendEmailSubject,sendEmailBody,sendWhatsAppPhone,sendWhatsAppText})
+═══════════════════════════════════ */
+function wmIcon(name){
+  var icons={
+    activity:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    booking:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    briefing:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+    incident:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    draft:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    package:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    user:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    cpu:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+    bolt:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
+  };
+  return icons[name]||icons.activity;
+}
+
+function wmEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function wmRenderSection(sec){
+  if(sec.type==='grid'){
+    var html='<div class="wm-grid">';
+    sec.fields.forEach(function(f){
+      html+='<div class="wm-field"><div class="wm-field-lbl">'+wmEsc(f.label)+'</div><div class="wm-field-val'+(f.mono?' mono':'')+'">'+wmEsc(f.value)+'</div></div>';
+    });
+    return html+'</div>';
+  }
+  if(sec.type==='block'){
+    var cls=sec.style?(' '+sec.style):'';
+    return '<div class="wm-block'+cls+'">'+sec.html+'</div>';
+  }
+  if(sec.type==='list'){
+    var html2='<div class="wm-list">';
+    sec.items.forEach(function(it){html2+='<div class="wm-list-row"><strong>'+wmEsc(it.k)+'</strong><span>'+wmEsc(it.v)+'</span></div>';});
+    return html2+'</div>';
+  }
+  if(sec.type==='form'){
+    var html3='<div>';
+    sec.fields.forEach(function(f){
+      html3+='<div class="wm-edit-row"><label>'+wmEsc(f.label)+'</label>';
+      if(f.input==='textarea'){html3+='<textarea class="wm-edit-textarea" rows="'+(f.rows||3)+'">'+wmEsc(f.value)+'</textarea>';}
+      else{html3+='<input class="wm-edit-input" type="text" value="'+wmEsc(f.value)+'"/>';}
+      html3+='</div>';
+    });
+    return html3+'</div>';
+  }
+  return '';
+}
+
+function wmOpen(opts){
+  var ico=document.getElementById('wmHeadIco');
+  ico.innerHTML=wmIcon(opts.icon||'activity');
+  document.getElementById('wmEyebrow').textContent=opts.eyebrow||'';
+  document.getElementById('wmTitle').textContent=opts.title||'';
+  document.getElementById('wmDate').textContent=opts.date||'';
+  var badge=document.getElementById('wmBadge');
+  if(opts.badge){
+    badge.textContent=opts.badge;
+    badge.className='wm-head-badge'+(opts.badgeColor?(' '+opts.badgeColor):'');
+    badge.style.display='';
+  } else {
+    badge.style.display='none';
+  }
+
+  var body=document.getElementById('wmBody');
+  var html='';
+  (opts.sections||[]).forEach(function(sec){
+    if(sec.title)html+='<div class="wm-section"><div class="wm-section-title">'+wmEsc(sec.title)+'</div>'+wmRenderSection(sec)+'</div>';
+    else html+='<div class="wm-section">'+wmRenderSection(sec)+'</div>';
+  });
+  body.innerHTML=html;
+
+  var foot=document.getElementById('wmFoot');
+  var footHtml='';
+  if(opts.editToast!==null){
+    var et=(opts.editToast||('Abriendo editor · '+(opts.title||'elemento'))).replace(/'/g,'\\'+'\'');
+    footHtml+='<button type="button" class="wm-btn wm-btn-edit" onclick="wmEdit(\''+et+'\')">✎ Editar</button>';
+  }
+  if(opts.confirm){
+    footHtml+='<button type="button" class="wm-btn wm-btn-confirm" onclick="wmConfirm(\''+opts.confirm.toast.replace(/'/g,'\\'+'\'')+'\')">'+wmEsc(opts.confirm.label||'Confirmar')+'</button>';
+  }
+  if(opts.send!==false){
+    var emailTo=(opts.email&&opts.email.to)||'';
+    var emailSubj=(opts.email&&opts.email.subject)||(opts.title||'WildIA');
+    var emailBody=(opts.email&&opts.email.body)||'';
+    var waPhone=(opts.whatsapp&&opts.whatsapp.phone)||'';
+    var waText=(opts.whatsapp&&opts.whatsapp.text)||'';
+    footHtml+='<div class="wm-send-menu" id="wmSendMenu">'
+      +'<button type="button" class="wm-btn wm-btn-send" onclick="wmToggleSend(event)">📨 Enviar como está</button>'
+      +'<div class="wm-send-pop">'
+        +'<button type="button" class="wm-send-opt email" onclick="wmSendEmail('+wmAttr(emailTo)+','+wmAttr(emailSubj)+','+wmAttr(emailBody)+')">'
+          +'<span class="wm-send-opt-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>'
+          +'<span>Email<span class="wm-send-opt-meta">'+(emailTo||'elige destinatario')+'</span></span>'
+        +'</button>'
+        +'<button type="button" class="wm-send-opt wapp" onclick="wmSendWhatsApp('+wmAttr(waPhone)+','+wmAttr(waText)+')">'
+          +'<span class="wm-send-opt-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>'
+          +'<span>WhatsApp<span class="wm-send-opt-meta">'+(waPhone?'+'+waPhone:'elige contacto')+'</span></span>'
+        +'</button>'
+      +'</div>'
+    +'</div>';
+  }
+  foot.innerHTML=footHtml;
+
+  var ov=document.getElementById('wmOverlay');
+  ov.classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function wmAttr(s){return '"'+String(s==null?'':s).replace(/\\/g,'\\\\').replace(/"/g,'&quot;').replace(/'/g,'&#39;')+'"';}
+
+function wmClose(){
+  var ov=document.getElementById('wmOverlay');
+  ov.classList.remove('show');
+  document.body.style.overflow='';
+  var menu=document.getElementById('wmSendMenu');
+  if(menu)menu.classList.remove('open');
+}
+
+function wmEdit(toast){
+  wildToast(toast,'info');
+}
+
+function wmConfirm(toast){
+  wildToast(toast,'ok');
+  wmClose();
+}
+
+function wmToggleSend(e){
+  e.stopPropagation();
+  var menu=document.getElementById('wmSendMenu');
+  if(menu)menu.classList.toggle('open');
+}
+
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('wmSendMenu');
+  if(menu&&!menu.contains(e.target))menu.classList.remove('open');
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')wmClose();});
+
+function wmSendEmail(to,subject,body){
+  var url='mailto:'+(to||'')+'?subject='+encodeURIComponent(subject||'')+'&body='+encodeURIComponent(body||'');
+  window.open(url,'_blank');
+  wildToast('Abriendo tu cliente de email...','info');
+  var menu=document.getElementById('wmSendMenu');if(menu)menu.classList.remove('open');
+}
+function wmSendWhatsApp(phone,text){
+  var clean=String(phone||'').replace(/[^0-9]/g,'');
+  var url='https://wa.me/'+clean+'?text='+encodeURIComponent(text||'');
+  window.open(url,'_blank');
+  wildToast('Abriendo WhatsApp...','info');
+  var menu=document.getElementById('wmSendMenu');if(menu)menu.classList.remove('open');
+}
+
+/* Datos de cliente en contexto · usados por todos los modales */
+var clientesWildIA={
+  'TechCorp Madrid':{email:'eventos@techcorpmadrid.es',tel:'34611222333'},
+  'Familia García':{email:'pgarcia@gmail.com',tel:'34622334455'},
+  'Grupo Outdoor BCN':{email:'reservas@outdoorbcn.cat',tel:'34633445566'},
+  'Pareja Lopez':{email:'l.lopez@hotmail.com',tel:'34644556677'},
+  'Aventureros Norte':{email:'norte@aventureros.es',tel:'34655667788'},
+  'Centro Escolar Pinar':{email:'extraescolares@cepinar.edu',tel:'34666778899'},
+  'Pareja Martínez':{email:'martinez.pareja@yahoo.es',tel:'34677889900'},
+  'Aventura Solo':{email:'jpenya@gmail.com',tel:'34688990011'},
+  'Hotel Sierra Nevada':{email:'concierge@hotelsierranevada.es',tel:'34958123456'},
+  'Apartamentos Roca':{email:'reservas@aptosroca.com',tel:'34958234567'},
+  'Camping Eresma':{email:'info@campingeresma.com',tel:'34921345678'},
+  'Javi M.':{email:'javi.m@aventurero.es',tel:'34699112233'},
+  'Carlos D. (Director)':{email:'carlos.d@wildiaturismo.com',tel:'34911334455'},
+  'Ana R. (Guía)':{email:'ana.r@wildiaturismo.com',tel:'34611990011'},
+  'Carlos M. (Guía)':{email:'carlos.m@wildiaturismo.com',tel:'34622880022'},
+  'María S. (Guía)':{email:'maria.s@wildiaturismo.com',tel:'34633770033'},
+  'Pedro L. (Guía)':{email:'pedro.l@wildiaturismo.com',tel:'34644660044'},
+  'Laura V. (Guía)':{email:'laura.v@wildiaturismo.com',tel:'34655550055'},
+  'Expert B. (Guía)':{email:'expert.b@wildiaturismo.com',tel:'34666440066'},
+  'RRHH WildIA':{email:'rrhh@wildiaturismo.com',tel:'34911443322'}
+};
+function clienteCtx(nombre){return clientesWildIA[nombre]||{email:'',tel:''};}
 
 var _notifsDinamicas=[];
 
@@ -1686,28 +1950,78 @@ function tablaRendimientoGuias(){
 
 function verActividad(i){
   var f=actividadesData[i];
-  document.getElementById('act-hora').textContent=f[0];
-  document.getElementById('act-titulo').textContent=f[1];
-  document.getElementById('act-pers').textContent=f[5];
-  document.getElementById('act-estado').textContent=f[7];
-  document.getElementById('act-av').textContent=f[2];
-  document.getElementById('act-av').style.background=f[3];
-  document.getElementById('act-guia').textContent=f[4];
-  document.getElementById('act-briefing').textContent=f[8];
-  document.getElementById('act-overlay').classList.add('show');
+  var cliente=f[9],ref=f[10],importe=f[11];
+  var ctx=clienteCtx(cliente);
+  var badgeColor=f[6]==='red'?'red':f[6]==='amber'?'amber':'green';
+  var emailBody='Hola '+cliente+',\n\nTe confirmamos los detalles de tu actividad:\n\n• Actividad: '+f[1]+'\n• Fecha y hora: hoy '+f[0]+'h\n• Guía asignado: '+f[4]+'\n• Participantes: '+f[5]+'\n• Estado: '+f[7]+'\n• Referencia: '+ref+'\n• Importe: '+importe+'\n\nNotas operativas: '+f[8]+'\n\nCualquier cambio o duda, respóndenos a este email o por WhatsApp.\n\nUn abrazo,\nEquipo WildIA · Turismo Activo & Aventura';
+  var waText='Hola '+cliente+'! 👋 Confirmamos tu '+f[1]+' hoy a las '+f[0]+'h con '+f[4]+'. Estado: '+f[7]+'. Ref: '+ref+'. Cualquier cambio nos dices. Equipo WildIA 🏕️';
+  wmOpen({
+    eyebrow:'FICHA DE ACTIVIDAD · '+ref,
+    title:f[1],
+    date:'Hoy '+f[0]+'h',
+    badge:f[7],
+    badgeColor:badgeColor,
+    icon:'activity',
+    sections:[
+      {title:'Detalles operativos',type:'grid',fields:[
+        {label:'Hora',value:f[0]+'h'},
+        {label:'Guía asignado',value:f[4]},
+        {label:'Participantes',value:f[5]},
+        {label:'Importe',value:importe},
+        {label:'Estado',value:f[7]},
+        {label:'Referencia',value:ref,mono:true}
+      ]},
+      {title:'Cliente · prerrellenado IA',type:'grid',fields:[
+        {label:'Cliente',value:cliente},
+        {label:'Email',value:ctx.email,mono:true},
+        {label:'Teléfono',value:ctx.tel?'+'+ctx.tel:'—',mono:true}
+      ]},
+      {title:'Notas operativas IA',type:'block',style:f[6]==='red'?'danger':(f[6]==='amber'?'warn':'success'),html:'<strong>WildIA:</strong> '+wmEsc(f[8])}
+    ],
+    editToast:'Abriendo editor · '+f[1]+' · '+ref,
+    email:{to:ctx.email,subject:'Tu actividad WildIA · '+f[1]+' · '+ref,body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
 }
-function cerrarActModal(){document.getElementById('act-overlay').classList.remove('show');}
+function cerrarActModal(){wmClose();}
 
 function editarActividad(i){
   var f=actividadesData[i];
-  document.getElementById('edit-titulo').value=f[1];
-  document.getElementById('edit-hora').value=f[0];
-  document.getElementById('edit-guia').value=f[4];
-  document.getElementById('edit-estado').value=f[7];
-  document.getElementById('edit-overlay').classList.add('show');
+  var cliente=f[9],ref=f[10],importe=f[11];
+  var ctx=clienteCtx(cliente);
+  var emailBody='Hola '+cliente+',\n\nHemos actualizado los detalles de tu actividad:\n\n• Actividad: '+f[1]+'\n• Fecha y hora: hoy '+f[0]+'h\n• Guía asignado: '+f[4]+'\n• Estado: '+f[7]+'\n• Referencia: '+ref+'\n\nSi alguno de estos puntos no encaja, respóndenos y lo ajustamos.\n\nEquipo WildIA';
+  var waText='Hola '+cliente+'! Hemos actualizado tu actividad '+f[1]+' (hoy '+f[0]+'h, guía '+f[4]+', '+f[7]+'). Ref '+ref+'. ¿Todo OK?';
+  wmOpen({
+    eyebrow:'EDITAR ACTIVIDAD · '+ref,
+    title:f[1],
+    date:'Hoy '+f[0]+'h',
+    badge:'EDICIÓN',
+    badgeColor:'orange',
+    icon:'activity',
+    sections:[
+      {title:'Datos editables',type:'form',fields:[
+        {label:'Hora',input:'text',value:f[0]},
+        {label:'Actividad',input:'text',value:f[1]},
+        {label:'Guía',input:'text',value:f[4]},
+        {label:'Participantes',input:'text',value:f[5]},
+        {label:'Estado',input:'text',value:f[7]},
+        {label:'Notas operativas',input:'textarea',value:f[8]}
+      ]},
+      {title:'Cliente afectado',type:'list',items:[
+        {k:'Cliente',v:cliente},
+        {k:'Email',v:ctx.email||'—'},
+        {k:'Teléfono',v:ctx.tel?'+'+ctx.tel:'—'},
+        {k:'Importe',v:importe}
+      ]}
+    ],
+    editToast:null,
+    confirm:{label:'Guardar cambios',toast:'Cambios guardados · '+f[1]+' · '+ref},
+    email:{to:ctx.email,subject:'Cambios en tu actividad WildIA · '+f[1]+' · '+ref,body:emailBody},
+    whatsapp:{phone:ctx.tel,text:waText}
+  });
 }
-function cerrarEditModal(){document.getElementById('edit-overlay').classList.remove('show');}
-function guardarActividad(){cerrarEditModal();}
+function cerrarEditModal(){wmClose();}
+function guardarActividad(){wmClose();wildToast('Cambios guardados','ok');}
 
 function salir(){
   document.getElementById('appShell').style.display='none';
@@ -2304,6 +2618,26 @@ window.addEventListener('load', function(){
       <button class="lm-btn-primary" style="flex:1;padding:12px;" onclick="cerrarModal()">Solicitar acceso</button>
       <button class="lm-btn-secondary" style="padding:12px 16px;" onclick="cerrarModal()">Cerrar</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══ REGLA 10 · Modal universal de elemento ═══ -->
+<div id="wmOverlay" onclick="if(event.target===this)wmClose()" role="dialog" aria-modal="true" aria-labelledby="wmTitle">
+  <div class="wm-box" id="wmBox">
+    <div class="wm-head">
+      <div class="wm-head-ico" id="wmHeadIco"></div>
+      <div class="wm-head-text">
+        <div class="wm-head-eyebrow" id="wmEyebrow"></div>
+        <div class="wm-head-title" id="wmTitle"></div>
+        <div class="wm-head-meta">
+          <span class="wm-head-date" id="wmDate"></span>
+          <span class="wm-head-badge" id="wmBadge"></span>
+        </div>
+      </div>
+      <button class="wm-head-close" type="button" onclick="wmClose()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="wm-body" id="wmBody"></div>
+    <div class="wm-foot" id="wmFoot"></div>
   </div>
 </div>
 

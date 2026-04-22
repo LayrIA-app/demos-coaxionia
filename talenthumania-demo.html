@@ -270,7 +270,7 @@ input,textarea,select,button{max-width:100%;}
 .bell-badge{position:absolute;top:-6px;right:-8px;background:#E8386D;color:#fff;font-size:.55rem;font-weight:800;border-radius:10px;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #F5F0E8;font-family:'Montserrat',sans-serif;}
 #alerts-overlay{display:none;position:fixed;inset:0;z-index:9990;background:transparent;}
 #alerts-overlay.open{display:block;}
-#alerts-modal{position:fixed;top:52px;right:16px;width:360px;max-height:80vh;background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(26,8,16,.2);display:flex;flex-direction:column;overflow:hidden;z-index:9991;}
+#alerts-modal{position:fixed;top:52px;right:16px;width:min(360px,calc(100vw - 32px));max-height:80vh;background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(26,8,16,.2);display:flex;flex-direction:column;overflow:hidden;z-index:9991;}
 .alerts-head{padding:14px 18px;background:linear-gradient(135deg,#1a0810,#E8386D);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .alerts-head-title{color:#fff;font-weight:700;font-size:.88rem;font-family:'Montserrat',sans-serif;}
 .alerts-body{overflow-y:auto;flex:1;padding:8px;}

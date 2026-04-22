@@ -1164,7 +1164,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif}
 <div id="loginScreen">
   <div class="login-box">
     <!-- Panel izquierdo -->
-    <div class="ll">
+    <div class="ll login-left">
       <div class="ll-diag"></div>
       <div class="ll-orb1"></div>
       <div class="ll-orb2"></div>
@@ -4088,8 +4088,8 @@ function buildLabLogistica(){
     +'</div>'
     +'<div style="font-size:.65rem;color:var(--text2)">Kit inicial dañado en tránsito. Reexpedición automática solicitada. ETA nueva entrega: mañana antes de las 11:54.</div>'
     +'<div style="margin-top:8px;display:flex;gap:8px">'
-    +'<button style="font-size:.6rem;font-weight:700;padding:5px 12px;background:#0A0A0F;color:#fff;border:none;border-radius:8px;cursor:pointer">Gestionar</button>'
-    +'<button style="font-size:.6rem;font-weight:700;padding:5px 12px;background:rgba(255,255,255,.5);color:var(--text1);border:1px solid var(--border);border-radius:8px;cursor:pointer">Contactar paciente</button>'
+    +'<button onclick="showToastEH(&quot;Incidencia #REX-3471 · abriendo gestor de reexpedición&quot;)" style="font-size:.6rem;font-weight:700;padding:5px 12px;background:#0A0A0F;color:#fff;border:none;border-radius:8px;cursor:pointer">Gestionar</button>'
+    +'<button onclick="showToastEH(&quot;Contactando paciente · kit de reposición enviado por mensajería urgente&quot;)" style="font-size:.6rem;font-weight:700;padding:5px 12px;background:rgba(255,255,255,.5);color:var(--text1);border:1px solid var(--border);border-radius:8px;cursor:pointer">Contactar paciente</button>'
     +'</div></div></div></div>';
 }
 
@@ -5198,8 +5198,11 @@ input,textarea,select,button{max-width:100%;}
 }
 
 /* ── 5. FONT-SIZE ESCALADO MÓVIL (REGLA 2 COAXIONIA) ── */
+html{font-size:16px;}
 @media(max-width:768px){html{font-size:18.5px;}}
 @media(max-width:480px){html{font-size:19.2px;}}
+/* REGLA 6 · alias .login-left sobre panel izquierdo .ll */
+@media(max-width:768px){.login-left{display:none!important;}}
 
 /* ── 2. RESPONSIVE GRIDS PACIENTE ── */
 @media(max-width:768px){
@@ -7011,5 +7014,14 @@ function activateMedicoProfile(){
     setTimeout(function(){showN(notifs[0]);setInterval(function(){idx=(idx+1)%notifs.length;showN(notifs[idx]);},35000);},3000);
     var bdg=document.getElementById('bellBadgeMed');if(bdg){bdg.textContent='4';bdg.style.display='flex';}
   },1000);
+}
+
+// Toast helper para CTAs paciente (REGLA 9)
+function showToastEH(msg){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:#0A0A0F;color:#fff;padding:11px 22px;border-radius:10px;font-size:.78rem;font-weight:500;z-index:99999;max-width:calc(100vw - 32px);text-align:center;line-height:1.4;box-shadow:0 6px 24px rgba(0,0,0,.3);';
+  t.textContent=msg||'Listo';
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){if(t.parentNode)t.remove();},400);},2600);
 }
 </script>
